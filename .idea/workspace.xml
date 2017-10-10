@@ -2,19 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/character.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/color.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grid.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/heatmap.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/old_stuff.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/scatter.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/utils.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logos.pdf" afterPath="$PROJECT_DIR$/logos.pdf" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.ipynb_checkpoints/test_anylogo-checkpoint.ipynb" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/test_anylogo-checkpoint.ipynb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/anylogo.py" afterPath="$PROJECT_DIR$/anylogo.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_anylogo.ipynb" afterPath="$PROJECT_DIR$/test_anylogo.ipynb" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -28,8 +17,8 @@
       <file leaf-file-name="anylogo.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/anylogo.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="95">
-              <caret line="285" column="34" lean-forward="false" selection-start-line="285" selection-start-column="34" selection-end-line="285" selection-end-column="34" />
+            <state relative-caret-position="1156">
+              <caret line="291" column="0" lean-forward="true" selection-start-line="291" selection-start-column="0" selection-end-line="291" selection-end-column="0" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -190,6 +179,14 @@
       <option name="presentableId" value="Default" />
       <updated>1507225961489</updated>
     </task>
+    <task id="LOCAL-00001" summary="Major revision, including working Logo() class">
+      <created>1507606071324</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1507606071324</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -217,6 +214,10 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Major revision, including working Logo() class" />
+    <option name="LAST_COMMIT_MESSAGE" value="Major revision, including working Logo() class" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -259,6 +260,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="38">
           <caret line="2" column="0" lean-forward="true" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -266,6 +268,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="950">
           <caret line="55" column="0" lean-forward="true" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -310,6 +315,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1530">
           <caret line="105" column="22" lean-forward="false" selection-start-line="105" selection-start-column="22" selection-end-line="105" selection-end-column="32" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -338,6 +344,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="390">
           <caret line="56" column="1" lean-forward="false" selection-start-line="56" selection-start-column="1" selection-end-line="56" selection-end-column="1" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -345,6 +354,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="38">
           <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -370,8 +380,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/anylogo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="285" column="34" lean-forward="false" selection-start-line="285" selection-start-column="34" selection-end-line="285" selection-end-column="34" />
+        <state relative-caret-position="1156">
+          <caret line="291" column="0" lean-forward="true" selection-start-line="291" selection-start-column="0" selection-end-line="291" selection-end-column="0" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
