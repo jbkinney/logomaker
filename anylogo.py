@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 
 from utils import Box, SMALL
 import color
-import data
 from character import Character, DEFAULT_FONT
 import data
 import pdb
