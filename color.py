@@ -28,7 +28,7 @@ color_scheme_dict = {
         'TU': .8 * three_ones
     },
 
-    'base pairing': {
+    'base_pairing': {
         'TAU': [1, .55, 0],
         'GC': [0, 0, 1]
     },
