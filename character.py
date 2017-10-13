@@ -19,10 +19,13 @@ FONT_FILE_DICT = {}
 for font_file in font_file_list:
     base_name = os.path.basename(font_file)
     font_name = os.path.splitext(base_name)[0]
-    FONT_FILE_DICT[str(font_name)] = font_file
 
-# Get list of font names
-FONTS = FONT_FILE_DICT.keys()
+    # Test whether font name is a string
+    if isinstance(font_name, (str, unicode)):
+        FONT_FILE_DICT[str(font_name)] = font_file
+
+# Get list of font names and sort
+FONTS = list(FONT_FILE_DICT.keys())
 FONTS.sort()
 
 class Character:
