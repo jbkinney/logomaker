@@ -11,7 +11,15 @@ def validate_mat(mat):
     Runs assert statements to verify that df is indeed a motif dataframe.
     Returns a cleaned-up version of df if possible
     '''
+
+    # Copy and preserve logomaker_type
+    try:
+        mat_type = mat.logomaker_type
+    except:
+        mat_type = None
     mat = mat.copy()
+    mat.logomaker_type = mat_type
+
     assert type(mat) == pd.core.frame.DataFrame, 'Error: df is not a dataframe'
     cols = mat.columns
 
@@ -70,24 +78,30 @@ def validate_freq_mat(mat):
     # Normalize across columns
     mat.loc[:, :] = mat.values / mat.values.sum(axis=1)[:, np.newaxis]
 
-    return mat
-
-def validate_info_mat(mat):
-    '''
-     Verifies that the df is indeed an info motif dataframe.
-     Returns a cleaned-up version of df if possible
-     '''
-
-    # Validate as motif
-    mat = validate_mat(mat)
-
-    # Validate df values as info values
-    assert (all(mat.values.ravel() >= 0)), \
-        'Error: not all values in df are >=0.'
+    # Label matrix type
+    mat.logomaker_type = 'freq_mat'
 
     return mat
 
-def transform_mat(mat, from_type, to_type, background=None, beta=1, pseudocount=1):
+# def validate_info_mat(mat):
+#     '''
+#      Verifies that the df is indeed an info motif dataframe.
+#      Returns a cleaned-up version of df if possible
+#      '''
+#
+#     # Validate as motif
+#     mat = validate_mat(mat)
+#
+#     # Validate df values as info values
+#     assert (all(mat.values.ravel() >= 0)), \
+#         'Error: not all values in df are >=0.'
+#
+#     # Label matrix type
+#     mat.anylogo_type = 'info_mat'
+#
+#     return mat
+
+def transform_mat(mat, to_type, from_type=None,  background=None, beta=1, pseudocount=1):
     '''
     transform_mat(): transforms a matrix of one type into another.
     :param mat: input matrix, in data frame format
@@ -101,6 +115,13 @@ def transform_mat(mat, from_type, to_type, background=None, beta=1, pseudocount=
 
     # Check that mat is valid
     mat = validate_mat(mat)
+
+    # Get from_type if not specified
+    if from_type is None:
+        try:
+            from_type = mat.logomaker_type
+        except:
+            assert False, 'Cant determine from_type'
 
     # Create background mat
     bg_mat = set_bg_mat(background=None, mat=mat)
@@ -155,6 +176,7 @@ def count_mat_to_freq_mat(count_mat, pseudocount=1):
 
     # Validate and return
     freq_mat = validate_freq_mat(freq_mat)
+    freq_mat.logomaker_type = 'freq_mat'
     return freq_mat
 
 def energy_mat_to_freq_mat(energy_mat, bg_mat, beta=1):
@@ -174,6 +196,7 @@ def energy_mat_to_freq_mat(energy_mat, bg_mat, beta=1):
 
     # Validate and return
     freq_mat = validate_freq_mat(freq_mat)
+    freq_mat.logomaker_type = 'freq_mat'
     return freq_mat
 
 def weight_mat_to_freq_mat(weight_mat, bg_mat, base=2):
@@ -192,6 +215,7 @@ def weight_mat_to_freq_mat(weight_mat, bg_mat, base=2):
 
     # Validate and return
     freq_mat = validate_freq_mat(freq_mat)
+    freq_mat.logomaker_type = 'freq_mat'
     return freq_mat
 
 def freq_mat_to_energy_mat(freq_mat, bg_mat, beta):
@@ -209,6 +233,7 @@ def freq_mat_to_energy_mat(freq_mat, bg_mat, beta):
 
     # Validate and return
     energy_mat = validate_mat(energy_mat)
+    energy_mat.logomaker_type = 'energy_mat'
     return energy_mat
 
 def freq_mat_to_weight_mat(freq_mat, bg_mat):
@@ -220,10 +245,11 @@ def freq_mat_to_weight_mat(freq_mat, bg_mat):
 
     # Compute weight_mat
     weight_mat = freq_mat.copy()
-    weight_mat.loc[:,:]  = np.log2(freq_mat / bg_mat)
+    weight_mat.loc[:, :] = np.log2(freq_mat / bg_mat)
 
     # Validate and return
     weight_mat = validate_mat(weight_mat)
+    weight_mat.logomaker_type = 'weight_mat'
     return weight_mat
 
 # Needed only for display purposes
@@ -238,28 +264,18 @@ def freq_mat_to_info_mat(freq_mat, bg_mat):
     info_list = (freq_mat.values*np.log2(freq_mat.values/bg_mat.values))\
                     .sum(axis=1)
 
-    info_mat.loc[:,:] = freq_mat.values*info_list[:,np.newaxis]
+    info_mat.loc[:, :] = freq_mat.values*info_list[:,np.newaxis]
 
     # Validate and return
     info_mat = validate_mat(info_mat)
+    info_mat.logomaker_type = 'info_mat'
     return info_mat
-
-
-# def get_beta_for_effect_mat(effect_mat, bg_mat, target_info, \
-#                            min_beta=.001, max_beta=100, num_betas=1000):
-#     betas = np.exp(np.linspace(np.log(min_beta), np.log(max_beta), num_betas))
-#     infos = np.zeros(len(betas))
-#     for i, beta in enumerate(betas):
-#         prob_mat = effect_mat_to_prob_mat(effect_mat, bg_mat, beta)
-#         infos[i] = get_prob_mat_info(prob_mat, bg_mat)
-#     i = np.argmin(np.abs(infos - target_info))
-#     beta = betas[i]
-#     return beta
 
 # Normalize a data frame of energies
 def normalize_energy_mat(energy_mat):
     mat = energy_mat.copy()
     mat.loc[:, :] = mat.values - mat.values.mean(axis=1)[:, np.newaxis]
+    mat.logomaker_type = 'energy_mat'
     return mat
 
 # Normalize a data frame of probabilities
@@ -270,6 +286,7 @@ def normalize_freq_mat(freq_mat, regularize=True):
     mat.loc[:, :] = mat.values / mat.values.sum(axis=1)[:, np.newaxis]
     if regularize:
         mat.loc[:, :] += SMALL
+    mat.logomaker_type = 'freq_mat'
     return mat
 
 
@@ -318,6 +335,7 @@ def set_bg_mat(background, mat):
     else:
         assert False, 'Error: bg_mat and df are incompatible'
     new_bg_mat = normalize_freq_mat(new_bg_mat)
+    new_bg_mat.logomaker_type='freq_mat'
     return new_bg_mat
 
 
@@ -352,5 +370,6 @@ def load_alignment(file_name):
 
     # Name index
     counts_mat.index.name = 'pos'
+    counts_mat.logomaker_type = 'count_mat'
 
     return counts_mat
