@@ -1,44 +1,18 @@
 from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch
 from matplotlib.colors import to_rgba
-from matplotlib.font_manager import FontProperties, findSystemFonts, findfont
+from matplotlib.font_manager import FontProperties 
 import numpy as np
 import os
 import pdb
 
 from utils import Box
 
-# Build dictionary mapping font names to font files
-font_files = findSystemFonts()
-FONT_FILE_DICT = {}
-for font_file in font_files:
-    try:
-        font_name = str(FontProperties(fname=font_file).get_name())
-    except:
-        #print 'Failed on %s'%font_file
-        continue
-    FONT_FILE_DICT[font_name] = font_file
 
-# Specify default font and add to dictionary
-default_font_file = findfont('sans')
-DEFAULT_FONT = str(FontProperties(fname=default_font_file).get_name())
-FONT_FILE_DICT[DEFAULT_FONT] = default_font_file
-
-# Get list of font names and sort
-FONTS = list(FONT_FILE_DICT.keys())
-FONTS.sort()
-
-def get_default_font():
-    ''' Returns the default chosen font'''
-    return DEFAULT_FONT
-
-def get_fonts():
-    ''' Returns a list of all available fonts'''
-    return FONTS
 
 class Character:
     def __init__(self, c, x, y, w, h, color,
-                 font_name=None,
+                 font_properties=None,
                  flip=False,
                  shade=1,
                  alpha=1, edgecolor='none'):
@@ -47,7 +21,7 @@ class Character:
 
         self.c = c
         self.box = Box(x, x + w, y, y + h)
-        self.font_name = font_name
+        self.font_properties = font_properties
         self.flip = flip
 
         # Set color
@@ -72,30 +46,15 @@ class Character:
         put_char_in_box(ax, self.c, bbox, \
                         facecolor=self.color,
                         edgecolor=self.edgecolor,
-                        font_name=self.font_name)
+                        font_properties=self.font_properties)
 
 
-def validate_font(font_name):
-    # Get default font properties if none specified
-    if font_name is None:
-        font_name = DEFAULT_FONT 
-
-    # If font is not in FONT_FILE_DICT, revert to default
-    elif not font_name in  FONT_FILE_DICT:
-        print 'Warning: unrecognized font %s; using default font %s.'%\
-            (font_name, DEFAULT_FONT)
-        font_name = DEFAULT_FONT
-    return font_name    
 
 def put_char_in_box(ax, char, bbox, facecolor='k', \
-                    edgecolor='none', font_name=None, zorder=0, \
+                    edgecolor='none', 
+                    font_properties=None, 
+                    zorder=0, \
                     font_weight='bold', font_style='normal'):
-
-    # Specify font properties from font name
-    font_name = validate_font(font_name)
-    font_file = FONT_FILE_DICT[font_name]
-    font_properties = FontProperties(fname=font_file, 
-        style=font_style, weight=font_weight)
 
     # Create raw path
     path = TextPath((0, 0), char, size=1, prop=font_properties)

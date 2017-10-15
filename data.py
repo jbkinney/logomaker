@@ -220,7 +220,7 @@ def freq_mat_to_weight_mat(freq_mat, bg_mat):
 
     # Compute weight_mat
     weight_mat = freq_mat.copy()
-    weight_mat.loc[:,:]  = freq_mat * np.log2(freq_mat / bg_mat)
+    weight_mat.loc[:,:]  = np.log2(freq_mat / bg_mat)
 
     # Validate and return
     weight_mat = validate_mat(weight_mat)
@@ -233,8 +233,12 @@ def freq_mat_to_info_mat(freq_mat, bg_mat):
     '''
     # Validate mat before use
     freq_mat = validate_freq_mat(freq_mat)
+    info_mat = freq_mat.copy()
 
-    info_mat = freq_mat * np.log2(freq_mat/bg_mat)
+    info_list = (freq_mat.values*np.log2(freq_mat.values/bg_mat.values))\
+                    .sum(axis=1)
+
+    info_mat.loc[:,:] = freq_mat.values*info_list[:,np.newaxis]
 
     # Validate and return
     info_mat = validate_mat(info_mat)
@@ -315,3 +319,38 @@ def set_bg_mat(background, mat):
         assert False, 'Error: bg_mat and df are incompatible'
     new_bg_mat = normalize_freq_mat(new_bg_mat)
     return new_bg_mat
+
+
+def load_alignment(file_name):
+    # Read in sequences from FASTA file
+    df = pd.io.parsers.read_csv(file_name, comment='>', names=['seq'])
+
+    # Get sequence length
+    L = len(df.loc[0, 'seq'])
+
+    # Remove whitespace
+    for i in range(len(df)):
+        seq = df.loc[i, 'seq'].strip()
+        assert len(seq) == L
+        df.loc[i, 'seq'] = seq
+
+    # Get set of unique characters
+    seq_list = list(df['seq'])
+    seq_concat = ''.join(seq_list)
+    unique_chars = list(set(seq_concat))
+    unique_chars.sort()
+
+    # Create counts matrix
+    counts_mat = pd.DataFrame(index=range(L), columns=unique_chars).fillna(0)
+
+    # Create array of characters at each position
+    char_array = np.array([np.array(list(seq)) for seq in seq_list])
+
+    # Sum of the number of occurances of each character at each position
+    for c in unique_chars:
+        counts_mat.loc[:, c] = (char_array == c).sum(axis=0).ravel()
+
+    # Name index
+    counts_mat.index.name = 'pos'
+
+    return counts_mat
