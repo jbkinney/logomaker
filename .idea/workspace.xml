@@ -2,11 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/character_transformation.ipynb" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/logomaker.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test_logomaker.ipynb" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.ipynb_checkpoints/test_anylogo-checkpoint.ipynb" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test_anylogo.ipynb" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logos.pdf" afterPath="$PROJECT_DIR$/logos.pdf" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.ipynb_checkpoints/test_anylogo-checkpoint.ipynb" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/test_anylogo-checkpoint.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data.py" afterPath="$PROJECT_DIR$/data.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_anylogo.ipynb" afterPath="$PROJECT_DIR$/test_anylogo.ipynb" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -242,7 +244,14 @@
       <option name="project" value="LOCAL" />
       <updated>1508105346223</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Added logomaker_type tag to dataframes returned by logomaker, as well as ability to read this type in Logo() and transform_mat">
+      <created>1508107455291</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1508107455291</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -276,7 +285,8 @@
     <MESSAGE value="Deleted derived classes of Logo" />
     <MESSAGE value="Changed a lot of stuff, including font handling and anylogo -&gt; logomaker" />
     <MESSAGE value="Implemented much better character transformation algorithm." />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented much better character transformation algorithm." />
+    <MESSAGE value="Added logomaker_type tag to dataframes returned by logomaker, as well as ability to read this type in Logo() and transform_mat" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added logomaker_type tag to dataframes returned by logomaker, as well as ability to read this type in Logo() and transform_mat" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
