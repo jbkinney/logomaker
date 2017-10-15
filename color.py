@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.colors import to_rgb
 
 from utils import restrict_dict
 
@@ -76,15 +77,32 @@ def expand_color_dict(color_dict):
 
 def get_color_dict(color_scheme,chars,shuffle_colors=False):
     ''' get color_dict: each key is 1 char, each value is a 4-vector of rgba values '''
-    # Set color scheme
-    if type(color_scheme) == dict:
+
+    # First check if color_scheme can be interpreted as a simple color
+    is_color = None
+    try:
+        color = to_rgb(color_scheme)
+        is_color = True
+    except:
+        pass;
+            
+    # If a single color
+    if is_color:
+        color_dict = {}
+        for char in chars:
+            color_dict[char] = color
+    # If a predefined color scheme
+    elif type(color_scheme) == dict:
         color_dict = expand_color_dict(color_scheme)
         for char in chars:
             assert char in color_dict
+    # If a string
     elif type(color_scheme) == str:
+        # Check if there is a pre-defined color scheme
         if color_scheme in color_scheme_dict:
             color_dict = color_scheme_dict[color_scheme]
             color_dict = expand_color_dict(color_dict)
+        # Otherwise, check if random
         elif color_scheme == 'random':
             color_dict = {}
             for char in chars:

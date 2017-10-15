@@ -5,10 +5,9 @@ import matplotlib.pyplot as plt
 
 from utils import Box, SMALL
 import color
-from character import Character, DEFAULT_FONT
+from character import Character, get_fonts, get_default_font, validate_font
 import data
 import pdb
-
 
 # Logo base class
 class Logo:
@@ -19,7 +18,7 @@ class Logo:
                  wtseq=None,
                  color_scheme='classic',
                  logo_style='classic',
-                 font_name=DEFAULT_FONT,
+                 font_name=None,
                  stack_order='big_on_top',
                  use_transparency=False,
                  max_alpha_val=None,
@@ -50,7 +49,7 @@ class Logo:
             if ylim is None:
                 ylim = [0, 1]
             if ylabel is None:
-                ylabel = 'frequency'
+                ylabel = 'probability'
 
         elif logo_type == 'info_logo':
             # Transform input mat to info_mat
@@ -95,10 +94,10 @@ class Logo:
 
         # Set colors
         self.color_scheme = color_scheme
-        self.color_dict = color.get_color_dict(color_scheme=self.color_scheme, chars=self.chars)
+        self.color_dict = color.get_color_dict(color_scheme=self.color_scheme, chars=self.chars) 
 
         # Set character style
-        self.font_name = font_name
+        self.font_name = validate_font(font_name)
         self.logo_style = logo_style
         self.stack_order = stack_order
         self.use_transparency = use_transparency
