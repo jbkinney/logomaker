@@ -15,12 +15,12 @@ for font_file in font_files:
     try:
         font_name = str(FontProperties(fname=font_file).get_name())
     except:
-        print 'Failed on %s'%font_file
+        #print 'Failed on %s'%font_file
         continue
     FONT_FILE_DICT[font_name] = font_file
 
 # Specify default font and add to dictionary
-default_font_file = findfont('bold')
+default_font_file = findfont('sans')
 DEFAULT_FONT = str(FontProperties(fname=default_font_file).get_name())
 FONT_FILE_DICT[DEFAULT_FONT] = default_font_file
 
