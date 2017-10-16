@@ -7,19 +7,108 @@ from matplotlib.transforms import Bbox
 import pdb
 
 # From logomaker package
-from utils import SMALL
+from data import SMALL
 import character 
 import color
 import data
 
 from data import load_alignment
 
+def make_logo(mat,
+              mat_type=None,
+              logo_type=None,
+              background=None,
+              ylabel=None,
+              ylim=None,
+              **kwargs):
+    '''
+    Primary function used to create logos
+    :param mat:
+    :param mat_type:
+    :param logo_type:
+    :param background:
+    :param ylabel:
+    :param ylim:
+    :param kwargs:
+    :return:
+    '''
+
+    # Get mat_type if not specified by user but
+    # is specified in matrix
+    if mat_type is None:
+        try:
+            mat_type = mat.logomaker_type
+        except:
+            mat_type = None
+            logo_type = None
+
+    # Validate df
+    mat = data.validate_mat(mat)
+
+    # Get background mat
+    bg_mat = data.set_bg_mat(background, mat)
+
+    if logo_type == 'counts':
+        # Transform input mat to freq_mat
+        mat = data.transform_mat(mat, from_type=mat_type, to_type='counts', background=bg_mat)
+        ymax = mat.values.sum(axis=1).max()
+
+        # Change default plot settings
+        if ylim is None:
+            ylim = [0, ymax]
+        if ylabel is None:
+            ylabel = 'counts'
+
+    elif logo_type == 'probability':
+        # Transform input mat to freq_mat
+        mat = data.transform_mat(mat, from_type=mat_type, to_type='probability', background=bg_mat)
+
+        # Change default plot settings
+        if ylim is None:
+            ylim = [0, 1]
+        if ylabel is None:
+            ylabel = 'probability'
+
+    elif logo_type == 'information':
+        # Transform input mat to info_mat
+        mat = data.transform_mat(mat, from_type=mat_type, to_type='information', background=bg_mat)
+
+        # Change default plot settings
+        if ylim is None and (background is None):
+            ylim = [0, np.log2(mat.shape[1])]
+        if ylabel is None:
+            ylabel = 'information\n(bits)'
+
+    elif logo_type == 'enrichment':
+        # Transform input mat to weight_mat
+        mat = data.transform_mat(mat, from_type=mat_type, to_type='enrichment', background=bg_mat)
+
+        # Change default plot settings
+        if ylabel is None:
+            ylabel = '$\log_2$\nenrichment'
+
+    elif logo_type == 'energy':
+        # Transform input mat to weight_mat
+        mat = data.transform_mat(mat, from_type=mat_type, to_type='energy', background=background)
+
+        # Change default plot settings
+        if ylabel is None:
+            ylabel = '- energy\n($k_B T$)'
+
+    elif logo_type is None:
+        mat = data.validate_mat(mat)
+
+    else:
+        assert False, 'Error! logo_type %s is invalid' % logo_type
+
+    # Create and return logo
+    logo = Logo(mat=mat, ylim=ylim, ylabel=ylabel, **kwargs)
+    return logo
+
+
 # Logo base class
 class Logo:
-    def __init__(self,
-                 mat,
-                 mat_type=None,
-                 logo_type=None,
+    def __init__(self, mat,
                  wtseq=None,
                  color_scheme='classic',
                  logo_style='classic',
@@ -32,79 +121,14 @@ class Logo:
                  use_transparency=False,
                  max_alpha_val=None,
                  neg_shade=.5,
-                 neg_flip=False,
+                 neg_flip=True,
                  floor_line_width=.5,
-                 background=None,
                  xlabel='position',
                  ylabel=None,
                  xlim=None,
                  ylim=None,
                  xticks=None,
-                 yticks=None,
-                 xticklabels=None,
-                 yticklabels=None):
-
-        # Get mat_type if not specified by user but
-        # is specified in matrix
-        if mat_type is None:
-            try:
-                mat_type = mat.logomaker_type
-            except:
-                mat_type = None
-                logo_type = None
-                print 'Warning: matrix type is unspecified, Reverting to logo_type=None.'
-                pass;
-
-        # Validate df
-        mat = data.validate_mat(mat)
-
-        # Get background mat
-        bg_mat = data.set_bg_mat(background, mat)
-
-        if logo_type == 'freq_logo':
-            # Transform input mat to freq_mat
-            mat = data.transform_mat(mat, from_type=mat_type, to_type='freq_mat', background=bg_mat)
-
-            # Change default plot settings
-            if ylim is None:
-                ylim = [0, 1]
-            if ylabel is None:
-                ylabel = 'probability'
-
-        elif logo_type == 'info_logo':
-            # Transform input mat to info_mat
-            mat = data.transform_mat(mat, from_type=mat_type, to_type='info_mat', background=bg_mat)
-
-            # Get max info value
-            self.max_info = max(mat.values.sum(axis=1))
-
-            # Change default plot settings
-            if ylim  is None and (background is None):
-                ylim = [0, np.log2(mat.shape[1])]
-            if ylabel is None:
-                ylabel = 'information\n(bits)'
-
-        elif logo_type == 'weight_logo':
-            # Transform input mat to weight_mat
-            mat = data.transform_mat(mat, from_type=mat_type, to_type='weight_mat', background=bg_mat)
-
-            # Change default plot settings
-            if ylabel is None:
-                ylabel = 'score'
-
-        elif logo_type == 'energy_logo':
-            # Transform input mat to weight_mat
-            mat = data.transform_mat(mat, from_type=mat_type, to_type='energy_mat', background=background)
-
-            # Change default plot settings
-            if ylabel is None:
-                ylabel = '- energy\n($k_B T$)'
-
-        elif logo_type is None:
-            mat = data.validate_mat(mat)
-
-        else:
-            assert False, 'Error! logo_type %s is invalid'%logo_type
+                 xticklabels=None):
 
         # Record user font input
         self.in_font_file = font_file
@@ -127,7 +151,6 @@ class Logo:
         self.color_dict = color.get_color_dict(color_scheme=self.color_scheme, chars=self.chars) 
 
         # Set character style
-        #self.font_name = validate_font(font_name)
         self.logo_style = logo_style
         self.stack_order = stack_order
         self.use_transparency = use_transparency
@@ -151,17 +174,10 @@ class Logo:
         # Set y axis params
         self.ylim = [self.bbox.ymin, self.bbox.ymax]\
             if ylim is None else ylim
-        self.yticks = range(
-            int(np.ceil(self.ylim[0])),
-            int(np.floor(self.ylim[1])) + 1) \
-            if yticks is None else yticks
-        self.yticklabels = ['%d' % y for y in self.yticks]\
-            if yticklabels is None else yticklabels
         self.ylabel = ylabel
 
         # Set other formatting parameters
         self.floor_line_width=floor_line_width
-
 
     def set_font_properties(self):
         ''' Sets properties of font to use in logo '''
@@ -284,8 +300,6 @@ class Logo:
             ax.set_xticklabels(self.xticklabels, rotation=90)
 
             # y axis
-            ax.set_yticks(self.yticks)
-            ax.set_yticklabels(self.yticklabels)
             ax.set_ylabel(self.ylabel)
 
             # box
@@ -327,8 +341,6 @@ class Logo:
             ax.set_xlabel(self.xlabel)
 
             # y axis
-            ax.set_yticks(self.yticks)
-            ax.set_yticklabels(self.yticklabels)
             ax.set_ylabel(self.ylabel)
 
             # box

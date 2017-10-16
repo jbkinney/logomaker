@@ -4,8 +4,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgb
 
-from utils import restrict_dict
-
 # Create color scheme dict
 three_zeros = np.zeros(3)
 three_ones = np.ones(3)
@@ -54,6 +52,9 @@ color_scheme_dict = {
         'GSTYCQNAVLIPWFM': [.5, .5, .5]
     }
 }
+
+def restrict_dict(in_dict, keys_to_keep):
+    return dict([(k, v) for k, v in in_dict.iteritems() if k in keys_to_keep])
 
 def cmap_to_color_scheme(chars, cmap_name):
     cmap = plt.get_cmap(cmap_name)
