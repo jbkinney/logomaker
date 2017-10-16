@@ -1,6 +1,6 @@
 from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch
-from matplotlib.colors import to_rgba
+
 
 from matplotlib.transforms import Affine2D, Bbox
 
@@ -8,11 +8,10 @@ import numpy as np
 import pdb
 
 class Character:
-    def __init__(self, c, xmin, ymin, width, height, color,
+    def __init__(self, c, xmin, ymin, width, height, facecolor,
                  font_properties=None,
                  flip=False,
-                 shade=1,
-                 alpha=1, edgecolor='none'):
+                 edgecolor='none', linewidth=0):
         assert width > 0
         assert height > 0
 
@@ -21,30 +20,25 @@ class Character:
         self.font_properties = font_properties
         self.flip = flip
 
-        # Set color
-        try:
-            self.color = np.array(to_rgba(color)) * \
-                         np.array([shade, shade, shade, 1])
-        except:
-            assert False, 'Error! Unable to interpret color %s' % repr(color)
-
         # Set tranparency
-        self.color[3] = alpha
+        self.facecolor=facecolor
         self.edgecolor=edgecolor
+        self.linewidth=linewidth
 
     def draw(self, ax):
 
         # Draw character
         put_char_in_box(ax, self.c, self.bbox,
                         flip=self.flip,
-                        facecolor=self.color,
+                        facecolor=self.facecolor,
                         edgecolor=self.edgecolor,
+                        linewidth=self.linewidth,
                         font_properties=self.font_properties)
 
 
 
 def put_char_in_box(ax, char, bbox, flip=False, facecolor='k',
-                    edgecolor='none', 
+                    edgecolor='none', linewidth=0,
                     font_properties=None, 
                     zorder=0):
 
@@ -71,5 +65,5 @@ def put_char_in_box(ax, char, bbox, flip=False, facecolor='k',
 
     # Make and display patch
     patch = PathPatch(path, facecolor=facecolor, edgecolor=edgecolor,
-                      zorder=zorder)
+                      zorder=zorder, linewidth=linewidth)
     ax.add_patch(patch)

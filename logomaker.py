@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 from matplotlib.transforms import Bbox
+from matplotlib.colors import to_rgba
 import pdb
 
 # From logomaker package
@@ -109,7 +110,11 @@ def make_logo(mat,
 # Logo base class
 class Logo:
     def __init__(self, mat,
-                 wtseq=None,
+                 highlight_sequence=None,
+                 highlight_edgecolor='black',
+                 highlight_edgewidth=1,
+                 highlight_facecolor=None,
+                 invert_highlight=False,
                  color_scheme='classic',
                  logo_style='classic',
                  font_family=None,
@@ -137,14 +142,33 @@ class Logo:
         self.in_font_family = font_family 
         self.in_font_properties = font_properties
 
-        # Decide on final set of font properties based on this input
-        self.set_font_properties()
+        # If user supplies a FontProperties object, validate it
+        if font_properties is not None:
+            assert type(font_properties) == FontProperties
+            self.font_properties = font_properties.copy()
+
+        # Otherwise, create a FontProperties object based on user's input
+        else:
+            self.font_properties = FontProperties(family=self.in_font_family,
+                                                  weight=self.in_font_weight,
+                                                  fname=self.in_font_file,
+                                                  style=self.in_font_style)
 
         # Set data
         self.df = mat.copy()
         self.poss = mat.index.copy()
-        self.chars = mat.columns.copy()
-        self.wtseq = wtseq
+        self.chars = np.array([str(c) for c in mat.columns])
+
+        # Set wild type sequence
+        if highlight_sequence is not None:
+            assert isinstance(highlight_sequence, basestring)
+            assert len(highlight_sequence) == len(self.poss)
+            assert set(list(str(highlight_sequence))) == set(self.chars), 'Error: highlight_sequence %s contains invalid characters' % highlight_sequence
+        self.highlight_sequence = highlight_sequence
+        self.highlight_edgecolor = highlight_edgecolor
+        self.highlight_edgewidth = highlight_edgewidth
+        self.highlight_facecolor = highlight_facecolor
+        self.invert_highlight = bool(invert_highlight)
 
         # Set colors
         self.color_scheme = color_scheme
@@ -178,21 +202,6 @@ class Logo:
 
         # Set other formatting parameters
         self.floor_line_width=floor_line_width
-
-    def set_font_properties(self):
-        ''' Sets properties of font to use in logo '''
-
-        # If user supplies a FontProperties object, validate it
-        if not (self.in_font_properties is None):
-            assert type(self.in_font_properties) == FontProperties
-            self.font_properties = self.in_font_properties.copy()
-
-        # Otherwise, create a FontProperties object based on user's input
-        else:
-            self.font_properties = FontProperties(family=self.in_font_family,
-                                                  weight=self.in_font_weight, 
-                                                  fname=self.in_font_file,
-                                                  style=self.in_font_style)
 
     def compute_characters(self):
 
@@ -232,7 +241,7 @@ class Logo:
                 if h < SMALL:
                     continue
 
-                # Get color
+                # Get facecolor
                 color = self.color_dict[char]
 
                 # Get flip, alpha, and shade
@@ -253,13 +262,34 @@ class Logo:
                 assert alpha <= 1.0, \
                     'Error: alpha=%f must be in [0,1]' % alpha
 
+                # Set default style
+                edgecolor = 'none'
+                linewidth = 0
+                try:
+                    facecolor = np.array(to_rgba(color))
+                except:
+                    assert False, 'Error! Unable to interpret facecolor %s' % repr(color)
+                facecolor[3] = alpha
+
+                # Shade facecolor if flipping
+                if flip:
+                    facecolor = facecolor * np.array([shade, shade, shade, 1])
+
+                # Change character style if highlighting character
+                if self.highlight_sequence is not None:
+                    if (char == self.highlight_sequence[i]) != self.invert_highlight:
+                        edgecolor = self.highlight_edgecolor
+                        linewidth = self.highlight_edgewidth
+                        if self.highlight_facecolor is not None:
+                            facecolor = self.highlight_facecolor
+
                 # Create and store character
                 char = character.Character(
                     c=char, xmin=x, ymin=y, width=w, height=h,
-                    alpha=alpha, color=color, flip=flip,
-                    shade=shade, 
+                    facecolor=facecolor, flip=flip,
                     font_properties = self.font_properties,
-                    edgecolor='none')
+                    edgecolor=edgecolor,
+                    linewidth=linewidth)
                 char_list.append(char)
 
                 # Increment y

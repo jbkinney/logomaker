@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgb
 
-# Create color scheme dict
+# Create facecolor scheme dict
 three_zeros = np.zeros(3)
 three_ones = np.ones(3)
 color_scheme_dict = {
@@ -66,7 +66,7 @@ def cmap_to_color_scheme(chars, cmap_name):
         color_scheme[char] = color
     return color_scheme
 
-# Expand strings in color dict into individual characters
+# Expand strings in facecolor dict into individual characters
 def expand_color_dict(color_dict):
     new_dict = {}
     for key in color_dict.keys():
@@ -79,7 +79,7 @@ def expand_color_dict(color_dict):
 def get_color_dict(color_scheme,chars,shuffle_colors=False):
     ''' get color_dict: each key is 1 char, each value is a 4-vector of rgba values '''
 
-    # First check if color_scheme can be interpreted as a simple color
+    # First check if color_scheme can be interpreted as a simple facecolor
     is_color = None
     try:
         color = to_rgb(color_scheme)
@@ -87,19 +87,19 @@ def get_color_dict(color_scheme,chars,shuffle_colors=False):
     except:
         pass;
             
-    # If a single color
+    # If a single facecolor
     if is_color:
         color_dict = {}
         for char in chars:
             color_dict[char] = color
-    # If a predefined color scheme
+    # If a predefined facecolor scheme
     elif type(color_scheme) == dict:
         color_dict = expand_color_dict(color_scheme)
         for char in chars:
             assert char in color_dict
     # If a string
     elif type(color_scheme) == str:
-        # Check if there is a pre-defined color scheme
+        # Check if there is a pre-defined facecolor scheme
         if color_scheme in color_scheme_dict:
             color_dict = color_scheme_dict[color_scheme]
             color_dict = expand_color_dict(color_dict)

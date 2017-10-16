@@ -36,7 +36,7 @@ def validate_mat(mat):
 
         # If column name is not a single chracter, try extracting single character
         # after an underscore
-        if not len(new_col_name)==1:
+        if len(new_col_name) != 1:
             new_col_name = new_col_name.split('_')[-1]
             assert (len(new_col_name)==1), \
                 'Error: could not extract single character from colum name %s'%col_name
