@@ -76,8 +76,12 @@ def expand_color_dict(color_dict):
             new_dict[char.lower()] = value
     return new_dict
 
-def get_color_dict(color_scheme,chars,shuffle_colors=False):
-    ''' get color_dict: each key is 1 char, each value is a 4-vector of rgba values '''
+
+def get_color_dict(color_scheme, chars, alpha, shuffle_colors=False):
+    '''
+    get color_dict: each key is 1 char, each value is a 4-vector of rgba values
+    This is the main function that Logo interfaces with
+    '''
 
     # First check if color_scheme can be interpreted as a simple facecolor
     is_color = None
@@ -126,5 +130,11 @@ def get_color_dict(color_scheme,chars,shuffle_colors=False):
         values = color_dict.values()
         np.random.shuffle(chars)
         color_dict = dict(zip(chars, values))
+
+    # Add an alpha to each color
+    for key in color_dict:
+        rgb = color_dict[key]
+        rgba = np.array(list(rgb)[:3] + [alpha])
+        color_dict[key] = rgba
 
     return color_dict

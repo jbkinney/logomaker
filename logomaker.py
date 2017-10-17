@@ -98,25 +98,34 @@ def make_logo(mat,
 
     elif logo_type is None:
         mat = data.validate_mat(mat)
+        ylabel = ''
 
     else:
         assert False, 'Error! logo_type %s is invalid' % logo_type
 
     # Create and return logo
     logo = Logo(mat=mat, ylim=ylim, ylabel=ylabel, **kwargs)
+    logo.logo_type = logo_type if logo_type is not None else 'generic'
     return logo
 
 
 # Logo base class
 class Logo:
     def __init__(self, mat,
+                 colors='classic',
+                 alpha=1,
+                 edgecolors='none',
+                 edgewidth=0,
+                 boxcolors='white',
+                 boxalpha=0,
                  highlight_sequence=None,
-                 highlight_edgecolor='black',
-                 highlight_edgewidth=1,
-                 highlight_facecolor=None,
-                 invert_highlight=False,
-                 color_scheme='classic',
-                 logo_style='classic',
+                 highlight_colors=None,
+                 highlight_alpha=None,
+                 highlight_edgecolors=None,
+                 highlight_edgewidth=None,
+                 highlight_boxcolors=None,
+                 highlight_boxalpha=None,
+                 axes_style='classic',
                  font_family=None,
                  font_weight=None,
                  font_file=None,
@@ -125,9 +134,10 @@ class Logo:
                  stack_order='big_on_top',
                  use_transparency=False,
                  max_alpha_val=None,
-                 neg_shade=.5,
+                 neg_shade=1,
+                 neg_alpha=1,
                  neg_flip=True,
-                 floor_line_width=.5,
+                 baseline_width=.5,
                  xlabel='position',
                  ylabel=None,
                  xlim=None,
@@ -159,26 +169,61 @@ class Logo:
         self.poss = mat.index.copy()
         self.chars = np.array([str(c) for c in mat.columns])
 
+        # Set normal character format
+        self.facecolors = colors
+        self.edgecolors = edgecolors
+        self.edgewidth = edgewidth
+        self.alpha = float(alpha)
+        self.boxcolors = boxcolors
+        self.boxalpha = float(boxalpha)
+
+        # Set normal character color dicts
+        self.facecolors_dict = color.get_color_dict(color_scheme=self.facecolors,
+                                                    chars=self.chars,
+                                                    alpha=self.alpha)
+        self.edgecolors_dict = color.get_color_dict(color_scheme=self.edgecolors,
+                                                    chars=self.chars,
+                                                    alpha=self.alpha)
+        self.boxcolors_dict = color.get_color_dict(color_scheme=self.boxcolors,
+                                                   chars=self.chars,
+                                                   alpha=self.boxalpha)
+
+        # Set higlighted character format
+        self.highlight_facecolors = highlight_colors if highlight_colors is not None else colors
+        self.highlight_edgecolors = highlight_edgecolors if highlight_edgecolors is not None else edgecolors
+        self.highlight_edgewidth = highlight_edgewidth if highlight_edgewidth is not None else edgewidth
+        self.highlight_alpha = float(highlight_alpha) if highlight_alpha is not None else alpha
+        self.highlight_boxcolors = highlight_boxcolors if highlight_boxcolors is not None else boxcolors
+        self.highlight_boxalpha = float(highlight_boxalpha) if highlight_boxalpha is not None else boxalpha
+
+        # Set highlight character color dicts
+        self.highlight_facecolors_dict = color.get_color_dict(color_scheme=self.highlight_facecolors,
+                                                              chars=self.chars,
+                                                              alpha=self.highlight_alpha)
+        self.highlight_edgecolors_dict = color.get_color_dict(color_scheme=self.highlight_edgecolors,
+                                                              chars=self.chars,
+                                                              alpha=self.highlight_alpha)
+        self.highlight_boxcolors_dict = color.get_color_dict(color_scheme=self.highlight_boxcolors,
+                                                             chars=self.chars,
+                                                             alpha=self.highlight_alpha)
+
         # Set wild type sequence
+        self.highlight_sequence = highlight_sequence
         if highlight_sequence is not None:
             assert isinstance(highlight_sequence, basestring)
             assert len(highlight_sequence) == len(self.poss)
-            assert set(list(str(highlight_sequence))) == set(self.chars), 'Error: highlight_sequence %s contains invalid characters' % highlight_sequence
-        self.highlight_sequence = highlight_sequence
-        self.highlight_edgecolor = highlight_edgecolor
-        self.highlight_edgewidth = highlight_edgewidth
-        self.highlight_facecolor = highlight_facecolor
-        self.invert_highlight = bool(invert_highlight)
+            assert set(list(str(highlight_sequence))) == set(self.chars), \
+                'Error: highlight_sequence %s contains invalid characters' % highlight_sequence
+            self.use_highlight = True
+        else:
+            self.use_highlight = False
 
-        # Set colors
-        self.color_scheme = color_scheme
-        self.color_dict = color.get_color_dict(color_scheme=self.color_scheme, chars=self.chars) 
-
-        # Set character style
-        self.logo_style = logo_style
+        # Set other character styling
+        self.logo_style = axes_style
         self.stack_order = stack_order
         self.use_transparency = use_transparency
-        self.neg_shade = neg_shade
+        self.neg_shade = float(neg_shade)
+        self.neg_alpha = float(neg_alpha)
         self.neg_flip = neg_flip
         self.max_alpha_val = max_alpha_val
         self.use_transparency = use_transparency
@@ -201,13 +246,15 @@ class Logo:
         self.ylabel = ylabel
 
         # Set other formatting parameters
-        self.floor_line_width=floor_line_width
+        self.floor_line_width=baseline_width
 
     def compute_characters(self):
 
         # Get largest value for computing transparency
         if self.max_alpha_val is None:
-            self.max_alpha_val = abs(self.df.values).max()
+            max_alpha_val = abs(self.df.values).max()
+        else:
+            max_alpha_val = self.max_alpha_val
 
         char_list = []
         for i, pos in enumerate(self.poss):
@@ -241,47 +288,40 @@ class Logo:
                 if h < SMALL:
                     continue
 
-                # Get facecolor
-                color = self.color_dict[char]
-
-                # Get flip, alpha, and shade
-                if val >= 0.0:
-                    alpha = 1.0
-                    flip = False
-                    shade = 1.0
+                # Get facecolor, edgecolor, and edgewidth
+                if self.use_highlight and (char == self.highlight_sequence[i]):
+                    facecolor = self.highlight_facecolors_dict[char].copy()
+                    edgecolor = self.highlight_edgecolors_dict[char].copy()
+                    boxcolor = self.highlight_boxcolors_dict[char].copy()
+                    boxalpha = self.highlight_boxalpha
+                    edgewidth = self.highlight_edgewidth
                 else:
-                    alpha = self.neg_shade
-                    flip = self.neg_flip
-                    shade = self.neg_shade
+                    facecolor = self.facecolors_dict[char].copy()
+                    edgecolor = self.edgecolors_dict[char].copy()
+                    boxcolor = self.boxcolors_dict[char].copy()
+                    boxalpha = self.boxalpha
+                    edgewidth = self.edgewidth
 
+                # Get flip and shade character accordingly
+                if val <= 0.0 and self.neg_flip:
+                    flip = True
+                    shade = self.neg_shade
+                    alpha = self.neg_alpha
+                    facecolor = facecolor * np.array([shade, shade, shade, alpha])
+                    edgecolor = edgecolor * np.array([shade, shade, shade, alpha])
+                else:
+                    flip = False
+
+                # Set alpha
                 if self.use_transparency:
-                    alpha *= h / self.max_alpha_val
+                    alpha = h / max_alpha_val
                     if alpha > 1:
                         alpha = 1.0
+                    elif alpha <= 0:
+                        alpha = 0.0
+                    facecolor[3] *= alpha
+                    edgecolor[3] *= alpha
 
-                assert alpha <= 1.0, \
-                    'Error: alpha=%f must be in [0,1]' % alpha
-
-                # Set default style
-                edgecolor = 'none'
-                linewidth = 0
-                try:
-                    facecolor = np.array(to_rgba(color))
-                except:
-                    assert False, 'Error! Unable to interpret facecolor %s' % repr(color)
-                facecolor[3] = alpha
-
-                # Shade facecolor if flipping
-                if flip:
-                    facecolor = facecolor * np.array([shade, shade, shade, 1])
-
-                # Change character style if highlighting character
-                if self.highlight_sequence is not None:
-                    if (char == self.highlight_sequence[i]) != self.invert_highlight:
-                        edgecolor = self.highlight_edgecolor
-                        linewidth = self.highlight_edgewidth
-                        if self.highlight_facecolor is not None:
-                            facecolor = self.highlight_facecolor
 
                 # Create and store character
                 char = character.Character(
@@ -289,7 +329,8 @@ class Logo:
                     facecolor=facecolor, flip=flip,
                     font_properties = self.font_properties,
                     edgecolor=edgecolor,
-                    linewidth=linewidth)
+                    linewidth=edgewidth,
+                    boxcolor=boxcolor, boxalpha=boxalpha)
                 char_list.append(char)
 
                 # Increment y
