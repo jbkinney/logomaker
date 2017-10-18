@@ -13,6 +13,24 @@ import character
 import color
 import data
 
+# Character lists
+DNA = list('ACGT')
+RNA = list('ACGU')
+dna = [c.lower() for c in DNA]
+rna = [c.lower() for c in DNA]
+PROTEIN = list('RKDENQSGHTAPYVMCLFIW')
+protein = [c.lower() for c in PROTEIN]
+PROTEIN_STOP = PROTEIN + ['*']
+protein_stop = protein + ['*']
+
+# Character transformations dictionaries
+to_DNA = {'a': 'A', 'c': 'C', 'g': 'G', 't': 'T', 'U': 'T', 'u': 'T'}
+to_dna = {'A': 'a', 'C': 'c', 'G': 'g', 'T': 't', 'U': 't', 'u': 't'}
+to_RNA = {'a': 'A', 'c': 'C', 'g': 'G', 't': 'U', 'T': 'U', 'u': 'U'}
+to_rna = {'A': 'a', 'C': 'c', 'G': 'g', 'T': 'u', 't': 'u', 'U': 'u'}
+to_PROTEIN = dict(zip(protein, PROTEIN))
+to_protein = dict(zip(PROTEIN, protein))
+
 from data import load_alignment
 
 def make_logo(mat,
@@ -23,15 +41,6 @@ def make_logo(mat,
               ylim=None,
               **kwargs):
     '''
-    Primary function used to create logos
-    :param mat:
-    :param mat_type:
-    :param logo_type:
-    :param background:
-    :param ylabel:
-    :param ylim:
-    :param kwargs:
-    :return:
     '''
 
     # Get mat_type if not specified by user but
@@ -113,6 +122,7 @@ def make_logo(mat,
 class Logo:
     def __init__(self, mat,
                  colors='classic',
+                 characters=None,
                  alpha=1,
                  edgecolors='none',
                  edgewidth=0,
@@ -165,11 +175,24 @@ class Logo:
                                                   weight=self.in_font_weight,
                                                   fname=self.in_font_file,
                                                   style=self.in_font_style)
-
         # Set data
-        self.df = mat.copy()
-        self.poss = mat.index.copy()
-        self.chars = np.array([str(c) for c in mat.columns])
+        self.in_df = mat.copy()
+
+        # Characters:
+        # Restrict to provided characters if string or list of characters
+        # Transform to provided characters if dictionary
+        if characters is None:
+            self.df = self.in_df.copy()
+        elif isinstance(characters, dict):
+            self.df = self.in_df.rename(columns=characters)
+        elif isinstance(characters, (str, unicode, list, np.array)):
+            characters = list(characters)
+            self.df = self.in_df[characters]
+        else:
+            assert False, 'Error: cant interpret characters.'
+
+        self.poss = self.df.index.copy()
+        self.chars = np.array([str(c) for c in self.df.columns])
         self.L = len(self.poss)
 
         # Set normal character format

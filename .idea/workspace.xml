@@ -3,8 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/character.py" afterPath="$PROJECT_DIR$/character.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logomaker.py" afterPath="$PROJECT_DIR$/logomaker.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/splicesite_logo.ipynb" afterPath="$PROJECT_DIR$/splicesite_logo.ipynb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_logo_types.ipynb" afterPath="$PROJECT_DIR$/test_logo_types.ipynb" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -15,10 +16,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="character.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="character.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/character.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="372">
+            <state relative-caret-position="1065">
               <caret line="71" column="39" lean-forward="true" selection-start-line="71" selection-start-column="39" selection-end-line="71" selection-end-column="39" />
               <folding>
                 <element signature="e#0#40#0" expanded="true" />
@@ -27,11 +28,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="logomaker.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="logomaker.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/logomaker.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-7">
-              <caret line="340" column="20" lean-forward="false" selection-start-line="340" selection-start-column="20" selection-end-line="341" selection-end-column="36" />
+            <state relative-caret-position="-1234">
+              <caret line="53" column="0" lean-forward="true" selection-start-line="53" selection-start-column="0" selection-end-line="53" selection-end-column="0" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -54,8 +55,8 @@
       <file leaf-file-name="color.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/color.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-7">
-              <caret line="82" column="43" lean-forward="false" selection-start-line="82" selection-start-column="43" selection-end-line="82" selection-end-column="43" />
+            <state relative-caret-position="433">
+              <caret line="35" column="0" lean-forward="false" selection-start-line="35" selection-start-column="0" selection-end-line="37" selection-end-column="29" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -74,7 +75,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>draw(</find>
       <find>FONTS</find>
       <find>font_name</find>
       <find>stack_order</find>
@@ -104,6 +104,7 @@
       <find>edgecolors</find>
       <find>neg_alpha</find>
       <find>xcenter</find>
+      <find>_characters</find>
     </findStrings>
     <replaceStrings>
       <replace>df</replace>
@@ -130,8 +131,8 @@
         <option value="$PROJECT_DIR$/utils.py" />
         <option value="$PROJECT_DIR$/color.py" />
         <option value="$PROJECT_DIR$/data.py" />
-        <option value="$PROJECT_DIR$/logomaker.py" />
         <option value="$PROJECT_DIR$/character.py" />
+        <option value="$PROJECT_DIR$/logomaker.py" />
       </list>
     </option>
   </component>
@@ -280,7 +281,14 @@
       <option name="project" value="LOCAL" />
       <updated>1508171456585</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Divided padding by 2, so that value is now equal to total whitespace">
+      <created>1508329416051</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1508329416051</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -318,7 +326,8 @@
     <MESSAGE value="Had forgotten to add logomaker.py and the ipython notebooks. Fixed." />
     <MESSAGE value="[x] Create ipython notebook to show off all the kinds of logos. &#10;[x] Get count_logo working&#10;[x] Refactor logo types to ‘counts’,’probability’,’enrichment’,’energy’,’information'&#10;[x] Remove utils.py&#10;[x] Write make_logo; move functionality out of Logo class constructor" />
     <MESSAGE value="Implemented sequence highlighting within logos" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented sequence highlighting within logos" />
+    <MESSAGE value="Divided padding by 2, so that value is now equal to total whitespace" />
+    <option name="LAST_COMMIT_MESSAGE" value="Divided padding by 2, so that value is now equal to total whitespace" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -481,16 +490,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/color.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7">
-          <caret line="82" column="43" lean-forward="false" selection-start-line="82" selection-start-column="43" selection-end-line="82" selection-end-column="43" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-7">
@@ -501,22 +500,32 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logomaker.py">
+    <entry file="file://$PROJECT_DIR$/character.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7">
-          <caret line="340" column="20" lean-forward="false" selection-start-line="340" selection-start-column="20" selection-end-line="341" selection-end-column="36" />
+        <state relative-caret-position="1065">
+          <caret line="71" column="39" lean-forward="true" selection-start-line="71" selection-start-column="39" selection-end-line="71" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#40#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/color.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="433">
+          <caret line="35" column="0" lean-forward="false" selection-start-line="35" selection-start-column="0" selection-end-line="37" selection-end-column="29" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/character.py">
+    <entry file="file://$PROJECT_DIR$/logomaker.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="372">
-          <caret line="71" column="39" lean-forward="true" selection-start-line="71" selection-start-column="39" selection-end-line="71" selection-end-column="39" />
+        <state relative-caret-position="-1234">
+          <caret line="53" column="0" lean-forward="true" selection-start-line="53" selection-start-column="0" selection-end-line="53" selection-end-column="0" />
           <folding>
-            <element signature="e#0#40#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
