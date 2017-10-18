@@ -60,11 +60,11 @@ def put_char_in_box(ax, char, bbox, flip=False, facecolor='k',
     tmp_bbox = tmp_path.get_extents()
 
     # Redefine tmp_bbox with padding as requested
-    x0 = tmp_bbox.xmin - hpad*tmp_bbox.width
-    x1 = tmp_bbox.xmax + hpad*tmp_bbox.width
-    y0 = tmp_bbox.ymin - vpad*tmp_bbox.height
-    y1 = tmp_bbox.ymax + vpad*tmp_bbox.height
-    tmp_bbox = Bbox([[x0,y0],[x1,y1]])
+    x0 = tmp_bbox.xmin - .5*hpad*tmp_bbox.width
+    x1 = tmp_bbox.xmax + .5*hpad*tmp_bbox.width
+    y0 = tmp_bbox.ymin - .5*vpad*tmp_bbox.height
+    y1 = tmp_bbox.ymax + .5*vpad*tmp_bbox.height
+    tmp_bbox = Bbox([[x0, y0], [x1, y1]])
 
     # THIS IS THE KEY TRANSFORMATION
     # 1. Translate character path so that lower left corner is at origin
