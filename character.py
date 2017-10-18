@@ -15,7 +15,7 @@ class Character:
         assert height > 0
 
         self.c = c
-        self.bbox = Bbox.from_bounds(xmin,ymin,width,height)
+        self.bbox = Bbox.from_bounds(xmin, ymin, width, height)
         self.font_properties = font_properties
         self.flip = flip
 
@@ -28,10 +28,10 @@ class Character:
         self.hpad = hpad
         self.vpad = vpad
 
-    def draw(self, ax):
-
-        # Draw character
-        put_char_in_box(ax, self.c, self.bbox,
+        # Calculate character & box patches
+        self.character_patch, self.box_patch = put_char_in_box(
+                        char=self.c,
+                        bbox=self.bbox,
                         flip=self.flip,
                         facecolor=self.facecolor,
                         edgecolor=self.edgecolor,
@@ -39,11 +39,22 @@ class Character:
                         font_properties=self.font_properties,
                         boxcolor=self.boxcolor,
                         boxalpha=self.boxalpha,
-                        hpad = self.hpad,
-                        vpad = self.vpad)
+                        hpad=self.hpad,
+                        vpad=self.vpad)
+
+    def draw(self, ax):
+        '''
+        Draws the character on a specified axes
+        :param ax: matplotlib axes object
+        :return: None
+        '''
+        ax.add_patch(self.box_patch)
+        ax.add_patch(self.character_patch)
 
 
-def put_char_in_box(ax, char, bbox, flip=False, facecolor='k',
+
+
+def put_char_in_box(char, bbox, flip=False, facecolor='k',
                     edgecolor='none', linewidth=0,
                     font_properties=None, boxcolor='none', boxalpha=0,
                     hpad=0, vpad=0):
@@ -76,10 +87,11 @@ def put_char_in_box(ax, char, bbox, flip=False, facecolor='k',
         .translate(tx=bbox.xmin, ty=bbox.ymin)
     char_path = transformation.transform_path(tmp_path)
 
-    # Draw box containing character
+    # Compute patch for box containing character
     box_patch = Rectangle((bbox.xmin, bbox.ymin), bbox.width, bbox.height, facecolor=boxcolor, alpha=boxalpha)
-    ax.add_patch(box_patch)
 
-    # Draw character
+    # Compute character patch
     char_patch = PathPatch(char_path, facecolor=facecolor, edgecolor=edgecolor, linewidth=linewidth)
-    ax.add_patch(char_patch)
+
+    # Return patches to user
+    return char_patch, box_patch

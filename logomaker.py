@@ -113,14 +113,14 @@ def make_logo(mat,
         assert False, 'Error! logo_type %s is invalid' % logo_type
 
     # Create and return logo
-    logo = Logo(mat=mat, ylim=ylim, ylabel=ylabel, **kwargs)
+    logo = Logo(matrix=mat, ylim=ylim, ylabel=ylabel, **kwargs)
     logo.logo_type = logo_type if logo_type is not None else 'generic'
     return logo
 
 
 # Logo base class
 class Logo:
-    def __init__(self, mat,
+    def __init__(self, matrix,
                  colors='classic',
                  characters=None,
                  alpha=1,
@@ -146,9 +146,9 @@ class Logo:
                  stack_order='big_on_top',
                  use_transparency=False,
                  max_alpha_val=None,
-                 neg_shade=1,
-                 neg_alpha=1,
-                 neg_flip=True,
+                 below_shade=1,
+                 below_alpha=1,
+                 below_flip=True,
                  baseline_width=.5,
                  xlabel='position',
                  ylabel=None,
@@ -156,6 +156,7 @@ class Logo:
                  ylim=None,
                  xticks=None,
                  xticklabels=None):
+
 
         # Record user font input
         self.in_font_file = font_file
@@ -176,7 +177,7 @@ class Logo:
                                                   fname=self.in_font_file,
                                                   style=self.in_font_style)
         # Set data
-        self.in_df = mat.copy()
+        self.in_df = matrix.copy()
 
         # Characters:
         # Restrict to provided characters if string or list of characters
@@ -250,9 +251,9 @@ class Logo:
         self.logo_style = axes_style
         self.stack_order = stack_order
         self.use_transparency = use_transparency
-        self.neg_shade = float(neg_shade)
-        self.neg_alpha = float(neg_alpha)
-        self.neg_flip = neg_flip
+        self.neg_shade = float(below_shade)
+        self.neg_alpha = float(below_alpha)
+        self.neg_flip = below_flip
         self.max_alpha_val = max_alpha_val
         self.use_transparency = use_transparency
 
