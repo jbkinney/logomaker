@@ -9,7 +9,8 @@ class Character:
     def __init__(self, c, xmin, ymin, width, height, facecolor,
                  font_properties=None,
                  flip=False,
-                 edgecolor='none', linewidth=0, boxcolor='none', boxalpha=0):
+                 edgecolor='none', linewidth=0, boxcolor='none', boxalpha=0,
+                 hpad=0, vpad=0):
         assert width > 0
         assert height > 0
 
@@ -24,6 +25,8 @@ class Character:
         self.linewidth=linewidth
         self.boxcolor=boxcolor
         self.boxalpha=boxalpha
+        self.hpad = hpad
+        self.vpad = vpad
 
     def draw(self, ax):
 
@@ -35,13 +38,15 @@ class Character:
                         linewidth=self.linewidth,
                         font_properties=self.font_properties,
                         boxcolor=self.boxcolor,
-                        boxalpha=self.boxalpha)
-
+                        boxalpha=self.boxalpha,
+                        hpad = self.hpad,
+                        vpad = self.vpad)
 
 
 def put_char_in_box(ax, char, bbox, flip=False, facecolor='k',
                     edgecolor='none', linewidth=0,
-                    font_properties=None, boxcolor='none', boxalpha=0):
+                    font_properties=None, boxcolor='none', boxalpha=0,
+                    hpad=0, vpad=0):
 
     # Create raw path
     tmp_path = TextPath((0, 0), char, size=1, prop=font_properties)
@@ -53,6 +58,13 @@ def put_char_in_box(ax, char, bbox, flip=False, facecolor='k',
 
     # Get bounding box for temporary character path
     tmp_bbox = tmp_path.get_extents()
+
+    # Redefine tmp_bbox with padding as requested
+    x0 = tmp_bbox.xmin - hpad*tmp_bbox.width
+    x1 = tmp_bbox.xmax + hpad*tmp_bbox.width
+    y0 = tmp_bbox.ymin - vpad*tmp_bbox.height
+    y1 = tmp_bbox.ymax + vpad*tmp_bbox.height
+    tmp_bbox = Bbox([[x0,y0],[x1,y1]])
 
     # THIS IS THE KEY TRANSFORMATION
     # 1. Translate character path so that lower left corner is at origin

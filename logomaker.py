@@ -125,6 +125,8 @@ class Logo:
                  highlight_edgewidth=None,
                  highlight_boxcolors=None,
                  highlight_boxalpha=None,
+                 hpad = 0,
+                 vpad = 0,
                  axes_style='classic',
                  font_family=None,
                  font_weight=None,
@@ -168,6 +170,7 @@ class Logo:
         self.df = mat.copy()
         self.poss = mat.index.copy()
         self.chars = np.array([str(c) for c in mat.columns])
+        self.L = len(self.poss)
 
         # Set normal character format
         self.facecolors = colors
@@ -176,6 +179,8 @@ class Logo:
         self.alpha = float(alpha)
         self.boxcolors = boxcolors
         self.boxalpha = float(boxalpha)
+        self.hpad = hpad
+        self.vpad = vpad
 
         # Set normal character color dicts
         self.facecolors_dict = color.get_color_dict(color_scheme=self.facecolors,
@@ -234,9 +239,9 @@ class Logo:
         # Set x axis params
         self.xlim = [self.bbox.xmin, self.bbox.xmax]\
             if xlim is None else xlim
-        self.xticks = self.poss \
+        self.xticks = range(len(self.poss)) \
             if xticks is None else xticks
-        self.xticklabels = ['%d' % x for x in self.xticks] \
+        self.xticklabels = self.poss\
             if xticklabels is None else xticklabels
         self.xlabel = xlabel
 
@@ -247,6 +252,7 @@ class Logo:
 
         # Set other formatting parameters
         self.floor_line_width=baseline_width
+
 
     def compute_characters(self):
 
@@ -259,7 +265,7 @@ class Logo:
         char_list = []
         for i, pos in enumerate(self.poss):
 
-            vals = self.df.loc[pos, :].values
+            vals = self.df.iloc[i, :].values
             ymin = (vals * (vals < 0)).sum()
 
             # Reorder columns
@@ -272,7 +278,7 @@ class Logo:
             ordered_chars = self.chars[indices]
 
             # This is the same for every character
-            x = pos - .5
+            x = float(i) - .5
             w = 1.0
 
             # Initialize y
@@ -303,8 +309,8 @@ class Logo:
                     edgewidth = self.edgewidth
 
                 # Get flip and shade character accordingly
-                if val <= 0.0 and self.neg_flip:
-                    flip = True
+                if val <= 0.0:
+                    flip = self.neg_flip
                     shade = self.neg_shade
                     alpha = self.neg_alpha
                     facecolor = facecolor * np.array([shade, shade, shade, alpha])
@@ -330,7 +336,10 @@ class Logo:
                     font_properties = self.font_properties,
                     edgecolor=edgecolor,
                     linewidth=edgewidth,
-                    boxcolor=boxcolor, boxalpha=boxalpha)
+                    boxcolor=boxcolor,
+                    boxalpha=boxalpha,
+                    hpad = self.hpad,
+                    vpad = self.vpad)
                 char_list.append(char)
 
                 # Increment y

@@ -329,34 +329,62 @@ def set_bg_mat(background, mat):
     return new_bg_mat
 
 
-def load_alignment(file_name):
-    # Read in sequences from FASTA file
-    df = pd.io.parsers.read_csv(file_name, comment='>', names=['seq'])
 
-    # Get sequence length
-    L = len(df.loc[0, 'seq'])
+def load_alignment(file_name=None, sequences=None, sequence_counts=None, characters=None, positions=None):
 
-    # Remove whitespace
-    for i in range(len(df)):
-        seq = df.loc[i, 'seq'].strip()
-        assert len(seq) == L
-        df.loc[i, 'seq'] = seq
+    # If loading file name
+    if file_name is not None:
+        # Read in sequences from FASTA file
+        df = pd.io.parsers.read_csv(file_name, comment='>', names=['seq'])
 
-    # Get set of unique characters
-    seq_list = list(df['seq'])
-    seq_concat = ''.join(seq_list)
-    unique_chars = list(set(seq_concat))
-    unique_chars.sort()
+        # Remove whitespace
+        for i in range(len(df)):
+            seq = df.loc[i, 'seq'].strip()
+            df.loc[i, 'seq'] = seq
+
+        # Get sequences
+        sequences = list(df['seq'])
+        sequence_counts = np.ones(len(sequences))
+
+    assert sequences is not None, 'Error: either file_name or sequences must not be None.'
+
+    # Get seq length
+    L = len(sequences[0])
+    assert all([len(seq) == L for seq in sequences]), 'Error: not all sequences have length %d.' % L
+
+    # Get counts list
+    if sequence_counts is None:
+        assert len(sequences) > 0, 'Error: sequences is empty'
+        counts_array = np.ones(len(sequences))
+    else:
+        assert len(sequence_counts) == len(sequences), 'Error: sequence_counts is not the same length as sequences'
+        counts_array = np.array(sequence_counts)
+
+    # If characters are not specified by user, get list of unique characters from sequence
+    if characters is None:
+        seq_concat = ''.join(sequences)
+        characters = list(set(seq_concat))
+        characters.sort()
+    elif isinstance(characters, basestring):
+        characters = list(characters)
+
+    # If positions is not specified by user, make it
+    if positions is not None:
+        assert len(positions) == L, 'Error: positions, if passed, must be same length as sequences.'
+    else:
+        positions = range(L)
 
     # Create counts matrix
-    counts_mat = pd.DataFrame(index=range(L), columns=unique_chars).fillna(0)
+    counts_mat = pd.DataFrame(index=positions, columns=characters).fillna(0)
 
     # Create array of characters at each position
-    char_array = np.array([np.array(list(seq)) for seq in seq_list])
+    char_array = np.array([np.array(list(seq)) for seq in sequences])
 
     # Sum of the number of occurances of each character at each position
-    for c in unique_chars:
-        counts_mat.loc[:, c] = (char_array == c).sum(axis=0).ravel()
+    for c in characters:
+        v = (char_array == c).astype(float)
+        v *= counts_array[:, np.newaxis]
+        counts_mat.loc[:, c] = v.sum(axis=0).ravel()
 
     # Name index
     counts_mat.index.name = 'pos'
