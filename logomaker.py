@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import ast
 import inspect
+import re
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 from matplotlib.transforms import Bbox
@@ -819,60 +820,87 @@ def make_styled_logo(style_file, *args, **user_kwargs):
     # Return logo to user
     return logo
 
-def load_parameters(file_name):
+def load_parameters(file_name, print_params=True, print_warnings=True):
     """
-    helper function that will parse the upload parameters file
-    so that the parameters can be displayed on screen
+    Fills a dictionary with parameters parsed from specified file.
 
-    Returns parameters specified as strings.
+    Arg:
 
-    parameters
-    ----------
-    :parameter parameters_filename (str): name of file containing parameters
+        file_name (str): Name of file containing parameter assignments
 
+    Return:
+
+        params_dict (dict): Dictionary containing parameter assignments
+            parsed from parameters file
     """
-    params = {}
+
+    # Create dictionary to hold results
+    params_dict = {}
+
+    # Create regular expression for parsing parameter file lines
+    pattern = re.compile('^\s*(?P<param_name>[\w]+)\s*:\s*(?P<param_value>.*)$')
 
     # Quit if file_name is not specified
     if file_name is None:
-        return params
+        return params_dict
 
-    # try read parameters file
+    # Open parameters file
     try:
-        # try opening file
-        fileObj = open(file_name,'r')
+        file_obj = open(file_name, 'r')
+    except IOError:
+        print('Error: could not open file %s for reading.' % file_name)
+        raise IOError
 
-        """ the following snippet tries to read parameters from file into a dict called params """
-        try:
-            for line in fileObj:
-                # removing leading and trailing whitespace
-                line = line.strip()
-                # ignore comments in the parameters file
-                # the use of hash to display comments in the
-                # params file is a design choice by the author
-                if not line.startswith("#"):
-                    # split lines by colon separator
-                    key_value = line.split(":")
-                    # print lists only of format key-value, i.e. ignore inputs \
-                    # with multiple values for the same key:{value_1,value_2}
-                    if len(key_value) == 2:
-                        params[key_value[0].strip()] = key_value[1].strip()
+    # Process each line of file and store resulting parameter values
+    # in params_dict
+    params_dict = {}
+    prefix = '' # This is needed to parse multi-line files
+    for line in file_obj:
 
-            """ 
-            parse read-in parameters correctly, i.e. change the value of the appropriate 
-            key to the appropriate type
-            The following needs to be done for all the parameters in the constructor
-            """
-            for key, value in params.iteritems():
-                params[key] = ast.literal_eval(value) # Much safer than eval()
+        # removing leading and trailing whitespace
+        line = prefix + line.strip()
 
-        except (RuntimeError, ValueError) as pe:
-            print('some went wrong parsing the parameters file', pe.message)
+        # Ignore lines that are empty or start with comment
+        if (len(line) == 0) or line.startswith('#'):
+            continue
 
-    except IOError as e:
-        print("Something went wrong reading the parameters file: ", e.strerror,
-              e.filename)
+        # Record current line plus a space in prefix, then continue to next
+        # if line ends in a "\"
+        if line[-1] == '\\':
+            prefix += line[:-1] + ' '
+            continue
 
-    # the following will change your dict to a pandas df
-    # param_df = pandas.DataFrame(params, index=[0])
-    return params
+        # Otherwise, clean prefix and continue with this parsing
+        else:
+            prefix = ''
+
+        # Parse line using pattern
+        match = re.match(pattern, line)
+
+        # If line matches, record parameter name and value
+        if match:
+            param_name = match.group('param_name')
+            param_value_str = match.group('param_value')
+
+            # Evaluate parameter value as Python literal
+            try:
+                params_dict[param_name] = ast.literal_eval(param_value_str)
+                if print_params:
+                    print('[set] %s = %s' % (param_name, param_value_str))
+
+            except ValueError:
+                if print_warnings:
+                    print(('Warning: could not set parameter "%s" because ' +
+                          'could not interpret "%s" as literal.') %
+                          (param_name, param_value_str))
+            except SyntaxError:
+                if print_warnings:
+                    print(('Warning: could not set parameter "%s" because ' +
+                          'of a syntax error in "%s".') %
+                          (param_name, param_value_str))
+
+
+        elif print_warnings:
+            print('Warning: could not parse line "%s".' % line)
+
+    return params_dict
