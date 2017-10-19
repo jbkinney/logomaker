@@ -804,7 +804,7 @@ def make_styled_logo(style_file, *args, **user_kwargs):
         args (list): standard args list passed by user
 
         user_kwargs (dict): user-specified keyword arguments used to overwrite
-            the keyword arguments specified in style_file
+            the keyword arguments specified in style_file.
     """
 
     # Load kwargs in parameters file
