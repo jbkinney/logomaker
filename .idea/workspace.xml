@@ -2,10 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.ipynb_checkpoints/test_logo_types-checkpoint.ipynb" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/test_logo_types-checkpoint.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data.py" afterPath="$PROJECT_DIR$/data.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logomaker.py" afterPath="$PROJECT_DIR$/logomaker.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_logo_types.ipynb" afterPath="$PROJECT_DIR$/test_logo_types.ipynb" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -324,7 +320,14 @@
       <option name="project" value="LOCAL" />
       <updated>1508413568200</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="created make_style_logo and simplified both make_logo and Logo.__init__()">
+      <created>1508423672440</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1508423672440</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -392,7 +395,8 @@
     <MESSAGE value="Implemented character transformations" />
     <MESSAGE value="Moved patch computation to character constructor, out of draw() function" />
     <MESSAGE value="Included ability to read parameters_file into make_logo, but I think this was a bad idea." />
-    <option name="LAST_COMMIT_MESSAGE" value="Included ability to read parameters_file into make_logo, but I think this was a bad idea." />
+    <MESSAGE value="created make_style_logo and simplified both make_logo and Logo.__init__()" />
+    <option name="LAST_COMMIT_MESSAGE" value="created make_style_logo and simplified both make_logo and Logo.__init__()" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
