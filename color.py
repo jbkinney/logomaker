@@ -16,11 +16,7 @@ color_scheme_dict = {
         'A': [0, .5, 0]
     },
 
-    'black': {
-        'ACGT': three_zeros
-    },
-
-    'gray': {
+    'grays': {
         'A': .2 * three_ones,
         'C': .4 * three_ones,
         'G': .6 * three_ones,

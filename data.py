@@ -19,7 +19,6 @@ def validate_mat(mat):
     except:
         mat_type = None
     mat = mat.copy()
-    mat.logomaker_type = mat_type
 
     assert type(mat) == pd.core.frame.DataFrame, 'Error: df is not a dataframe'
     cols = mat.columns
@@ -59,6 +58,7 @@ def validate_mat(mat):
     char_cols = list(mat.columns)
     char_cols.sort()
     mat = mat[char_cols]
+    mat.logomaker_type = mat_type
 
     # Return cleaned-up df
     return mat
