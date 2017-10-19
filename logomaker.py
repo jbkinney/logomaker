@@ -39,30 +39,7 @@ to_protein = dict(zip(PROTEIN, protein))
 
 from data import load_alignment
 
-
-def actual_kwargs():
-    """
-    Decorator that provides the wrapped function with an attribute 'actual_kwargs'
-    containing just those keyword arguments actually passed in to the function.
-    found here:
-    https://stackoverflow.com/questions/1408818/getting-the-the-keyword-arguments-actually-passed-to-a-python-method
-    """
-    def decorator(function):
-        def inner(*args, **kwargs):
-
-            # Record names of all function arguments
-            inner.arg_names = inspect.getargspec(function)[0]
-
-            # Record names of keywords passed by user
-            inner.user_kwargs = kwargs
-
-            return function(*args, **kwargs)
-        return inner
-    return decorator
-
-@actual_kwargs()
 def make_logo(matrix,
-              parameters_file=None,
               matrix_type=None,
               logo_type=None,
               background=None,
@@ -140,13 +117,12 @@ def make_logo(matrix,
         background: [WRITE]
 
         pseudocount (float): For converting a counts matrix to a probability
-            matrix. Must be >= 0. [IMPLEMENT]
+            matrix. Must be >= 0.
 
         energy_gamma (float): For conversion from log enrichment to energy.
-            [IMPLEMENT]
 
-        energy_units (str): Units to display in ylabel of energy logo.
-            [IMPLEMENT]
+        energy_units (str): Units to display in ylabel of energy logo. Does not
+            affect energy value.
 
         enrichment_logbase (str): Logarithm to use when computing enrichment.
             Value can be '2', '10', or 'e'. [IMPLEMENT]
@@ -314,43 +290,8 @@ def make_logo(matrix,
 
         yticklabels (list): Overrides automatic determination by matplotlib.
 
-        ylabel (string): Overrides value determined by "logo_style".
-
+        ylabel (string): Overrides value determined by "logo_type".
     """
-
-    # Read in args from parameters_file
-    file_kwargs = load_parameters(parameters_file)
-
-    # Get list of user-specified arguments
-    user_kwargs = make_logo.user_kwargs
-
-    # Report on user-specified and file-specified variables
-    reports = []
-    for arg_name in make_logo.arg_names:
-        # Report argumet if set by user
-        if arg_name in user_kwargs:
-            arg_value = user_kwargs[arg_name]
-            reports.append('[user] %s : %s' %(arg_name, repr(arg_value)))
-
-        # Otherwise, report and set argument specified in file
-        elif arg_name in file_kwargs:
-            arg_value = file_kwargs[arg_name]
-
-            # WARNING: input to exec needs to be safe!
-            exec_str = '%s = %s' % (arg_name, repr(arg_value))
-            exec(exec_str)
-            reports.append('[file] %s : %s' % (arg_name, repr(arg_value)))
-
-        # Otherwise, report argument specified by default
-        # else:
-        #     reports.append('[default] %s : %s' % \
-        #                    (arg_name, repr(eval(arg_name))))
-
-    # Print report contents
-    reports.sort()
-    print '### Parameters ###'
-    for report in reports:
-        print report
 
     # Validate matrix
     matrix = data.validate_mat(matrix)
@@ -360,31 +301,36 @@ def make_logo(matrix,
         print 'Warning: invalid logo_type = %s. Using None.' % repr(logo_type)
         logo_type = None
 
-    # Set matrix_type if it is None and the user didn't specify it to be so
-    if (matrix_type is None):
+    # Set matrix_type if it is None but matrix.logomaker_type is set
+    if (matrix_type is None) and ('logomaker_type' in matrix.__dict__):
+        if matrix.logomaker_type in LOGOMAKER_TYPES:
+            matrix_type = matrix.logomaker_type
 
-        # If user specified matrix_type = None
-        if ('matrix_type' in make_logo.user_kwargs) and not (logo_type is None):
-            logo_type = None
-            print 'Warning: matrix_type is None, so setting logo_type=None.'
-
-        # If matrix specifies a matrix type
-        elif ('logomaker_type' in matrix.__dict__):
-            if matrix.logomaker_type in LOGOMAKER_TYPES:
-                matrix_type = matrix.logomaker_type
-            else:
-                print 'Warning: invalid matrix.logomaker_type = %s.' % \
-                      repr(matrix.logomaker_type) +' Using matrix_type = None.'
+            # If logo_type is not specified, default to matrix_type
+            if logo_type is None:
+                logo_type = matrix_type
+        else:
+            print 'Warning: invalid matrix.logomaker_type = %s.' % \
+                  repr(matrix.logomaker_type) +' Using matrix_type = None.'
 
     # Get background matrix
     bg_mat = data.set_bg_mat(background, matrix)
 
+    # Keyword arguments to send to data.transform_mat
+    transform_mat_kwargs = {
+        'matrix':matrix,
+        'from_type':matrix_type,
+        'background':bg_mat,
+        'pseudocount':pseudocount,
+        'energy_gamma':energy_gamma,
+        'enrichment_logbase':enrichment_logbase,
+        'information_units':information_units
+    }
+
     if logo_type == 'counts':
         # Transform input matrix to freq_mat
-        matrix = data.transform_mat(matrix,
-                                    from_type=matrix_type,
-                                    to_type='counts',
-                                    background=bg_mat)
+        matrix = data.transform_mat(to_type='counts',
+                                    **transform_mat_kwargs)
         ymax = matrix.values.sum(axis=1).max()
 
         # Change default plot settings
@@ -395,10 +341,8 @@ def make_logo(matrix,
 
     elif logo_type == 'probability':
         # Transform input matrix to freq_mat
-        matrix = data.transform_mat(matrix,
-                                    from_type=matrix_type,
-                                    to_type='probability',
-                                    background=bg_mat)
+        matrix = data.transform_mat(to_type='probability',
+                                    **transform_mat_kwargs)
 
         # Change default plot settings
         if ylim is None:
@@ -408,38 +352,40 @@ def make_logo(matrix,
 
     elif logo_type == 'information':
         # Transform input matrix to info_mat
-        matrix = data.transform_mat(matrix,
-                                    from_type=matrix_type,
-                                    to_type='information',
-                                    background=bg_mat)
+        matrix = data.transform_mat(to_type='information',
+                                    **transform_mat_kwargs)
 
         # Change default plot settings
         if ylim is None and (background is None):
             ylim = [0, np.log2(matrix.shape[1])]
         if ylabel is None:
-            ylabel = 'information\n(bits)'
+            ylabel = 'information\n(%s)' % information_units
 
     elif logo_type == 'enrichment':
         # Transform input matrix to weight_mat
-        matrix = data.transform_mat(matrix,
-                                    from_type=matrix_type,
-                                    to_type='enrichment',
-                                    background=bg_mat)
+        matrix = data.transform_mat(to_type='enrichment',
+                                    **transform_mat_kwargs)
 
         # Change default plot settings
         if ylabel is None:
-            ylabel = '$\log_2$\nenrichment'
+            if enrichment_logbase == 2:
+                ylabel = '$\log_2$\nenrichment'
+            elif enrichment_logbase == 10:
+                ylabel = '$\log_{10}$\nenrichment'
+            elif enrichment_logbase == np.e:
+                ylabel = '$\ln $\nenrichment'
+            else:
+                assert False, 'Error: invalid choice of enrichment_logbase=%f'\
+                              % enrichment_logbase
 
     elif logo_type == 'energy':
         # Transform input matrix to weight_mat
-        matrix = data.transform_mat(matrix,
-                                    from_type=matrix_type,
-                                    to_type='energy',
-                                    background=background)
+        matrix = data.transform_mat(to_type='energy',
+                                    **transform_mat_kwargs)
 
         # Change default plot settings
         if ylabel is None:
-            ylabel = '- energy\n($k_B T$)'
+            ylabel = '- energy\n(%s)' % energy_units
 
     elif logo_type is None:
         matrix = data.validate_mat(matrix)
@@ -450,10 +396,19 @@ def make_logo(matrix,
 
     # Record kwargs for Logo constructor
     kwargs_for_logo = {}
-    for arg_name in make_logo.arg_names:
+
+    # Explicitly kwargs modified in this function
+    kwargs_for_logo['matrix'] = matrix
+    kwargs_for_logo['ylim'] = ylim
+    kwargs_for_logo['ylabel'] = ylabel
+
+    # Record rest of kwargs
+    for arg_name in inspect.getargspec(Logo.__init__)[0]:
+        if arg_name == 'self':
+            continue
         kwargs_for_logo[arg_name] = eval(arg_name)
 
-    # Create Logo instance
+    # Create Logo instance and set logo_type
     logo = Logo(**kwargs_for_logo)
     logo.logo_type = logo_type
 
@@ -463,14 +418,52 @@ def make_logo(matrix,
 
 # Logo base class
 class Logo:
-    def __init__(self, **kwargs):
+    def __init__(self,
+                 matrix,
+                 colors='black',
+                 characters=None,
+                 alpha=1.,
+                 edgecolors='none',
+                 edgewidth=0.,
+                 boxcolors='white',
+                 boxalpha=0.,
+                 highlight_sequence=None,
+                 highlight_colors=None,
+                 highlight_alpha=None,
+                 highlight_edgecolors=None,
+                 highlight_edgewidth=None,
+                 highlight_boxcolors=None,
+                 highlight_boxalpha=None,
+                 hpad=0.,
+                 vpad=0.,
+                 axes_style='classic',
+                 font_family=None,
+                 font_weight=None,
+                 font_file=None,
+                 font_style=None,
+                 font_properties=None,
+                 stack_order='big_on_top',
+                 use_transparency=False,
+                 max_alpha_val=None,
+                 below_shade=1.,
+                 below_alpha=1.,
+                 below_flip=True,
+                 baseline_width=.5,
+                 xlim=None,
+                 xticks=None,
+                 xticklabels=None,
+                 xlabel='position',
+                 ylim=None,
+                 yticks=None,
+                 yticklabels=None,
+                 ylabel=None):
 
         # Record user font input
-        self.in_font_file = kwargs['font_file']
-        self.in_font_style = kwargs['font_style']
-        self.in_font_weight = kwargs['font_weight']
-        self.in_font_family = kwargs['font_family']
-        self.in_font_properties = kwargs['font_properties']
+        self.in_font_file = font_file
+        self.in_font_style = font_style
+        self.in_font_weight = font_weight
+        self.in_font_family = font_family
+        self.in_font_properties = font_properties
 
         # If user supplies a FontProperties object, validate it
         if self.in_font_properties is not None:
@@ -485,12 +478,12 @@ class Logo:
                                                   fname=self.in_font_file,
                                                   style=self.in_font_style)
         # Set data
-        self.in_df = kwargs['matrix'].copy()
+        self.in_df = matrix.copy()
 
         # Characters:
         # Restrict to provided characters if string or list of characters
         # Transform to provided characters if dictionary
-        self.in_characters = kwargs['characters']
+        self.in_characters = characters
         if self.in_characters is None:
             self.df = self.in_df.copy()
         elif isinstance(self.in_characters, dict):
@@ -507,14 +500,14 @@ class Logo:
         self.L = len(self.poss)
 
         # Set normal character format
-        self.facecolors = kwargs['colors']
-        self.edgecolors = kwargs['edgecolors']
-        self.edgewidth = kwargs['edgewidth']
-        self.alpha = float(kwargs['alpha'])
-        self.boxcolors = kwargs['boxcolors']
-        self.boxalpha = float(kwargs['boxalpha'])
-        self.hpad = kwargs['hpad']
-        self.vpad = kwargs['vpad']
+        self.facecolors = colors
+        self.edgecolors = edgecolors
+        self.edgewidth = edgewidth
+        self.alpha = float(alpha)
+        self.boxcolors = boxcolors
+        self.boxalpha = float(boxalpha)
+        self.hpad = hpad
+        self.vpad = vpad
 
         # Set normal character color dicts
         self.facecolors_dict = \
@@ -531,24 +524,24 @@ class Logo:
                                      alpha=self.boxalpha)
 
         # Set higlighted character format
-        self.highlight_facecolors = kwargs['highlight_colors'] \
-            if kwargs['highlight_colors'] is not None \
-            else kwargs['colors']
-        self.highlight_edgecolors = kwargs['highlight_edgecolors'] \
-            if kwargs['highlight_edgecolors'] is not None  \
-            else kwargs['edgecolors']
-        self.highlight_edgewidth = kwargs['highlight_edgewidth'] \
-            if kwargs['highlight_edgewidth'] is not None \
-            else kwargs['edgewidth']
-        self.highlight_alpha = float(kwargs['highlight_alpha']) \
-            if kwargs['highlight_alpha'] is not None \
-            else kwargs['alpha']
-        self.highlight_boxcolors = kwargs['highlight_boxcolors'] \
-            if kwargs['highlight_boxcolors'] is not None \
-            else kwargs['boxcolors']
-        self.highlight_boxalpha = float(kwargs['highlight_boxalpha']) \
-            if kwargs['highlight_boxalpha'] is not None \
-            else kwargs['boxalpha']
+        self.highlight_facecolors = highlight_colors \
+            if highlight_colors is not None \
+            else colors
+        self.highlight_edgecolors = highlight_edgecolors\
+            if highlight_edgecolors is not None  \
+            else edgecolors
+        self.highlight_edgewidth = highlight_edgewidth\
+            if highlight_edgewidth is not None \
+            else edgewidth
+        self.highlight_alpha = float(highlight_alpha) \
+            if highlight_alpha is not None \
+            else highlight_alpha
+        self.highlight_boxcolors = highlight_boxcolors \
+            if highlight_boxcolors is not None \
+            else boxcolors
+        self.highlight_boxalpha = float(highlight_boxalpha) \
+            if highlight_boxalpha is not None \
+            else boxalpha
 
         # Set highlight character color dicts
         self.highlight_facecolors_dict = \
@@ -565,9 +558,9 @@ class Logo:
                                      alpha=self.highlight_alpha)
 
         # Set wild type sequence
-        self.highlight_sequence = kwargs['highlight_sequence']
-        if self.highlight_sequence  is not None:
-            assert isinstance(self.highlight_sequence , basestring)
+        self.highlight_sequence = highlight_sequence
+        if self.highlight_sequence is not None:
+            assert isinstance(self.highlight_sequence, basestring)
             assert len(self.highlight_sequence ) == len(self.poss)
             assert set(list(str(self.highlight_sequence))) == set(self.chars),\
                 'Error: highlight_sequence %s contains invalid characters'\
@@ -577,36 +570,36 @@ class Logo:
             self.use_highlight = False
 
         # Set other character styling
-        self.logo_style = kwargs['axes_style']
-        self.stack_order = kwargs['stack_order']
-        self.use_transparency = kwargs['use_transparency']
-        self.neg_shade = float(kwargs['below_shade'])
-        self.neg_alpha = float(kwargs['below_alpha'])
-        self.neg_flip = kwargs['below_flip']
-        self.max_alpha_val = kwargs['max_alpha_val']
-        self.use_transparency = kwargs['use_transparency']
+        self.logo_style = axes_style
+        self.stack_order = stack_order
+        self.use_transparency = use_transparency
+        self.neg_shade = float(below_shade)
+        self.neg_alpha = float(below_alpha)
+        self.neg_flip = below_flip
+        self.max_alpha_val = max_alpha_val
+        self.use_transparency = use_transparency
 
         # Compute characters and box
         self.compute_characters()
 
         # Set x axis params
         self.xlim = [self.bbox.xmin, self.bbox.xmax]\
-            if kwargs['xlim'] is None else kwargs['xlim']
+            if xlim is None else xlim
         self.xticks = range(len(self.poss)) \
-            if kwargs['xticks'] is None else kwargs['xticks']
+            if xticks is None else xticks
         self.xticklabels = self.poss\
-            if kwargs['xticklabels'] is None else kwargs['xticklabels']
-        self.xlabel = kwargs['xlabel']
+            if xticklabels is None else xticklabels
+        self.xlabel = xlabel
 
         # Set y axis params
         self.ylim = [self.bbox.ymin, self.bbox.ymax]\
-            if kwargs['ylim'] is None else kwargs['ylim']
-        self.ylabel = kwargs['ylabel']
-        self.yticks = kwargs['yticks']
-        self.yticklabels = kwargs['yticklabels']
+            if ylim is None else ylim
+        self.ylabel = ylabel
+        self.yticks = yticks
+        self.yticklabels = yticklabels
 
         # Set other formatting parameters
-        self.floor_line_width = kwargs['baseline_width']
+        self.floor_line_width = baseline_width
 
 
     def compute_characters(self):
@@ -710,7 +703,6 @@ class Logo:
         ymax = max([c.bbox.ymax for c in char_list])
         bbox = Bbox([[xmin, ymin], [xmax, ymax]])
 
-
         # Set char_list and box
         self.char_list = char_list
         self.bbox = bbox
@@ -792,6 +784,40 @@ class Logo:
         if self.yticklabels is not None:
             ax.set_yticklabels(self.yticklabels)
 
+
+def make_styled_logo(style_file, *args, **user_kwargs):
+    """
+    Description:
+
+        Generates a logo using default parameters specified in a style file that
+        can be overwritten by the user. For detailed information on all
+        possible arguments, see make_logo()
+
+    Return:
+
+        logo (logomaker.Logo): a rendered logo.
+
+    Args:
+
+        style_file (str): file containing default keyword arguments
+
+        args (list): standard args list passed by user
+
+        user_kwargs (dict): user-specified keyword arguments used to overwrite
+            the keyword arguments specified in style_file
+    """
+
+    # Load kwargs in parameters file
+    file_kwargs = load_parameters(style_file)
+
+    # Set kwargs equal to file_kwargs, modified by user_kwargs
+    kwargs = dict(file_kwargs, **user_kwargs)
+
+    # Make logo
+    logo = make_logo(*args, **kwargs)
+
+    # Return logo to user
+    return logo
 
 def load_parameters(file_name):
     """

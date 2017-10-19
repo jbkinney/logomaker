@@ -7,7 +7,7 @@ import pdb
 # Set constants
 SMALL = 1E-6
 
-def validate_mat(mat):
+def validate_mat(matrix):
     '''
     Runs assert statements to verify that df is indeed a motif dataframe.
     Returns a cleaned-up version of df if possible
@@ -15,13 +15,13 @@ def validate_mat(mat):
 
     # Copy and preserve logomaker_type
     try:
-        mat_type = mat.logomaker_type
+        mat_type = matrix.logomaker_type
     except:
         mat_type = None
-    mat = mat.copy()
+    matrix = matrix.copy()
 
-    assert type(mat) == pd.core.frame.DataFrame, 'Error: df is not a dataframe'
-    cols = mat.columns
+    assert type(matrix) == pd.core.frame.DataFrame, 'Error: df is not a dataframe'
+    cols = matrix.columns
 
     for i, col_name in enumerate(cols):
         # Ok to have a 'pos' column
@@ -45,83 +45,88 @@ def validate_mat(mat):
             'Error: column name "%s" is a whitespace charcter.'%repr(col_name)
 
         # Set revised column name
-        mat.rename(columns={col_name:new_col_name}, inplace=True)
+        matrix.rename(columns={col_name:new_col_name}, inplace=True)
 
     # If there is a pos column, make that the index
     if 'pos' in cols:
-        mat.set_index('pos', drop=True, inplace=True)
+        matrix.set_index('pos', drop=True, inplace=True)
 
     # Remove name from index column
-    mat.index.names = [None]
+    matrix.index.names = [None]
 
     # Alphabetize character columns
-    char_cols = list(mat.columns)
+    char_cols = list(matrix.columns)
     char_cols.sort()
-    mat = mat[char_cols]
-    mat.logomaker_type = mat_type
+    matrix = matrix[char_cols]
+    matrix.logomaker_type = mat_type
 
     # Return cleaned-up df
-    return mat
+    return matrix
 
-def validate_probability_mat(mat):
+def validate_probability_mat(matrix):
     '''
     Verifies that the df is indeed a probability motif dataframe.
     Returns a normalized and cleaned-up version of df if possible
     '''
 
     # Validate as motif
-    mat = validate_mat(mat)
+    matrix = validate_mat(matrix)
 
     # Validate df values as info values
-    assert (all(mat.values.ravel() >= 0)), \
+    assert (all(matrix.values.ravel() >= 0)), \
         'Error: not all values in df are >=0.'
 
     # Normalize across columns
-    mat.loc[:, :] = mat.values / mat.values.sum(axis=1)[:, np.newaxis]
+    matrix.loc[:, :] = matrix.values / matrix.values.sum(axis=1)[:, np.newaxis]
 
     # Label matrix type
-    mat.logomaker_type = 'probability'
+    matrix.logomaker_type = 'probability'
 
-    return mat
+    return matrix
 
 
-def transform_mat(mat, to_type, from_type=None, background=None, beta=1, pseudocount=1):
+def transform_mat(matrix, to_type, from_type=None, background=None,
+                  energy_gamma=1, pseudocount=1, enrichment_logbase=2,
+                  information_units='bits'):
     '''
     transform_mat(): transforms a matrix of one type into another.
-    :param mat: input matrix, in data frame format
+    :param matrix: input matrix, in data frame format
     :param from_type: type of matrix to transform from
     :param to_type: type of matrix to transform to
     :param background: background base frequencies
-    :param beta: parameter for converting energies to frequencies
+    :param gamma: parameter for converting energies to frequencies
     :param pseudocount: psuedocount used to convert count_mat to freq_mat
     :return: out_mat, a matrix in data frame format of the specified output type
     '''
 
-    # Check that mat is valid
-    mat = validate_mat(mat)
+    # Check that matrix is valid
+    matrix = validate_mat(matrix)
 
     # Get from_type if not specified
     if from_type is None:
         try:
-            from_type = mat.logomaker_type
+            from_type = matrix.logomaker_type
         except:
             assert False, 'Cant determine from_type'
 
-    # Create background mat
-    bg_mat = set_bg_mat(background=None, mat=mat)
+    # Create background matrix
+    bg_mat = set_bg_mat(background=background, matrix=matrix)
 
     # Compute freq_mat from from_type
     if from_type == 'probability':
-        probability_mat = validate_probability_mat(mat)
+        probability_mat = validate_probability_mat(matrix)
 
     elif from_type == 'counts':
-        probability_mat = counts_mat_to_probability_mat(mat, pseudocount=pseudocount)
+        probability_mat = counts_mat_to_probability_mat(matrix,
+                                                        pseudocount=pseudocount)
 
     elif from_type == 'energy':
-        probability_mat = energy_mat_to_probability_mat(mat, bg_mat, beta)
+        probability_mat = energy_mat_to_probability_mat(matrix, bg_mat,
+                                                        gamma=energy_gamma)
 
     elif from_type == 'enrichment':
-        probability_mat = enrichment_mat_to_probability_mat(mat, bg_mat)
+        probability_mat = enrichment_mat_to_probability_mat(matrix, bg_mat,
+                                                            base=enrichment_logbase)
 
     else:
         assert False, 'Error! from_type %s is invalid.'%from_type
@@ -129,21 +134,25 @@ def transform_mat(mat, to_type, from_type=None, background=None, beta=1, pseudoc
     # Compute out_mat from freq_mat
     if to_type == 'counts':
         if from_type == 'counts':
-            out_mat = mat
+            out_mat = matrix
         else:
-            assert False, 'Cannot convert from %s to count_mat'%mat.logomaker_type
+            assert False, 'Cannot convert from %s to count_mat' % \
+                          matrix.logomaker_type
 
     elif to_type == 'probability':
         out_mat = probability_mat
 
     elif to_type == 'energy':
-        out_mat = probability_mat_to_energy_mat(probability_mat, bg_mat, beta)
+        out_mat = probability_mat_to_energy_mat(probability_mat, bg_mat,
+                                                gamma=energy_gamma)
 
     elif to_type == 'enrichment':
-        out_mat = probability_mat_to_enrichment_mat(probability_mat, bg_mat)
+        out_mat = probability_mat_to_enrichment_mat(probability_mat, bg_mat,
+                                                    base=enrichment_logbase)
 
     elif to_type == 'information':
-        out_mat = probability_mat_to_information_mat(probability_mat, bg_mat)
+        out_mat = probability_mat_to_information_mat(probability_mat, bg_mat,
+                                                     units=information_units)
 
     else:
         assert False, 'Error! to_type %s is invalid.'%to_type
@@ -169,7 +178,7 @@ def counts_mat_to_probability_mat(count_mat, pseudocount=1):
     freq_mat.logomaker_type = 'probability'
     return freq_mat
 
-def energy_mat_to_probability_mat(energy_mat, bg_mat, beta=1):
+def energy_mat_to_probability_mat(energy_mat, bg_mat, gamma=1):
     '''
     Converts an energy_mat to a freq_mat
     '''
@@ -180,7 +189,7 @@ def energy_mat_to_probability_mat(energy_mat, bg_mat, beta=1):
     freq_mat = energy_mat.copy()
     vals = energy_mat.values
     vals -= vals.mean(axis=1)[:, np.newaxis]
-    weights = np.exp(-beta * vals) * bg_mat.values
+    weights = np.exp(-gamma * vals) * bg_mat.values
     freq_mat.loc[:, :] = weights / weights.sum(axis=1)[:, np.newaxis]
     freq_mat = normalize_freq_mat(freq_mat)
 
@@ -208,7 +217,7 @@ def enrichment_mat_to_probability_mat(weight_mat, bg_mat, base=2):
     freq_mat.logomaker_type = 'probability'
     return freq_mat
 
-def probability_mat_to_energy_mat(freq_mat, bg_mat, beta):
+def probability_mat_to_energy_mat(freq_mat, bg_mat, gamma):
     '''
     Converts a freq_mat to an energy_mat
     '''
@@ -218,7 +227,7 @@ def probability_mat_to_energy_mat(freq_mat, bg_mat, beta):
     # Compute energy_mat
     energy_mat = freq_mat.copy()
     vals = freq_mat.values
-    energy_mat.loc[:,:] = (1/beta)*np.log(vals/bg_mat.values)
+    energy_mat.loc[:,:] = (1 / gamma) * np.log(vals / bg_mat.values)
     energy_mat = normalize_energy_mat(energy_mat)
 
     # Validate and return
@@ -226,7 +235,7 @@ def probability_mat_to_energy_mat(freq_mat, bg_mat, beta):
     energy_mat.logomaker_type = 'energy'
     return energy_mat
 
-def probability_mat_to_enrichment_mat(freq_mat, bg_mat):
+def probability_mat_to_enrichment_mat(freq_mat, bg_mat, base=2):
     '''
     Converts a freq_mat to an energy_mat
     '''
@@ -235,7 +244,7 @@ def probability_mat_to_enrichment_mat(freq_mat, bg_mat):
 
     # Compute weight_mat
     weight_mat = freq_mat.copy()
-    weight_mat.loc[:, :] = np.log2(freq_mat / bg_mat)
+    weight_mat.loc[:, :] = np.log2(freq_mat / bg_mat)/np.log2(base)
 
     # Validate and return
     weight_mat = validate_mat(weight_mat)
@@ -243,16 +252,24 @@ def probability_mat_to_enrichment_mat(freq_mat, bg_mat):
     return weight_mat
 
 # Needed only for display purposes
-def probability_mat_to_information_mat(freq_mat, bg_mat):
+def probability_mat_to_information_mat(freq_mat, bg_mat, units='bits'):
     '''
     Converts a prob df to an information df
     '''
+    # Set units
+    if units=='bits':
+        multiplier = 1
+    elif units=='nats':
+        multiplier = 1./np.log2(np.e)
+    else:
+        assert False, 'Error: invalid selection for units = %s' % units
+
     # Validate mat before use
     freq_mat = validate_probability_mat(freq_mat)
     info_mat = freq_mat.copy()
 
-    info_list = (freq_mat.values*np.log2(freq_mat.values/bg_mat.values))\
-                    .sum(axis=1)
+    info_list = (freq_mat.values * multiplier *
+                 np.log2(freq_mat.values/bg_mat.values)).sum(axis=1)
 
     info_mat.loc[:, :] = freq_mat.values*info_list[:,np.newaxis]
 
@@ -280,45 +297,45 @@ def normalize_freq_mat(freq_mat, regularize=True):
     return mat
 
 
-def set_bg_mat(background, mat):
+def set_bg_mat(background, matrix):
     '''
     Creates a background matrix given a background specification and matrix
     with the right rows and columns
      '''
-    num_pos, num_cols = mat.shape
+    num_pos, num_cols = matrix.shape
 
     # Create background from scratch
     if background is None:
-        new_bg_mat = mat.copy()
+        new_bg_mat = matrix.copy()
         new_bg_mat.loc[:, :] = 1 / num_cols
 
     # Expand rows of list or numpy array background
     elif type(background) == list or type(background) == np.ndarray:
-        assert len(background) == mat.shape[1], \
+        assert len(background) == matrix.shape[1], \
             'Error: df and background have mismatched dimensions.'
-        new_bg_mat = mat.copy()
+        new_bg_mat = matrix.copy()
         background = np.array(background).ravel()
         new_bg_mat.loc[:, :] = background
 
     elif type(background) == dict:
-        assert set(background.keys()) == set(mat.columns), \
+        assert set(background.keys()) == set(matrix.columns), \
             'Error: df and background have different columns.'
-        new_bg_mat = mat.copy()
+        new_bg_mat = matrix.copy()
         for i in new_bg_mat.index:
             new_bg_mat.loc[i, :] = background
 
     # Expand single-row background data frame
     elif type(background) == pd.core.frame.DataFrame and \
                     background.shape == (1, num_cols):
-        assert all(mat.columns == background.columns), \
+        assert all(matrix.columns == background.columns), \
             'Error: df and bg_mat have different columns.'
-        new_bg_mat = mat.copy()
+        new_bg_mat = matrix.copy()
         new_bg_mat.loc[:, :] = background.values.ravel()
 
     # Use full background dataframe
     elif type(background) == pd.core.frame.DataFrame and \
-                    background.index == mat.index:
-        assert all(mat.columns == background.columns), \
+                    all(background.index == matrix.index):
+        assert all(matrix.columns == background.columns), \
             'Error: df and bg_mat have different columns.'
         new_bg_mat = background.copy()
 
@@ -330,7 +347,8 @@ def set_bg_mat(background, mat):
 
 
 
-def load_alignment(file_name=None, sequences=None, sequence_counts=None, characters=None, positions=None):
+def load_alignment(file_name=None, sequences=None, sequence_counts=None,
+                   characters=None, positions=None):
 
     # If loading file name
     if file_name is not None:
