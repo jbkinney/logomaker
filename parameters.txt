@@ -1,0 +1,8 @@
+
+logo_type : 'probability'
+below_flip : True
+width : .9
+axes_style : 'rails'
+use_transparency : False
+stack_order : 'small_on_top'
+use_transparency : True
