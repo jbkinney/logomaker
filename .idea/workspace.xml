@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/sortseq_test.ipynb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logomaker.py" afterPath="$PROJECT_DIR$/logomaker.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sortseq_test.ipynb" afterPath="$PROJECT_DIR$/sortseq_test.ipynb" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -30,8 +30,8 @@
       <file leaf-file-name="logomaker.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/logomaker.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="732">
-              <caret line="539" column="33" lean-forward="false" selection-start-line="539" selection-start-column="33" selection-end-line="539" selection-end-column="33" />
+            <state relative-caret-position="580">
+              <caret line="552" column="55" lean-forward="true" selection-start-line="552" selection-start-column="55" selection-end-line="552" selection-end-column="55" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -337,7 +337,14 @@
       <option name="project" value="LOCAL" />
       <updated>1508507217011</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="Added sortseq_test.ipynb">
+      <created>1508513126689</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1508513126689</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -410,7 +417,8 @@
     <MESSAGE value="fixed load_parameters() to use re and accept multi-line input." />
     <MESSAGE value="Created 'vlines' axis format. Implemented xtick_spacing and xtick_anchor also." />
     <MESSAGE value="Minor changes." />
-    <option name="LAST_COMMIT_MESSAGE" value="Minor changes." />
+    <MESSAGE value="Added sortseq_test.ipynb" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added sortseq_test.ipynb" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -643,8 +651,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/logomaker.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="732">
-          <caret line="539" column="33" lean-forward="false" selection-start-line="539" selection-start-column="33" selection-end-line="539" selection-end-column="33" />
+        <state relative-caret-position="580">
+          <caret line="552" column="55" lean-forward="true" selection-start-line="552" selection-start-column="55" selection-end-line="552" selection-end-column="55" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>

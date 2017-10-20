@@ -538,21 +538,23 @@ class Logo:
 
         # If restricting to specific positions
         if use_positions is not None:
-            indices = [(pos in use_positions) for pos in self.poss]
+            indices = np.array([(pos in use_positions) for pos in self.poss])
 
         # If restricting positions to a specific range of positions
         elif use_position_range is not None:
             min = use_position_range[0]
             max = use_position_range[1]
-            indices = (self.poss >= min) & (self.poss < max)
+            indices = np.array((self.poss >= min) & (self.poss < max))
 
         # Otherwise, use all positions
         else:
-            indices = np.ones(self.L)
+            indices = np.ones(self.L).astype(bool)
 
         # Trim df, highlight_sequence, etc. accordingly
         indices = np.array(indices, dtype=bool)
-        self.highlight_sequence = self.highlight_sequence[indices]
+        self.highlight_sequence = \
+            ''.join([c for i, c in enumerate(self.highlight_sequence)
+                     if indices[i]])
         self.df = self.df.loc[indices, :]
         self.poss = self.poss[indices]
         self.L = len(self.poss)
