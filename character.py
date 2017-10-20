@@ -28,8 +28,15 @@ class Character:
         self.hpad = hpad
         self.vpad = vpad
 
+
+    def draw(self, ax):
+        '''
+        Draws the character on a specified axes
+        :param ax: matplotlib axes object
+        :return: None
+        '''
         # Calculate character & box patches
-        self.character_patch, self.box_patch = put_char_in_box(
+        put_char_in_box(ax=ax,
                         char=self.c,
                         bbox=self.bbox,
                         flip=self.flip,
@@ -42,19 +49,10 @@ class Character:
                         hpad=self.hpad,
                         vpad=self.vpad)
 
-    def draw(self, ax):
-        '''
-        Draws the character on a specified axes
-        :param ax: matplotlib axes object
-        :return: None
-        '''
-        ax.add_patch(self.box_patch)
-        ax.add_patch(self.character_patch)
 
 
 
-
-def put_char_in_box(char, bbox, flip=False, facecolor='k',
+def put_char_in_box(ax, char, bbox, flip=False, facecolor='k',
                     edgecolor='none', linewidth=0,
                     font_properties=None, boxcolor='none', boxalpha=0,
                     hpad=0, vpad=0):
@@ -88,10 +86,14 @@ def put_char_in_box(char, bbox, flip=False, facecolor='k',
     char_path = transformation.transform_path(tmp_path)
 
     # Compute patch for box containing character
-    box_patch = Rectangle((bbox.xmin, bbox.ymin), bbox.width, bbox.height, facecolor=boxcolor, alpha=boxalpha)
+    box_patch = Rectangle((bbox.xmin, bbox.ymin), bbox.width, bbox.height,
+                      facecolor=boxcolor, alpha=boxalpha)
+    ax.add_patch(box_patch)
 
     # Compute character patch
-    char_patch = PathPatch(char_path, facecolor=facecolor, edgecolor=edgecolor, linewidth=linewidth)
+    char_patch = PathPatch(char_path, facecolor=facecolor, edgecolor=edgecolor,
+                           linewidth=linewidth)
+    ax.add_patch(char_patch)
 
     # Return patches to user
     return char_patch, box_patch

@@ -78,8 +78,14 @@ def make_logo(matrix,
               below_alpha=1.,
               below_flip=True,
               baseline_width=.5,
+              vline_width=1,
+              vline_color='black',
+              width=1,
               xlim=None,
               xticks=None,
+              xtick_spacing=None,
+              xtick_anchor=0,
+              xtick_format=None,
               xticklabels=None,
               xlabel='position',
               ylim=None,
@@ -450,8 +456,14 @@ class Logo:
                  below_alpha=1.,
                  below_flip=True,
                  baseline_width=.5,
+                 vline_width=1,
+                 vline_color='black',
+                 width=1,
                  xlim=None,
                  xticks=None,
+                 xtick_spacing=None,
+                 xtick_anchor=0,
+                 xtick_format=None,
                  xticklabels=None,
                  xlabel='position',
                  ylim=None,
@@ -509,6 +521,7 @@ class Logo:
         self.boxalpha = float(boxalpha)
         self.hpad = hpad
         self.vpad = vpad
+        self.width = float(width)
 
         # Set normal character color dicts
         self.facecolors_dict = \
@@ -586,11 +599,33 @@ class Logo:
         # Set x axis params
         self.xlim = [self.bbox.xmin, self.bbox.xmax]\
             if xlim is None else xlim
-        self.xticks = range(len(self.poss)) \
-            if xticks is None else xticks
-        self.xticklabels = self.poss\
-            if xticklabels is None else xticklabels
+
+        self.in_xticks = xticks
+        self.in_xticklabels = xticklabels
+        self.xtick_spacing = xtick_spacing
+        self.xtick_anchor = xtick_anchor
+        self.xtick_format = xtick_format
+
+        # Set xticks
+        if xticks is not None:
+            self.xticks = xticks
+        elif xtick_spacing is not None:
+            self.xticks = [pos for pos in self.poss if \
+                           (pos-xtick_anchor) % xtick_spacing == 0.0]
+        else:
+            self.xticks = self.poss
+
+        # Set xticklabels
+        if xticklabels is not None:
+            self.xticklabels = xticklabels
+        elif xtick_format is not None:
+            self.xticklabels = [xtick_format % x for x in self.xticks]
+        else:
+            self.xticklabels = self.xticks
+
         self.xlabel = xlabel
+        self.vline_width = vline_width
+        self.vline_color = to_rgba(vline_color)
 
         # Set y axis params
         self.ylim = [self.bbox.ymin, self.bbox.ymax]\
@@ -630,8 +665,8 @@ class Logo:
             ordered_chars = self.chars[indices]
 
             # This is the same for every character
-            x = float(i) - .5
-            w = 1.0
+            x = pos - self.width/2.0
+            w = self.width
 
             # Initialize y
             y = ymin
@@ -712,12 +747,8 @@ class Logo:
         if ax is None:
             ax = plt.gca()
 
-        # Draw characters
-        for char in self.char_list:
-            char.draw(ax)
-
         # Draw floor line
-        ax.axhline(0,color='k',linewidth=self.floor_line_width)
+        ax.axhline(0, color='k', linewidth=self.floor_line_width)
 
         # Logo-specific formatting
         ax.set_xlim(self.xlim)
@@ -777,6 +808,24 @@ class Logo:
             # box
             ax.axis('on')
 
+        elif self.logo_style == 'vlines':
+
+            for x in self.xticks:
+                ax.axvline(x,
+                           linewidth=self.vline_width,
+                           color=self.vline_color,
+                           zorder=-1)
+
+            ax.xaxis.set_tick_params(width=0)
+            ax.set_xticklabels(self.xticklabels)
+            ax.set_xticks(self.xticks)
+            ax.set_yticks([])
+            ax.set_ylabel('')
+            ax.spines['left'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+            ax.spines['top'].set_visible(False)
+            ax.spines['bottom'].set_visible(False)
+
         else:
             assert False, 'Error! Undefined logo_style=%s' % self.logo_style
 
@@ -785,8 +834,14 @@ class Logo:
         if self.yticklabels is not None:
             ax.set_yticklabels(self.yticklabels)
 
+        # Draw characters
+        for char in self.char_list:
+            char.draw(ax)
 
-def make_styled_logo(style_file, *args, **user_kwargs):
+def make_styled_logo(style_file,
+                     print_params=True,
+                     print_warnings=True,
+                     *args, **user_kwargs):
     """
     Description:
 
@@ -809,7 +864,7 @@ def make_styled_logo(style_file, *args, **user_kwargs):
     """
 
     # Load kwargs in parameters file
-    file_kwargs = load_parameters(style_file)
+    file_kwargs = load_parameters(style_file, print_params, print_warnings)
 
     # Set kwargs equal to file_kwargs, modified by user_kwargs
     kwargs = dict(file_kwargs, **user_kwargs)

@@ -127,6 +127,10 @@ def get_color_dict(color_scheme, chars, alpha, shuffle_colors=False):
         np.random.shuffle(chars)
         color_dict = dict(zip(chars, values))
 
+    # Set alpha=1 if None is provided
+    if alpha is None:
+        alpha = 1.0
+
     # Add an alpha to each color
     for key in color_dict:
         rgb = color_dict[key]
