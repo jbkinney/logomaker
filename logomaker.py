@@ -49,18 +49,18 @@ def make_logo(matrix,
               energy_units='a.u.',
               enrichment_logbase=2,
               information_units='bits',
-              positions=None,
-              use_positions=None,
-              use_position_range=None,
-              colors='black',
+              colors='blue',
               characters=None,
               alpha=1.,
               edgecolors='none',
               edgewidth=0.,
               boxcolors='white',
               boxalpha=0.,
+              positions=None,
+              use_positions=None,
+              use_position_range=None,
               highlight_sequence=None,
-              highlight_colors=None,
+              highlight_colors='tomato',
               highlight_alpha=None,
               highlight_edgecolors=None,
               highlight_edgewidth=None,
@@ -420,7 +420,11 @@ def make_logo(matrix,
 
     # Create Logo instance and set logo_type
     logo = Logo(**kwargs_for_logo)
+
+    # Decorate logo
     logo.logo_type = logo_type
+    logo.background = background
+    logo.bg_mat = bg_mat
 
     # Return Logo instance to user
     return logo
@@ -430,7 +434,7 @@ def make_logo(matrix,
 class Logo:
     def __init__(self,
                  matrix,
-                 colors='black',
+                 colors='blue',
                  characters=None,
                  alpha=1.,
                  edgecolors='none',
@@ -441,10 +445,10 @@ class Logo:
                  use_positions=None,
                  use_position_range=None,
                  highlight_sequence=None,
-                 highlight_colors=None,
-                 highlight_alpha=None,
-                 highlight_edgecolors=None,
-                 highlight_edgewidth=None,
+                 highlight_colors='tomato',
+                 highlight_alpha=1,
+                 highlight_edgecolors='none',
+                 highlight_edgewidth=1,
                  highlight_boxcolors=None,
                  highlight_boxalpha=None,
                  hpad=0.,
@@ -552,9 +556,10 @@ class Logo:
 
         # Trim df, highlight_sequence, etc. accordingly
         indices = np.array(indices, dtype=bool)
-        self.highlight_sequence = \
-            ''.join([c for i, c in enumerate(self.highlight_sequence)
-                     if indices[i]])
+        if highlight_sequence is not None:
+            self.highlight_sequence = \
+                ''.join([c for i, c in enumerate(self.highlight_sequence)
+                         if indices[i]])
         self.df = self.df.loc[indices, :]
         self.poss = self.poss[indices]
         self.L = len(self.poss)

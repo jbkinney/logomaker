@@ -227,7 +227,7 @@ def probability_mat_to_energy_mat(freq_mat, bg_mat, gamma):
     # Compute energy_mat
     energy_mat = freq_mat.copy()
     vals = freq_mat.values
-    energy_mat.loc[:,:] = (1 / gamma) * np.log(vals / bg_mat.values)
+    energy_mat.loc[:, :] = (1 / gamma) * np.log(vals / bg_mat.values)
     energy_mat = normalize_energy_mat(energy_mat)
 
     # Validate and return
@@ -347,24 +347,33 @@ def set_bg_mat(background, matrix):
 
 
 
-def load_alignment(file_name=None, sequences=None, sequence_counts=None,
-                   characters=None, positions=None):
+def load_alignment(fasta_file=None, sequences=None, sequence_counts=None,
+                   characters=None, positions=None, ignore_characters='.-'):
 
     # If loading file name
-    if file_name is not None:
-        # Read in sequences from FASTA file
-        df = pd.io.parsers.read_csv(file_name, comment='>', names=['seq'])
+    if fasta_file is not None:
+
+        # Load lines
+        with open(fasta_file, 'r') as f:
+            lines = f.readlines()
 
         # Remove whitespace
-        for i in range(len(df)):
-            seq = df.loc[i, 'seq'].strip()
-            df.loc[i, 'seq'] = seq
+        pattern = re.compile(r'\s+')
+        lines = [re.sub(pattern, '', line) for line in lines]
 
-        # Get sequences
-        sequences = list(df['seq'])
-        sequence_counts = np.ones(len(sequences))
+        # Remove comment lines
+        pattern = re.compile(r'^[>#]')
+        lines = [line for line in lines if not re.match(pattern, line)]
 
-    assert sequences is not None, 'Error: either file_name or sequences must not be None.'
+        # Remove empty lines
+        lines = [line for line in lines if (len(line) > 0)]
+
+        # Store sequences and counts
+        sequences = lines
+        sequence_counts = np.ones(len(lines))
+
+    assert sequences is not None, \
+        'Error: either fasta_file or sequences must not be None.'
 
     # Get seq length
     L = len(sequences[0])
@@ -403,6 +412,12 @@ def load_alignment(file_name=None, sequences=None, sequence_counts=None,
         v = (char_array == c).astype(float)
         v *= counts_array[:, np.newaxis]
         counts_mat.loc[:, c] = v.sum(axis=0).ravel()
+
+    # Remove columns corresponding to unwanted characters
+    columns = counts_mat.columns.copy()
+    for char in ignore_characters:
+        if char in columns:
+            del counts_mat[char]
 
     # Name index
     counts_mat.index.name = 'pos'

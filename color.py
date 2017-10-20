@@ -86,28 +86,39 @@ def get_color_dict(color_scheme, chars, alpha, shuffle_colors=False):
         is_color = True
     except:
         pass;
-            
+
+    # Initialize color_dict
+    color_dict = {}
+
     # If a single facecolor
     if is_color:
-        color_dict = {}
         for char in chars:
             color_dict[char] = color
+
     # If a predefined facecolor scheme
     elif type(color_scheme) == dict:
         color_dict = expand_color_dict(color_scheme)
         for char in chars:
             assert char in color_dict
+
     # If a string
     elif type(color_scheme) == str:
-        # Check if there is a pre-defined facecolor scheme
-        if color_scheme in color_scheme_dict:
-            color_dict = color_scheme_dict[color_scheme]
-            color_dict = expand_color_dict(color_dict)
+        # Check if color scheme is 'none'
+        if color_scheme == 'none':
+            for char in chars:
+                color_dict[char] = [0, 0, 0, 0]
+            alpha = 0
+
         # Otherwise, check if random
         elif color_scheme == 'random':
-            color_dict = {}
             for char in chars:
                 color_dict[char] = np.random.rand(3)
+
+        # Check if there is a pre-defined facecolor scheme
+        elif color_scheme in color_scheme_dict:
+            color_dict = color_scheme_dict[color_scheme]
+            color_dict = expand_color_dict(color_dict)
+
         else:
             cmap_name = color_scheme
             color_dict = cmap_to_color_scheme(chars, cmap_name)
