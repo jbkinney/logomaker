@@ -49,6 +49,9 @@ def make_logo(matrix,
               energy_units='a.u.',
               enrichment_logbase=2,
               information_units='bits',
+              positions=None,
+              use_positions=None,
+              use_position_range=None,
               colors='black',
               characters=None,
               alpha=1.,
@@ -325,13 +328,13 @@ def make_logo(matrix,
 
     # Keyword arguments to send to data.transform_mat
     transform_mat_kwargs = {
-        'matrix':matrix,
-        'from_type':matrix_type,
-        'background':bg_mat,
-        'pseudocount':pseudocount,
-        'energy_gamma':energy_gamma,
-        'enrichment_logbase':enrichment_logbase,
-        'information_units':information_units
+        'matrix': matrix,
+        'from_type': matrix_type,
+        'background': bg_mat,
+        'pseudocount': pseudocount,
+        'energy_gamma': energy_gamma,
+        'enrichment_logbase': enrichment_logbase,
+        'information_units': information_units
     }
 
     if logo_type == 'counts':
@@ -434,6 +437,9 @@ class Logo:
                  edgewidth=0.,
                  boxcolors='white',
                  boxalpha=0.,
+                 positions=None,
+                 use_positions=None,
+                 use_position_range=None,
                  highlight_sequence=None,
                  highlight_colors=None,
                  highlight_alpha=None,
@@ -507,9 +513,48 @@ class Logo:
         else:
             assert False, 'Error: cant interpret characters %s.' % \
                           repr(self.in_characters)
-
-        self.poss = self.df.index.copy()
         self.chars = np.array([str(c) for c in self.df.columns])
+
+        # Set positions
+        if positions is not None:
+            self.df['pos'] = positions
+            self.df.set_index('pos', inplace=True, drop=True)
+        self.poss = self.df.index.copy()
+        self.L = len(self.poss)
+
+        # Set wild type sequence
+        self.highlight_sequence = highlight_sequence
+        if self.highlight_sequence is not None:
+            assert isinstance(self.highlight_sequence, basestring), \
+                'Error: highlight_sequence is not a string.'
+            assert len(self.highlight_sequence ) == len(self.poss), \
+                'Error: highlight_sequence has a different length than matrix.'
+            assert set(list(str(self.highlight_sequence))) == set(self.chars),\
+                'Error: highlight_sequence %s contains invalid characters'\
+                %self.highlight_sequence
+            self.use_highlight = True
+        else:
+            self.use_highlight = False
+
+        # If restricting to specific positions
+        if use_positions is not None:
+            indices = [(pos in use_positions) for pos in self.poss]
+
+        # If restricting positions to a specific range of positions
+        elif use_position_range is not None:
+            min = use_position_range[0]
+            max = use_position_range[1]
+            indices = (self.poss >= min) & (self.poss < max)
+
+        # Otherwise, use all positions
+        else:
+            indices = np.ones(self.L)
+
+        # Trim df, highlight_sequence, etc. accordingly
+        indices = np.array(indices, dtype=bool)
+        self.highlight_sequence = self.highlight_sequence[indices]
+        self.df = self.df.loc[indices, :]
+        self.poss = self.poss[indices]
         self.L = len(self.poss)
 
         # Set normal character format
@@ -570,18 +615,6 @@ class Logo:
                 color.get_color_dict(color_scheme=self.highlight_boxcolors,
                                      chars=self.chars,
                                      alpha=self.highlight_alpha)
-
-        # Set wild type sequence
-        self.highlight_sequence = highlight_sequence
-        if self.highlight_sequence is not None:
-            assert isinstance(self.highlight_sequence, basestring)
-            assert len(self.highlight_sequence ) == len(self.poss)
-            assert set(list(str(self.highlight_sequence))) == set(self.chars),\
-                'Error: highlight_sequence %s contains invalid characters'\
-                %self.highlight_sequence
-            self.use_highlight = True
-        else:
-            self.use_highlight = False
 
         # Set other character styling
         self.logo_style = axes_style
