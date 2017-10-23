@@ -1,17 +1,11 @@
 
-occurance_threshold: .5
-logo_type : 'counts'
+logo_type : 'probability'
 below_flip : True
-vpad : 0
-axes_style : 'everything'
-font_family : 'fantasy'
-use_transparency : False
-stack_order : 'small_on_top'
-use_transparency : True
-pseudocount : 0
-xtick_spacing : 5
-vline_width : 1
-vline_color : 'yellow'
-width : .8
-max_stretched_character : 'E'
-first_position_is_1: True
+foo bar
+virus : eval(x=5)
+highlight_edgewidth : 1
+colors : 'classic'
+highlight_colors: 'classic'
+highlight_sequence : 'ATTAATGTGAGTTAGCTCACTCATTA'
+vpad : .05
+width : .90

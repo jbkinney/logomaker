@@ -17,11 +17,14 @@ from matplotlib.colors import to_rgb, to_rgba
 
 import warnings
 
-
 # Revise warning output to just show warning, not file name or line number
 def _warning(message, category = UserWarning, filename = '', lineno = -1):
     print('Warning: ' + str(message), file=sys.stderr)
+
+# Comment this line if you want to see line numbers producing warnings
 warnings.showwarning = _warning
+
+# Comment this line if you don't want to see warnings multiple times
 #warnings.simplefilter('always', UserWarning)
 
 

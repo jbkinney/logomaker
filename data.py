@@ -347,26 +347,26 @@ def load_alignment(fasta_file=None, sequences=None, sequence_counts=None,
         positions = range(L)
 
     # Create counts matrix
-    counts_mat = pd.DataFrame(index=positions, columns=characters).fillna(0)
+    counts_mat = pd.DataFrame(index=positions).fillna(0)
 
     # Create array of characters at each position
     char_array = np.array([np.array(list(seq)) for seq in sequences])
 
     # Get list of unique characters
-    characters = np.unique(char_array.ravel())
-    characters.sort()
+    unique_characters = np.unique(char_array.ravel())
+    unique_characters.sort()
 
     # Sum of the number of occurances of each character at each position
-    for c in characters:
+    for c in unique_characters:
         v = (char_array == c).astype(float)
         v *= counts_array[:, np.newaxis]
         counts_mat.loc[:, c] = v.sum(axis=0).ravel()
 
-    # Remove columns corresponding to unwanted characters
-    columns = counts_mat.columns.copy()
-    for char in ignore_characters:
-        if char in columns:
-            del counts_mat[char]
+    # Filter columns
+    counts_mat = filter_columns(counts_mat,
+                                sequence_type=sequence_type,
+                                characters=characters,
+                                ignore_characters=ignore_characters)
 
     # Remove rows with too few counts
     position_counts = counts_mat.values.sum(axis=1)
@@ -378,13 +378,13 @@ def load_alignment(fasta_file=None, sequences=None, sequence_counts=None,
     counts_mat.index.name = 'pos'
     counts_mat.logomaker_type = 'counts'
 
-    # Filter columns
-    counts_mat = filter_columns(counts_mat, sequence_type)
-
     return counts_mat
 
 
-def filter_columns(matrix, sequence_type=None, characters=None):
+def filter_columns(matrix,
+                   sequence_type=None,
+                   characters=None,
+                   ignore_characters='.-'):
 
     # Rename characters if appropriate
     if sequence_type is None:
@@ -416,14 +416,19 @@ def filter_columns(matrix, sequence_type=None, characters=None):
     # Otherwise performing translation, do it
     elif len(translation_dict) > 0:
         # Rename columns
-        matrix.rename(columns=translation_dict)
+        new_matrix = matrix.rename(columns=translation_dict)
         new_columns = list(set(translation_dict.values()))
         new_columns.sort()
-        new_matrix = matrix.loc[:, new_columns]
+        new_matrix = new_matrix.loc[:, new_columns]
 
-    # Otherwise, just return old matrix
+    # Otherwise, just copy matrix
     else:
         new_matrix = matrix.copy()
+
+    # Remove any characters to ignore
+    for char in ignore_characters:
+        if char in new_matrix.columns:
+            del new_matrix[char]
 
     # Record logomaker type
     if 'logomaker_type' in matrix.__dict__:

@@ -37,6 +37,7 @@ def make_logo(matrix=None,
               draw_now=False,
               colors='blue',
               characters=None,
+              ignore_characters='.-',
               sequence_type=None,
               uniform_stretch=False,
               max_stretched_character=None,
@@ -479,6 +480,7 @@ class Logo:
                  matrix,
                  colors,
                  characters,
+                 ignore_characters,
                  sequence_type,
                  uniform_stretch,
                  max_stretched_character,
@@ -551,8 +553,12 @@ class Logo:
                                                   fname=self.in_font_file,
                                                   style=self.in_font_style)
 
-        # Set matrix data
-        self.df = data.filter_columns(matrix, sequence_type, characters)
+        # Set matrix data after filtering by columns
+        self.df = data.filter_columns(matrix=matrix,
+                                      sequence_type=sequence_type,
+                                      characters=characters,
+                                      ignore_characters=ignore_characters)
+
 
         # Get list of characters
         self.chars = np.array([str(c) for c in self.df.columns])
