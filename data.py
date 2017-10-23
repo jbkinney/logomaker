@@ -298,9 +298,13 @@ def set_bg_mat(background, matrix):
 
 
 
-def load_alignment(fasta_file=None, sequences=None, sequence_counts=None,
+def load_alignment(fasta_file=None,
+                   sequences=None,
+                   sequence_counts=None,
                    sequence_type=None,
-                   characters=None, positions=None, ignore_characters='.-',
+                   characters=None,
+                   positions=None,
+                   ignore_characters='.-',
                    occurance_threshold=0):
 
     # If loading file name

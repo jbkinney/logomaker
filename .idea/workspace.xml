@@ -2,15 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.ipynb_checkpoints/splicesite_logo-checkpoint.ipynb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/splicesite_logo.ipynb" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data.py" afterPath="$PROJECT_DIR$/data.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logomaker.py" afterPath="$PROJECT_DIR$/logomaker.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/parameters.txt" afterPath="$PROJECT_DIR$/parameters.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sortseq_test.ipynb" afterPath="$PROJECT_DIR$/sortseq_test.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tfbindingsites_test.ipynb" afterPath="$PROJECT_DIR$/tfbindingsites_test.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/validate.py" afterPath="$PROJECT_DIR$/validate.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/wwdomain_test.ipynb" afterPath="$PROJECT_DIR$/wwdomain_test.ipynb" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -39,8 +32,8 @@
           <file leaf-file-name="logomaker.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/logomaker.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="762">
-                  <caret line="556" column="51" lean-forward="false" selection-start-line="556" selection-start-column="51" selection-end-line="556" selection-end-column="51" />
+                <state relative-caret-position="5127">
+                  <caret line="302" column="38" lean-forward="true" selection-start-line="302" selection-start-column="38" selection-end-line="302" selection-end-column="38" />
                   <folding>
                     <element signature="e#0#31#0" expanded="true" />
                   </folding>
@@ -64,11 +57,11 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="validate.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="validate.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/validate.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="342">
-                  <caret line="18" column="0" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+                <state relative-caret-position="678">
+                  <caret line="172" column="1" lean-forward="true" selection-start-line="172" selection-start-column="1" selection-end-line="172" selection-end-column="1" />
                   <folding>
                     <element signature="e#0#47#0" expanded="true" />
                   </folding>
@@ -76,11 +69,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="data.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="data.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/data.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="7201">
-                  <caret line="379" column="0" lean-forward="true" selection-start-line="379" selection-start-column="0" selection-end-line="379" selection-end-column="0" />
+                <state relative-caret-position="3705">
+                  <caret line="195" column="17" lean-forward="true" selection-start-line="195" selection-start-column="17" selection-end-line="195" selection-end-column="17" />
                   <folding>
                     <element signature="e#0#31#0" expanded="true" />
                   </folding>
@@ -159,9 +152,9 @@
         <option value="$PROJECT_DIR$/utils.py" />
         <option value="$PROJECT_DIR$/character.py" />
         <option value="$PROJECT_DIR$/color.py" />
-        <option value="$PROJECT_DIR$/data.py" />
         <option value="$PROJECT_DIR$/logomaker.py" />
         <option value="$PROJECT_DIR$/validate.py" />
+        <option value="$PROJECT_DIR$/data.py" />
       </list>
     </option>
   </component>
@@ -420,7 +413,21 @@
       <option name="project" value="LOCAL" />
       <updated>1508770725303</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Fixed bugs in character filtering, i.e., use of the parameters sequence_type, characters, and ignore_characters">
+      <created>1508773007043</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1508773007043</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Added splicesite_test.ipynb">
+      <created>1508773039498</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1508773039498</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -499,7 +506,9 @@
     <MESSAGE value="Added all files in root folder" />
     <MESSAGE value="Made lots of changes over the weekend." />
     <MESSAGE value="Implemented sequence_type and rcparams arguments. Wrote data.filter_columns." />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented sequence_type and rcparams arguments. Wrote data.filter_columns." />
+    <MESSAGE value="Fixed bugs in character filtering, i.e., use of the parameters sequence_type, characters, and ignore_characters" />
+    <MESSAGE value="Added splicesite_test.ipynb" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added splicesite_test.ipynb" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -844,32 +853,32 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data.py">
+    <entry file="file://$PROJECT_DIR$/validate.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7201">
-          <caret line="379" column="0" lean-forward="true" selection-start-line="379" selection-start-column="0" selection-end-line="379" selection-end-column="0" />
+        <state relative-caret-position="678">
+          <caret line="172" column="1" lean-forward="true" selection-start-line="172" selection-start-column="1" selection-end-line="172" selection-end-column="1" />
           <folding>
-            <element signature="e#0#31#0" expanded="true" />
+            <element signature="e#0#47#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/logomaker.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="762">
-          <caret line="556" column="51" lean-forward="false" selection-start-line="556" selection-start-column="51" selection-end-line="556" selection-end-column="51" />
+        <state relative-caret-position="5127">
+          <caret line="302" column="38" lean-forward="true" selection-start-line="302" selection-start-column="38" selection-end-line="302" selection-end-column="38" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/validate.py">
+    <entry file="file://$PROJECT_DIR$/data.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="18" column="0" lean-forward="true" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+        <state relative-caret-position="3705">
+          <caret line="195" column="17" lean-forward="true" selection-start-line="195" selection-start-column="17" selection-end-line="195" selection-end-column="17" />
           <folding>
-            <element signature="e#0#47#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
