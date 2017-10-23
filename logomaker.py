@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 from matplotlib.transforms import Bbox
 from matplotlib.colors import to_rgba
+import matplotlib as mpl
 import pdb
 
 # From logomaker package
@@ -17,25 +18,6 @@ import color
 import data
 
 from validate import validate_parameter, validate_mat
-
-
-# Character lists
-DNA = list('ACGT')
-RNA = list('ACGU')
-dna = [c.lower() for c in DNA]
-rna = [c.lower() for c in DNA]
-PROTEIN = list('RKDENQSGHTAPYVMCLFIW')
-protein = [c.lower() for c in PROTEIN]
-PROTEIN_STOP = PROTEIN + ['*']
-protein_stop = protein + ['*']
-
-# Character transformations dictionaries
-to_DNA = {'a': 'A', 'c': 'C', 'g': 'G', 't': 'T', 'U': 'T', 'u': 'T'}
-to_dna = {'A': 'a', 'C': 'c', 'G': 'g', 'T': 't', 'U': 't', 'u': 't'}
-to_RNA = {'a': 'A', 'c': 'C', 'g': 'G', 't': 'U', 'T': 'U', 'u': 'U'}
-to_rna = {'A': 'a', 'C': 'c', 'G': 'g', 'T': 'u', 't': 'u', 'U': 'u'}
-to_PROTEIN = dict(zip(protein, PROTEIN))
-to_protein = dict(zip(PROTEIN, protein))
 
 from data import load_alignment
 
@@ -53,12 +35,9 @@ def make_logo(matrix=None,
               figsize=None,
               save_to_file=None,
               draw_now=False,
-              fasta_file=None,
-              sequences=None,
-              sequence_counts=None,
-              ignore_characters='.-XNxn',
               colors='blue',
               characters=None,
+              sequence_type=None,
               uniform_stretch=False,
               max_stretched_character=None,
               alpha=1.,
@@ -80,6 +59,7 @@ def make_logo(matrix=None,
               hpad=0.,
               vpad=0.,
               axes_style='classic',
+              axes_fontsize=None,
               font_family=None,
               font_weight=None,
               font_file=None,
@@ -108,7 +88,8 @@ def make_logo(matrix=None,
               yticklabels=None,
               ylabel=None,
               show_binary_yaxis=False,
-              title=None):
+              title=None,
+              rcparams={}):
     """
     Description:
 
@@ -336,13 +317,6 @@ def make_logo(matrix=None,
         # Set parameter value equal to the valid value
         exec("%s = valid_value" % name)
 
-    # If user specifies a fasta file, read in counts matrix
-    if (fasta_file is not None) or (sequences is not None):
-        matrix = load_alignment(fasta_file=fasta_file,
-                                sequences=sequences,
-                                sequence_counts=sequence_counts,
-                                ignore_characters=ignore_characters)
-
     # Set matrix_type to value given in matrix object if appropriate
     if matrix_type is None:
         if 'logomaker_type' in matrix.__dict__:
@@ -471,22 +445,27 @@ def make_logo(matrix=None,
     logo.background = background
     logo.bg_mat = bg_mat
 
+    # Set RC parameters
+    for key, value in rcparams.items():
+        mpl.rcParams[key] = value
+
     # If user specifies a figure size, make figure and axis,
     # draw logo, then return all three
     if figsize is not None:
+
         fig, ax = plt.subplots(figsize=figsize)
         logo.draw(ax)
-        plt.tight_layout()
         if save_to_file:
             fig.savefig(save_to_file)
+        plt.draw()
 
         return logo, ax, fig
 
     # If draw_now, get current axes, draw logo, and return both
-    elif draw_now is not None:
+    elif draw_now:
         ax = plt.gca()
         logo.draw(ax)
-        plt.tight_layout()
+
         return logo, ax
 
     # Otherwise, just return logo to user
@@ -500,6 +479,7 @@ class Logo:
                  matrix,
                  colors,
                  characters,
+                 sequence_type,
                  uniform_stretch,
                  max_stretched_character,
                  alpha,
@@ -570,23 +550,11 @@ class Logo:
                                                   weight=self.in_font_weight,
                                                   fname=self.in_font_file,
                                                   style=self.in_font_style)
-        # Set data
-        self.in_df = matrix.copy()
 
-        # Characters:
-        # Restrict to provided characters if string or list of characters
-        # Transform to provided characters if dictionary
-        self.in_characters = characters
-        if self.in_characters is None:
-            self.df = self.in_df.copy()
-        elif isinstance(self.in_characters, dict):
-            self.df = self.in_df.rename(columns=self.in_characters)
-        elif isinstance(self.in_characters, (str, unicode, list, np.array)):
-            characters = list(self.in_characters)
-            self.df = self.in_df[characters]
-        else:
-            assert False, 'Error: cant interpret characters %s.' % \
-                          repr(self.in_characters)
+        # Set matrix data
+        self.df = data.filter_columns(matrix, sequence_type, characters)
+
+        # Get list of characters
         self.chars = np.array([str(c) for c in self.df.columns])
 
         # Set positions
@@ -891,7 +859,9 @@ class Logo:
         self.char_list = char_list
         self.bbox = bbox
 
+
     def draw(self, ax=None):
+
         if ax is None:
             ax = plt.gca()
 
@@ -1010,6 +980,8 @@ class Logo:
         # Render title
         if self.title:
             ax.set_title(self.title)
+
+        plt.draw()
 
 def make_styled_logo(style_file=None,
                      style_dict=None,
@@ -1155,3 +1127,4 @@ def load_parameters(file_name, print_params=True, print_warnings=True):
             print('Warning: could not parse line "%s".' % line)
 
     return params_dict
+

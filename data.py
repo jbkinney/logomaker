@@ -7,6 +7,24 @@ import pdb
 # Set constants
 SMALL = 1E-6
 
+# Character lists
+DNA = list('ACGT')
+RNA = list('ACGU')
+dna = [c.lower() for c in DNA]
+rna = [c.lower() for c in DNA]
+PROTEIN = list('RKDENQSGHTAPYVMCLFIW')
+protein = [c.lower() for c in PROTEIN]
+PROTEIN_STOP = PROTEIN + ['*']
+protein_stop = protein + ['*']
+
+# Character transformations dictionaries
+to_DNA = {'a': 'A', 'c': 'C', 'g': 'G', 't': 'T', 'U': 'T', 'u': 'T'}
+to_dna = {'A': 'a', 'C': 'c', 'G': 'g', 'T': 't', 'U': 't', 'u': 't'}
+to_RNA = {'a': 'A', 'c': 'C', 'g': 'G', 't': 'U', 'T': 'U', 'u': 'U'}
+to_rna = {'A': 'a', 'C': 'c', 'G': 'g', 'T': 'u', 't': 'u', 'U': 'u'}
+to_PROTEIN = dict(zip(protein, PROTEIN))
+to_protein = dict(zip(PROTEIN, protein))
+
 from validate import validate_mat, validate_probability_mat
 
 def transform_mat(matrix, to_type, from_type=None, background=None,
@@ -281,6 +299,7 @@ def set_bg_mat(background, matrix):
 
 
 def load_alignment(fasta_file=None, sequences=None, sequence_counts=None,
+                   sequence_type=None,
                    characters=None, positions=None, ignore_characters='.-',
                    occurance_threshold=0):
 
@@ -321,14 +340,6 @@ def load_alignment(fasta_file=None, sequences=None, sequence_counts=None,
         assert len(sequence_counts) == len(sequences), 'Error: sequence_counts is not the same length as sequences'
         counts_array = np.array(sequence_counts)
 
-    # If characters are not specified by user, get list of unique characters from sequence
-    if characters is None:
-        seq_concat = ''.join(sequences)
-        characters = list(set(seq_concat))
-        characters.sort()
-    elif isinstance(characters, basestring):
-        characters = list(characters)
-
     # If positions is not specified by user, make it
     if positions is not None:
         assert len(positions) == L, 'Error: positions, if passed, must be same length as sequences.'
@@ -340,6 +351,10 @@ def load_alignment(fasta_file=None, sequences=None, sequence_counts=None,
 
     # Create array of characters at each position
     char_array = np.array([np.array(list(seq)) for seq in sequences])
+
+    # Get list of unique characters
+    characters = np.unique(char_array.ravel())
+    characters.sort()
 
     # Sum of the number of occurances of each character at each position
     for c in characters:
@@ -363,4 +378,55 @@ def load_alignment(fasta_file=None, sequences=None, sequence_counts=None,
     counts_mat.index.name = 'pos'
     counts_mat.logomaker_type = 'counts'
 
+    # Filter columns
+    counts_mat = filter_columns(counts_mat, sequence_type)
+
     return counts_mat
+
+
+def filter_columns(matrix, sequence_type=None, characters=None):
+
+    # Rename characters if appropriate
+    if sequence_type is None:
+        translation_dict = {}
+    elif sequence_type == 'dna':
+        translation_dict = to_dna
+    elif sequence_type == 'DNA':
+        translation_dict = to_DNA
+    elif sequence_type == 'rna':
+        translation_dict = to_rna
+    elif sequence_type == 'RNA':
+        translation_dict = to_RNA
+    elif sequence_type == 'protein':
+        translation_dict = to_protein
+    elif sequence_type == 'PROTEIN':
+        translation_dict = to_PROTEIN
+    else:
+        message = \
+            "Could not interpret sequence_type = %s. Columns not filtered." %\
+            repr(sequence_type)
+        warnings.warn(message, UserWarning)
+        translation_dict = {}
+
+    # If manually restricting to specific characters, do it:
+    if characters is not None:
+        new_columns = [c for c in characters if c in matrix.columns]
+        new_matrix = matrix.loc[:,new_columns]
+
+    # Otherwise performing translation, do it
+    elif len(translation_dict) > 0:
+        # Rename columns
+        matrix.rename(columns=translation_dict)
+        new_columns = list(set(translation_dict.values()))
+        new_columns.sort()
+        new_matrix = matrix.loc[:, new_columns]
+
+    # Otherwise, just return old matrix
+    else:
+        new_matrix = matrix.copy()
+
+    # Record logomaker type
+    if 'logomaker_type' in matrix.__dict__:
+        new_matrix.logomaker_type = matrix.logomaker_type
+
+    return new_matrix

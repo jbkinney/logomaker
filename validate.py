@@ -113,8 +113,6 @@ params_with_string_values = {
     'xlabel',
     'ylabel',
     'title',
-    'ignore_characters',
-    'fasta_file',
     'save_to_file'
 }
 
@@ -234,6 +232,14 @@ def validate_parameter(name, user, default):
 
     elif name == 'figsize':
         value = _validate_array(name, user, default, length=2)
+
+    elif name == 'rcparams':
+        if type(user)==dict:
+            value = user
+        else:
+            message = "rcparams = %s is not a dictionary. Using % instead." \
+            % (repr(user),repr(default))
+            warnings.warn(message, UserWarning)
 
     else:
         warnings.warn("'%s' parameter not validated." % name, UserWarning)
