@@ -7,87 +7,11 @@ import pdb
 # Set constants
 SMALL = 1E-6
 
-def validate_mat(matrix):
-    '''
-    Runs assert statements to verify that df is indeed a motif dataframe.
-    Returns a cleaned-up version of df if possible
-    '''
-
-    # Copy and preserve logomaker_type
-    try:
-        mat_type = matrix.logomaker_type
-    except:
-        mat_type = None
-    matrix = matrix.copy()
-
-    assert type(matrix) == pd.core.frame.DataFrame, 'Error: df is not a dataframe'
-    cols = matrix.columns
-
-    for i, col_name in enumerate(cols):
-        # Ok to have a 'pos' column
-        if col_name=='pos':
-            continue
-
-        # Convert column name to simple string if possible
-        assert isinstance(col_name,basestring), \
-            'Error: column name %s is not a string'%col_name
-        new_col_name = str(col_name)
-
-        # If column name is not a single chracter, try extracting single character
-        # after an underscore
-        if len(new_col_name) != 1:
-            new_col_name = new_col_name.split('_')[-1]
-            assert (len(new_col_name)==1), \
-                'Error: could not extract single character from colum name %s'%col_name
-
-        # Make sure that colun name is not a whitespace character
-        assert re.match('\S',new_col_name), \
-            'Error: column name "%s" is a whitespace charcter.'%repr(col_name)
-
-        # Set revised column name
-        matrix.rename(columns={col_name:new_col_name}, inplace=True)
-
-    # If there is a pos column, make that the index
-    if 'pos' in cols:
-        matrix.set_index('pos', drop=True, inplace=True)
-
-    # Remove name from index column
-    matrix.index.names = [None]
-
-    # Alphabetize character columns
-    char_cols = list(matrix.columns)
-    char_cols.sort()
-    matrix = matrix[char_cols]
-    matrix.logomaker_type = mat_type
-
-    # Return cleaned-up df
-    return matrix
-
-def validate_probability_mat(matrix):
-    '''
-    Verifies that the df is indeed a probability motif dataframe.
-    Returns a normalized and cleaned-up version of df if possible
-    '''
-
-    # Validate as motif
-    matrix = validate_mat(matrix)
-
-    # Validate df values as info values
-    assert (all(matrix.values.ravel() >= 0)), \
-        'Error: not all values in df are >=0.'
-
-    # Normalize across columns
-    matrix.loc[:, :] = matrix.values / matrix.values.sum(axis=1)[:, np.newaxis]
-
-    # Label matrix type
-    matrix.logomaker_type = 'probability'
-
-    return matrix
-
+from validate import validate_mat, validate_probability_mat
 
 def transform_mat(matrix, to_type, from_type=None, background=None,
                   energy_gamma=1, pseudocount=1, enrichment_logbase=2,
-                  information_units='bits'):
+                  enrichment_centering=True, information_units='bits'):
     '''
     transform_mat(): transforms a matrix of one type into another.
     :param matrix: input matrix, in data frame format
@@ -117,16 +41,17 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
         probability_mat = validate_probability_mat(matrix)
 
     elif from_type == 'counts':
-        probability_mat = counts_mat_to_probability_mat(matrix,
-                                                        pseudocount=pseudocount)
+        probability_mat = \
+            counts_mat_to_probability_mat(matrix, pseudocount=pseudocount)
 
     elif from_type == 'energy':
         probability_mat = energy_mat_to_probability_mat(matrix, bg_mat,
                                                         gamma=energy_gamma)
 
     elif from_type == 'enrichment':
-        probability_mat = enrichment_mat_to_probability_mat(matrix, bg_mat,
-                                                            base=enrichment_logbase)
+        probability_mat = \
+            enrichment_mat_to_probability_mat(matrix, bg_mat,
+                                              base=enrichment_logbase)
 
     else:
         assert False, 'Error! from_type %s is invalid.'%from_type
@@ -147,8 +72,10 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
                                                 gamma=energy_gamma)
 
     elif to_type == 'enrichment':
-        out_mat = probability_mat_to_enrichment_mat(probability_mat, bg_mat,
-                                                    base=enrichment_logbase)
+        out_mat = \
+            probability_mat_to_enrichment_mat(probability_mat, bg_mat,
+                                              base=enrichment_logbase,
+                                              centering=enrichment_centering)
 
     elif to_type == 'information':
         out_mat = probability_mat_to_information_mat(probability_mat, bg_mat,
@@ -235,7 +162,8 @@ def probability_mat_to_energy_mat(freq_mat, bg_mat, gamma):
     energy_mat.logomaker_type = 'energy'
     return energy_mat
 
-def probability_mat_to_enrichment_mat(freq_mat, bg_mat, base=2):
+def probability_mat_to_enrichment_mat(freq_mat, bg_mat, base=2,
+                                      centering=True):
     '''
     Converts a freq_mat to an energy_mat
     '''
@@ -245,6 +173,11 @@ def probability_mat_to_enrichment_mat(freq_mat, bg_mat, base=2):
     # Compute weight_mat
     weight_mat = freq_mat.copy()
     weight_mat.loc[:, :] = np.log2(freq_mat / bg_mat)/np.log2(base)
+
+    # Center if requested
+    if centering:
+        weight_mat.loc[:, :] = \
+            weight_mat.values - weight_mat.values.mean(axis=1)[:, np.newaxis]
 
     # Validate and return
     weight_mat = validate_mat(weight_mat)
@@ -348,7 +281,8 @@ def set_bg_mat(background, matrix):
 
 
 def load_alignment(fasta_file=None, sequences=None, sequence_counts=None,
-                   characters=None, positions=None, ignore_characters='.-'):
+                   characters=None, positions=None, ignore_characters='.-',
+                   occurance_threshold=0):
 
     # If loading file name
     if fasta_file is not None:
@@ -418,6 +352,12 @@ def load_alignment(fasta_file=None, sequences=None, sequence_counts=None,
     for char in ignore_characters:
         if char in columns:
             del counts_mat[char]
+
+    # Remove rows with too few counts
+    position_counts = counts_mat.values.sum(axis=1)
+    max_counts = position_counts.max()
+    positions_to_keep = position_counts >= occurance_threshold * max_counts
+    counts_mat = counts_mat.loc[positions_to_keep, :]
 
     # Name index
     counts_mat.index.name = 'pos'

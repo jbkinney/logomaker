@@ -4,6 +4,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgb
 
+import validate
+import warnings
+
 # Create facecolor scheme dict
 three_zeros = np.zeros(3)
 three_ones = np.ones(3)
@@ -127,9 +130,17 @@ def get_color_dict(color_scheme, chars, alpha, shuffle_colors=False):
         assert False, 'color_scheme has invalid type.'
 
     # Restrict color_dict to only characters in columns
-    assert set(chars) <= set(color_dict.keys()), \
-        'Error: column characters not in color_dict'
-    color_dict = restrict_dict(color_dict, chars)
+    # assert set(chars) <= set(color_dict.keys()), \
+    #     'Error: column characters not in color_dict'
+    # color_dict = restrict_dict(color_dict, chars)
+
+    if not (set(chars) <= set(color_dict.keys())):
+        for c in chars:
+            if not c in color_dict:
+                message = "Character '%s' is not in color_dict. Using black."\
+                    % c
+                warnings.warn(message, UserWarning)
+                color_dict[c] = to_rgb('black')
 
     # Shuffle colors if requested
     if shuffle_colors:
