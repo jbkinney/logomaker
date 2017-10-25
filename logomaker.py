@@ -47,11 +47,11 @@ def make_logo(matrix=None,
               boxcolors='white',
               boxalpha=0.,
               positions=None,
-              first_position_is_1=True,
+              first_position=1,
               use_positions=None,
               use_position_range=None,
               highlight_sequence=None,
-              highlight_colors='tomato',
+              highlight_colors=None,
               highlight_alpha=None,
               highlight_edgecolors=None,
               highlight_edgewidth=None,
@@ -490,7 +490,7 @@ class Logo:
                  boxcolors,
                  boxalpha,
                  positions,
-                 first_position_is_1,
+                 first_position,
                  use_positions,
                  use_position_range,
                  highlight_sequence,
@@ -572,8 +572,9 @@ class Logo:
             self.df.set_index('pos', inplace=True, drop=True)
 
         # Otherwise, if numbering positions from 1, do this
-        elif first_position_is_1:
-            positions = range(1, self.L+1)
+        else:
+            positions = range(first_position,
+                              first_position + self.L)
             self.df['pos'] = positions
             self.df.set_index('pos', inplace=True, drop=True)
 

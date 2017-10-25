@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import re
 import pdb
+from Bio import SeqIO
 
 # Set constants
 SMALL = 1E-6
@@ -297,7 +298,6 @@ def set_bg_mat(background, matrix):
     return new_bg_mat
 
 
-
 def load_alignment(fasta_file=None,
                    sequences=None,
                    sequence_counts=None,
@@ -310,24 +310,12 @@ def load_alignment(fasta_file=None,
     # If loading file name
     if fasta_file is not None:
 
-        # Load lines
-        with open(fasta_file, 'r') as f:
-            lines = f.readlines()
+        # Load sequences using SeqIO
+        sequences = [str(record.seq) for record in \
+                     SeqIO.parse(fasta_file, "fasta")]
 
-        # Remove whitespace
-        pattern = re.compile(r'\s+')
-        lines = [re.sub(pattern, '', line) for line in lines]
-
-        # Remove comment lines
-        pattern = re.compile(r'^[>#]')
-        lines = [line for line in lines if not re.match(pattern, line)]
-
-        # Remove empty lines
-        lines = [line for line in lines if (len(line) > 0)]
-
-        # Store sequences and counts
-        sequences = lines
-        sequence_counts = np.ones(len(lines))
+        # Assign each sequence a count of 1
+        sequence_counts = np.ones(len(sequences))
 
     assert sequences is not None, \
         'Error: either fasta_file or sequences must not be None.'
@@ -421,6 +409,11 @@ def filter_columns(matrix,
     elif len(translation_dict) > 0:
         # Rename columns
         new_matrix = matrix.rename(columns=translation_dict)
+
+        # Collapse columns with same name
+        new_matrix = new_matrix.groupby(new_matrix.columns, axis=1).sum()
+
+        # Order columns alphabetically
         new_columns = list(set(translation_dict.values()))
         new_columns.sort()
         new_matrix = new_matrix.loc[:, new_columns]

@@ -1,11 +1,9 @@
 
-logo_type : 'probability'
+logo_type : 'information'
 below_flip : True
-foo bar
-virus : eval(x=5)
-highlight_edgewidth : 1
 colors : 'classic'
-highlight_colors: 'classic'
+highlight_colors: 'black'
 highlight_sequence : 'ATTAATGTGAGTTAGCTCACTCATTA'
 vpad : .05
 width : .90
+ylim:[0,1]
