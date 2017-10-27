@@ -29,7 +29,7 @@ to_protein = dict(zip(PROTEIN, protein))
 from validate import validate_mat, validate_probability_mat
 
 def transform_mat(matrix, to_type, from_type=None, background=None,
-                  energy_gamma=1, pseudocount=1, enrichment_logbase=2,
+                  pseudocount=1, enrichment_logbase=2,
                   enrichment_centering=True, information_units='bits'):
     '''
     transform_mat(): transforms a matrix of one type into another.
@@ -45,13 +45,6 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
     # Check that matrix is valid
     matrix = validate_mat(matrix)
 
-    # Get from_type if not specified
-    if from_type is None:
-        try:
-            from_type = matrix.logomaker_type
-        except:
-            assert False, 'Cant determine from_type'
-
     # Create background matrix
     bg_mat = set_bg_mat(background=background, matrix=matrix)
 
@@ -62,10 +55,6 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
     elif from_type == 'counts':
         probability_mat = \
             counts_mat_to_probability_mat(matrix, pseudocount=pseudocount)
-
-    elif from_type == 'energy':
-        probability_mat = energy_mat_to_probability_mat(matrix, bg_mat,
-                                                        gamma=energy_gamma)
 
     elif from_type == 'enrichment':
         probability_mat = \
@@ -81,14 +70,10 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
             out_mat = matrix
         else:
             assert False, 'Cannot convert from %s to count_mat' % \
-                          matrix.logomaker_type
+                          from_type
 
     elif to_type == 'probability':
         out_mat = probability_mat
-
-    elif to_type == 'energy':
-        out_mat = probability_mat_to_energy_mat(probability_mat, bg_mat,
-                                                gamma=energy_gamma)
 
     elif to_type == 'enrichment':
         out_mat = \
@@ -117,32 +102,12 @@ def counts_mat_to_probability_mat(count_mat, pseudocount=1):
     freq_mat = count_mat.copy()
     vals = count_mat.values + pseudocount
     freq_mat.loc[:,:] = vals / vals.sum(axis=1)[:,np.newaxis]
-    freq_mat = normalize_freq_mat(freq_mat)
+    freq_mat = normalize_probability_matrix(freq_mat)
 
     # Validate and return
     freq_mat = validate_probability_mat(freq_mat)
-    freq_mat.logomaker_type = 'probability'
     return freq_mat
 
-def energy_mat_to_probability_mat(energy_mat, bg_mat, gamma=1):
-    '''
-    Converts an energy_mat to a freq_mat
-    '''
-    # Validate mat before use
-    energy_mat = validate_mat(energy_mat)
-
-    # Compute freq_mat
-    freq_mat = energy_mat.copy()
-    vals = energy_mat.values
-    vals -= vals.mean(axis=1)[:, np.newaxis]
-    weights = np.exp(-gamma * vals) * bg_mat.values
-    freq_mat.loc[:, :] = weights / weights.sum(axis=1)[:, np.newaxis]
-    freq_mat = normalize_freq_mat(freq_mat)
-
-    # Validate and return
-    freq_mat = validate_probability_mat(freq_mat)
-    freq_mat.logomaker_type = 'probability'
-    return freq_mat
 
 def enrichment_mat_to_probability_mat(weight_mat, bg_mat, base=2):
     '''
@@ -156,35 +121,17 @@ def enrichment_mat_to_probability_mat(weight_mat, bg_mat, base=2):
     vals -= vals.mean(axis=1)[:, np.newaxis]
     weights = np.pow(base, vals) * bg_mat.values
     freq_mat.loc[:, :] = weights / weights.sum(axis=1)[:, np.newaxis]
-    freq_mat = normalize_freq_mat(freq_mat)
+    freq_mat = normalize_probability_matrix(freq_mat)
 
     # Validate and return
     freq_mat = validate_probability_mat(freq_mat)
-    freq_mat.logomaker_type = 'probability'
     return freq_mat
 
-def probability_mat_to_energy_mat(freq_mat, bg_mat, gamma):
-    '''
-    Converts a freq_mat to an energy_mat
-    '''
-    # Validate mat before use
-    freq_mat = validate_probability_mat(freq_mat)
-
-    # Compute energy_mat
-    energy_mat = freq_mat.copy()
-    vals = freq_mat.values
-    energy_mat.loc[:, :] = (1 / gamma) * np.log(vals / bg_mat.values)
-    energy_mat = normalize_energy_mat(energy_mat)
-
-    # Validate and return
-    energy_mat = validate_mat(energy_mat)
-    energy_mat.logomaker_type = 'energy'
-    return energy_mat
 
 def probability_mat_to_enrichment_mat(freq_mat, bg_mat, base=2,
                                       centering=True):
     '''
-    Converts a freq_mat to an energy_mat
+    Converts a probability matrix to an enrichment matrix
     '''
     # Validate mat before use
     freq_mat = validate_probability_mat(freq_mat)
@@ -200,7 +147,6 @@ def probability_mat_to_enrichment_mat(freq_mat, bg_mat, base=2,
 
     # Validate and return
     weight_mat = validate_mat(weight_mat)
-    weight_mat.logomaker_type = 'enrichment'
     return weight_mat
 
 # Needed only for display purposes
@@ -227,25 +173,17 @@ def probability_mat_to_information_mat(freq_mat, bg_mat, units='bits'):
 
     # Validate and return
     info_mat = validate_mat(info_mat)
-    info_mat.logomaker_type = 'information'
     return info_mat
 
-# Normalize a data frame of energies
-def normalize_energy_mat(energy_mat):
-    mat = energy_mat.copy()
-    mat.loc[:, :] = mat.values - mat.values.mean(axis=1)[:, np.newaxis]
-    mat.logomaker_type = 'energy'
-    return mat
 
 # Normalize a data frame of probabilities
-def normalize_freq_mat(freq_mat, regularize=True):
+def normalize_probability_matrix(freq_mat, regularize=True):
     mat = freq_mat.copy()
     assert all(np.ravel(mat.values) >= 0), \
         'Error: Some data frame entries are negative.'
     mat.loc[:, :] = mat.values / mat.values.sum(axis=1)[:, np.newaxis]
     if regularize:
         mat.loc[:, :] += SMALL
-    mat.logomaker_type = 'probability'
     return mat
 
 
@@ -293,8 +231,7 @@ def set_bg_mat(background, matrix):
 
     else:
         assert False, 'Error: bg_mat and df are incompatible'
-    new_bg_mat = normalize_freq_mat(new_bg_mat)
-    new_bg_mat.logomaker_type='probability'
+    new_bg_mat = normalize_probability_matrix(new_bg_mat)
     return new_bg_mat
 
 
@@ -368,7 +305,6 @@ def load_alignment(fasta_file=None,
 
     # Name index
     counts_mat.index.name = 'pos'
-    counts_mat.logomaker_type = 'counts'
 
     return counts_mat
 
@@ -426,9 +362,5 @@ def filter_columns(matrix,
     for char in ignore_characters:
         if char in new_matrix.columns:
             del new_matrix[char]
-
-    # Record logomaker type
-    if 'logomaker_type' in matrix.__dict__:
-        new_matrix.logomaker_type = matrix.logomaker_type
 
     return new_matrix

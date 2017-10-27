@@ -6,11 +6,23 @@ import numpy as np
 import pdb
 
 class Character:
-    def __init__(self, c, xmin, ymin, width, height, facecolor,
-                 font_properties=None,
-                 flip=False,
-                 edgecolor='none', linewidth=0, boxcolor='none', boxalpha=0,
-                 hpad=0, vpad=0, max_hstretch=np.Inf):
+    def __init__(self,
+                 c,
+                 xmin,
+                 ymin,
+                 width,
+                 height,
+                 font_properties,
+                 flip,
+                 facecolor,
+                 edgecolor,
+                 linewidth,
+                 boxcolor,
+                 boxedgecolor,
+                 boxedgewidth,
+                 hpad,
+                 vpad,
+                 max_hstretch):
         assert width > 0
         assert height > 0
 
@@ -24,7 +36,8 @@ class Character:
         self.edgecolor=edgecolor
         self.linewidth=linewidth
         self.boxcolor=boxcolor
-        self.boxalpha=boxalpha
+        self.boxedgecolor=boxedgecolor
+        self.boxedgewidth=boxedgewidth
         self.hpad = hpad
         self.vpad = vpad
         self.max_hstretch = max_hstretch
@@ -46,16 +59,27 @@ class Character:
                         linewidth=self.linewidth,
                         font_properties=self.font_properties,
                         boxcolor=self.boxcolor,
-                        boxalpha=self.boxalpha,
+                        boxedgecolor=self.boxedgecolor,
+                        boxedgewidth=self.boxedgewidth,
                         hpad=self.hpad,
                         vpad=self.vpad,
                         max_hstretch=self.max_hstretch)
 
 
-def put_char_in_box(ax, char, bbox, flip=False, facecolor='k',
-                    edgecolor='none', linewidth=0,
-                    font_properties=None, boxcolor='none', boxalpha=0,
-                    hpad=0, vpad=0, max_hstretch=np.Inf):
+def put_char_in_box(ax,
+                    char,
+                    bbox,
+                    facecolor,
+                    edgecolor,
+                    linewidth,
+                    boxcolor,
+                    boxedgecolor,
+                    boxedgewidth,
+                    font_properties,
+                    flip,
+                    hpad,
+                    vpad,
+                    max_hstretch):
 
     # Create raw path
     tmp_path = TextPath((0, 0), char, size=1, prop=font_properties)
@@ -94,12 +118,17 @@ def put_char_in_box(ax, char, bbox, flip=False, facecolor='k',
     char_path = transformation.transform_path(tmp_path)
 
     # Compute patch for box containing character
-    box_patch = Rectangle((bbox.xmin, bbox.ymin), bbox.width, bbox.height,
-                      facecolor=boxcolor, alpha=boxalpha)
+    box_patch = Rectangle((bbox.xmin, bbox.ymin),
+                          bbox.width, bbox.height,
+                          facecolor=boxcolor,
+                          edgecolor=boxedgecolor,
+                          linewidth=boxedgewidth)
     ax.add_patch(box_patch)
 
     # Compute character patch
-    char_patch = PathPatch(char_path, facecolor=facecolor, edgecolor=edgecolor,
+    char_patch = PathPatch(char_path,
+                           facecolor=facecolor,
+                           edgecolor=edgecolor,
                            linewidth=linewidth)
     ax.add_patch(char_patch)
 

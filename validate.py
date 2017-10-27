@@ -46,8 +46,7 @@ def _try_some_code(code_lines, **kwargs):
 #
 
 # Valid values for matrix_type and logo_type
-LOGOMAKER_TYPES = {'counts', 'probability', 'enrichment', 'energy',
-                   'information'}
+LOGOMAKER_TYPES = {'counts', 'probability', 'enrichment', 'information'}
 
 params_with_float_values = {
     'xtick_anchor'
@@ -55,7 +54,6 @@ params_with_float_values = {
 
 # Names of numerical parameters that must be > 0
 params_greater_than_0 = {
-    'energy_gamma',
     'width',
     'xtick_spacing'
 }
@@ -112,7 +110,6 @@ params_with_string_values = {
     'font_family',
     'font_style',
     'font_file',
-    'energy_units',
     'xlabel',
     'ylabel',
     'title',
@@ -149,14 +146,12 @@ params_that_specify_colors = {
 # Names of parameters that cannot have None value
 params_that_cant_be_none = {
     'pseudocount',
-    'energy_gamma',
     'enrichment_logbase',
     'information_units',
     'alpha',
     'edgewidth',
     'hpad',
     'vpad',
-    'axes_style',
     'stack_order',
     'baseline_width',
     'vline_width',
@@ -164,9 +159,6 @@ params_that_cant_be_none = {
     'width',
     'draw_now'
 }
-# Do not allow any boolean parameters to be None
-params_that_cant_be_none = \
-    params_that_cant_be_none.union(params_with_boolean_values)
 
 #
 # Primary validation function
@@ -183,7 +175,7 @@ def validate_parameter(name, user, default):
     # Skip if value is none
     if user is None:
         if name in params_that_cant_be_none:
-            raise ValueError("Parameter '%s' cannot be None.")
+            raise ValueError("Parameter '%s' cannot be None." % name)
         else:
             value = user
 
@@ -472,10 +464,6 @@ def validate_mat(matrix):
     '''
 
     # Copy and preserve logomaker_type
-    try:
-        mat_type = matrix.logomaker_type
-    except:
-        mat_type = None
     matrix = matrix.copy()
 
     assert type(matrix) == pd.core.frame.DataFrame, 'Error: df is not a dataframe'
@@ -516,7 +504,6 @@ def validate_mat(matrix):
     char_cols = list(matrix.columns)
     char_cols.sort()
     matrix = matrix[char_cols]
-    matrix.logomaker_type = mat_type
 
     # Return cleaned-up df
     return matrix
@@ -536,8 +523,5 @@ def validate_probability_mat(matrix):
 
     # Normalize across columns
     matrix.loc[:, :] = matrix.values / matrix.values.sum(axis=1)[:, np.newaxis]
-
-    # Label matrix type
-    matrix.logomaker_type = 'probability'
 
     return matrix

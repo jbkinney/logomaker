@@ -22,74 +22,104 @@ from validate import validate_parameter, validate_mat
 from data import load_alignment
 
 def make_logo(matrix=None,
-              matrix_type=None,
+
+              # Matrix transformation (make_logo only)
+              matrix_type='counts',
               logo_type=None,
               background=None,
               pseudocount=1.0,
-              energy_gamma=1.0,
-              energy_units='a.u.',
               enrichment_logbase=2,
               enrichment_centering=True,
               information_units='bits',
-              occurance_threshold=0,
+              counts_threshold=0,
+
+              # Immediate drawing (make_logo only)
               figsize=None,
-              save_to_file=None,
               draw_now=False,
-              colors='blue',
+              save_to_file=None,
+
+              # Position choice
+              position_range=None,
+              shift_first_position_to=1,
+
+              # Character choice
+              sequence_type=None,
               characters=None,
               ignore_characters='.-',
-              sequence_type=None,
-              uniform_stretch=False,
-              max_stretched_character=None,
-              alpha=1.,
-              edgecolors='none',
-              edgewidth=0.,
+
+              # Character formatting
+              colors='gray',
+              alpha=1,
+              edgecolors='k',
+              edgealpha=1,
+              edgewidth=0,
               boxcolors='white',
-              boxalpha=0.,
-              positions=None,
-              first_position=1,
-              use_positions=None,
-              use_position_range=None,
+              boxedgecolors='black',
+              boxedgewidth=0,
+              boxalpha=0,
+              boxedgealpha=0,
+
+              # Highlighted character formatting
               highlight_sequence=None,
               highlight_colors=None,
               highlight_alpha=None,
               highlight_edgecolors=None,
               highlight_edgewidth=None,
+              highlight_edgealpha=None,
               highlight_boxcolors=None,
               highlight_boxalpha=None,
-              hpad=0.,
-              vpad=0.,
-              axes_style='classic',
-              axes_fontsize=None,
+              highlight_boxedgecolors=None,
+              highlight_boxedgewidth=None,
+              highlight_boxedgealpha=None,
+
+              # Character font
+              font_properties=None,
+              font_file=None,
               font_family=None,
               font_weight=None,
-              font_file=None,
               font_style=None,
-              font_properties=None,
+
+              # Character placement
               stack_order='big_on_top',
               use_transparency=False,
               max_alpha_val=None,
               below_shade=1.,
               below_alpha=1.,
               below_flip=True,
+              hpad=0.,
+              vpad=0.,
+              width=1,
+              uniform_stretch=False,
+              max_stretched_character=None,
+
+              # Special axes formatting
+              axes_type='classic',
               baseline_width=.5,
               vline_width=1,
               vline_color='gray',
-              show_vlines=False,
-              width=1,
+              show_vlines=None,
+              show_binary_yaxis=False,
+
+              # Standard axes formatting
               xlim=None,
               xticks=None,
               xtick_spacing=None,
               xtick_anchor=0,
-              xtick_format=None,
               xticklabels=None,
-              xlabel='position',
+              xtick_rotation=None,
+              xtick_length=None,
+              xlabel=None,
               ylim=None,
               yticks=None,
               yticklabels=None,
+              ytick_rotation=None,
+              ytick_length=None,
               ylabel=None,
-              show_binary_yaxis=False,
               title=None,
+              left_spine=None,
+              right_spine=None,
+              top_spine=None,
+              bottom_spine=None,
               rcparams={}):
     """
     Description:
@@ -111,24 +141,16 @@ def make_logo(matrix=None,
             this function.
 
         matrix_type: Type of matrix provided. Value can be 'counts',
-            'probability', 'enrichment', 'energy', 'information', or
-            None. Defaults to the value of matrix.logomaker_type if that
-            exists and is valid, then to None.
+            'probability', 'enrichment', or 'information'.
 
         logo_type (str): Type of logo to display. Value can be 'counts',
-            'probability', 'enrichment', 'energy', 'information', or
-            None. Defaults to matrix_type if provided, then to value of
-            matrix.logomaker_type if that exists and is valid, then to None.
+            'probability', 'enrichment', 'information', or
+            None. Defaults to matrix_type if provided.
 
         background: [WRITE]
 
         pseudocount (float): For converting a counts matrix to a probability
             matrix. Must be >= 0.
-
-        energy_gamma (float): For conversion from log enrichment to energy.
-
-        energy_units (str): Units to display in ylabel of energy logo. Does not
-            affect energy value.
 
         enrichment_logbase (str): Logarithm to use when computing enrichment.
             Value can be '2', '10', or 'e'. [IMPLEMENT]
@@ -299,9 +321,9 @@ def make_logo(matrix=None,
         ylabel (string): Overrides value determined by "logo_type".
     """
 
-    #
-    # Validate all function parameters
-    #
+    ######################################################################
+    # Validate all parameters
+
     names, vargs, kwargs, default_values = inspect.getargspec(make_logo)
     user_values = [eval(name) for name in names]
 
@@ -318,20 +340,42 @@ def make_logo(matrix=None,
         # Set parameter value equal to the valid value
         exec("%s = valid_value" % name)
 
-    # Set matrix_type to value given in matrix object if appropriate
-    if matrix_type is None:
-        if 'logomaker_type' in matrix.__dict__:
-            matrix_type = matrix.logomaker_type
-    matrix_type = validate_parameter('matrix_type', matrix_type, None)
+    ######################################################################
+    # matrix.columns
+
+    # Filter matrix columns based on sequence and character specifications
+    matrix = data.filter_columns(matrix=matrix,
+                                 sequence_type=sequence_type,
+                                 characters=characters,
+                                 ignore_characters=ignore_characters)
+    characters = matrix.columns
+
+    ######################################################################
+    # matrix.index
 
     # If matrix_type is counts, remove positions with too few counts
     if matrix_type == 'counts':
         position_counts = matrix.values.sum(axis=1)
-        max_counts = position_counts.max()
-        positions_to_keep = position_counts >= occurance_threshold * max_counts
-        matrix = matrix.loc[positions_to_keep, :]
-        matrix.logomaker_type = 'counts'
-        matrix = validate_mat(matrix)
+        matrix = matrix.loc[position_counts >= counts_threshold, :]
+
+    # Restrict to specific position range if requested
+    if position_range is not None:
+        min = position_range[0]
+        max = position_range[1]
+        matrix = matrix.loc[(matrix.index >= min) & (matrix.index < max), :]
+
+    # Matrix length is now set. Record it.
+    L = len(matrix)
+
+    # Shift positions to requested start
+    positions = range(shift_first_position_to, shift_first_position_to + L)
+    matrix['pos'] = positions
+    matrix.set_index('pos', inplace=True, drop=True)
+    matrix = validate_mat(matrix)
+    positions = matrix.index
+
+    ######################################################################
+    # matrix.values
 
     # Set logo_type equal to matrix_type if is currently None
     if logo_type is None:
@@ -341,58 +385,141 @@ def make_logo(matrix=None,
     # Get background matrix
     bg_mat = data.set_bg_mat(background, matrix)
 
-    # Keyword arguments to send to data.transform_mat
-    transform_mat_kwargs = {
-        'matrix': matrix,
-        'from_type': matrix_type,
-        'background': bg_mat,
-        'pseudocount': pseudocount,
-        'energy_gamma': energy_gamma,
-        'enrichment_logbase': enrichment_logbase,
-        'enrichment_centering': enrichment_centering,
-        'information_units': information_units
+    # Transform matrix:
+    matrix = data.transform_mat(matrix=matrix,
+                                from_type=matrix_type,
+                                to_type=logo_type,
+                                pseudocount=pseudocount,
+                                background=bg_mat,
+                                enrichment_logbase=enrichment_logbase,
+                                enrichment_centering=enrichment_centering,
+                                information_units=information_units)
+
+    ######################################################################
+    # font_properties
+
+    # If font_properties is set directly by user, validate it
+    if font_properties is not None:
+        assert isinstance(font_properties, FontProperties), \
+            'Error: font_properties is not an instance of FontProperties.'
+    # Otherwise, create font_properties from other font information
+    else:
+        font_properties = FontProperties(family=font_family,
+                                         weight=font_weight,
+                                         fname=font_file,
+                                         style=font_style)
+
+    ######################################################################
+    # character_style
+
+    character_style = {
+        'facecolors': color.get_color_dict(color_scheme=colors,
+                                           chars=characters,
+                                           alpha=alpha),
+        'edgecolors': color.get_color_dict(color_scheme=edgecolors,
+                                           chars=characters,
+                                           alpha=edgealpha),
+        'boxcolors': color.get_color_dict(color_scheme=boxcolors,
+                                          chars=characters,
+                                          alpha=boxalpha),
+        'boxedgecolors': color.get_color_dict(color_scheme=boxedgecolors,
+                                              chars=characters,
+                                              alpha=boxedgealpha),
+        'edgewidth': edgewidth,
+        'boxedgewidth': boxedgewidth,
     }
 
-    if logo_type == 'counts':
-        # Transform input matrix to freq_mat
-        matrix = data.transform_mat(to_type='counts',
-                                    **transform_mat_kwargs)
-        ymax = matrix.values.sum(axis=1).max()
+    ######################################################################
+    # highlight_style
 
-        # Change default plot settings
+    # Set higlighted character format
+    highlight_colors = highlight_colors \
+        if highlight_colors is not None \
+        else colors
+    highlight_alpha = float(highlight_alpha) \
+        if highlight_alpha is not None \
+        else alpha
+    highlight_edgecolors = highlight_edgecolors \
+        if highlight_edgecolors is not None \
+        else edgecolors
+    highlight_edgewidth = highlight_edgewidth \
+        if highlight_edgewidth is not None \
+        else edgewidth
+    highlight_edgealpha = float(highlight_edgealpha) \
+        if highlight_edgealpha is not None \
+        else edgealpha
+    highlight_boxcolors = highlight_boxcolors \
+        if highlight_boxcolors is not None \
+        else boxcolors
+    highlight_boxalpha = float(highlight_boxalpha) \
+        if highlight_boxalpha is not None \
+        else boxalpha
+    highlight_boxedgecolors = highlight_boxedgecolors \
+        if highlight_boxedgecolors is not None \
+        else boxedgecolors
+    highlight_boxedgewidth = highlight_boxedgewidth \
+        if highlight_boxedgewidth is not None \
+        else boxedgewidth
+    highlight_boxedgealpha = highlight_boxedgealpha \
+        if highlight_boxedgealpha is not None \
+        else boxedgealpha
+
+    highlight_style = {
+        'facecolors': color.get_color_dict(color_scheme=highlight_colors,
+                                           chars=characters,
+                                           alpha=highlight_alpha),
+        'edgecolors': color.get_color_dict(color_scheme=highlight_edgecolors,
+                                           chars=characters,
+                                           alpha=highlight_edgealpha),
+        'boxcolors': color.get_color_dict(color_scheme=highlight_boxcolors,
+                                          chars=characters,
+                                          alpha=highlight_boxalpha),
+        'boxedgecolors': color.get_color_dict(
+                                          color_scheme=highlight_boxedgecolors,
+                                          chars=characters,
+                                          alpha=highlight_boxedgealpha),
+        'edgewidth': highlight_edgewidth,
+        'boxedgewidth': highlight_boxedgewidth,
+    }
+
+    ######################################################################
+    # placement_style
+
+    placement_style = {
+        'stack_order': stack_order,
+        'use_transparency': use_transparency,
+        'max_alpha_val': max_alpha_val,
+        'below_shade': below_shade,
+        'below_alpha': below_alpha,
+        'below_flip': below_flip,
+        'hpad': hpad,
+        'vpad': vpad,
+        'width': width,
+        'uniform_stretch': uniform_stretch,
+        'max_stretched_character': max_stretched_character
+    }
+
+    ######################################################################
+    # axes_style
+
+    # Modify ylim and ylabel according to logo_type
+    if logo_type == 'counts':
+        ymax = matrix.values.sum(axis=1).max()
         if ylim is None:
             ylim = [0, ymax]
         if ylabel is None:
             ylabel = 'counts'
-
     elif logo_type == 'probability':
-        # Transform input matrix to freq_mat
-        matrix = data.transform_mat(to_type='probability',
-                                    **transform_mat_kwargs)
-
-        # Change default plot settings
         if ylim is None:
             ylim = [0, 1]
         if ylabel is None:
             ylabel = 'probability'
-
     elif logo_type == 'information':
-        # Transform input matrix to info_mat
-        matrix = data.transform_mat(to_type='information',
-                                    **transform_mat_kwargs)
-
-        # Change default plot settings
         if ylim is None and (background is None):
             ylim = [0, np.log2(matrix.shape[1])]
         if ylabel is None:
             ylabel = 'information\n(%s)' % information_units
-
     elif logo_type == 'enrichment':
-        # Transform input matrix to weight_mat
-        matrix = data.transform_mat(to_type='enrichment',
-                                    **transform_mat_kwargs)
-
-        # Change default plot settings
         if ylabel is None:
             if enrichment_logbase == 2:
                 ylabel = '$\log_2$ enrichment'
@@ -403,48 +530,183 @@ def make_logo(matrix=None,
             else:
                 assert False, 'Error: invalid choice of enrichment_logbase=%f'\
                               % enrichment_logbase
-
-            # Only add centering if user hasn't defined a ylabel
             if enrichment_centering:
                 ylabel = 'centered\n' + ylabel
-
-    elif logo_type == 'energy':
-        # Transform input matrix to weight_mat
-        matrix = data.transform_mat(to_type='energy',
-                                    **transform_mat_kwargs)
-
-        # Change default plot settings
-        if ylabel is None:
-            ylabel = '- energy\n(%s)' % energy_units
-
-    elif logo_type is None:
-        matrix = data.validate_mat(matrix)
-        ylabel = ''
-
     else:
-        assert False, 'Error! logo_type %s is invalid' % logo_type
+        if ylabel is None:
+            ylabel = ''
 
-    # Record kwargs for Logo constructor
-    kwargs_for_logo = {}
+    # If showing binary yaxis, symmetrize ylim and set yticks to +/-
+    if show_binary_yaxis:
+        if ylim is None:
+            y = np.max(abs(ylim[0]), abs(ylim[1]))
+            ylim = [-y, y]
+        if yticks is None:
+            yticks = ylim
+        if yticklabels is None:
+            yticklabels = ['$-$', '$+$']
+        if ytick_length is None:
+            ytick_length = 0
 
-    # Explicitly kwargs modified in this function
-    kwargs_for_logo['matrix'] = matrix
-    kwargs_for_logo['ylim'] = ylim
-    kwargs_for_logo['ylabel'] = ylabel
+    # Set ylim (will not be None)
+    if ylim is None:
+        ymax = (matrix.values * (matrix.values > 0)).sum(axis=1).max()
+        ymin = (matrix.values * (matrix.values < 0)).sum(axis=1).min()
+        ylim = [ymin, ymax]
 
-    # Record rest of kwargs
-    for arg_name in inspect.getargspec(Logo.__init__)[0]:
-        if arg_name == 'self':
-            continue
-        kwargs_for_logo[arg_name] = eval(arg_name)
+    # Set xlim (will not be None)
+    if xlim is None:
+        xmin = matrix.index.min() - .5
+        xmax = matrix.index.max() + .5
+        xlim = [xmin, xmax]
 
-    # Create Logo instance and set logo_type
-    logo = Logo(**kwargs_for_logo)
+    # If axes_type is specified, make additional modifications
+    if axes_type == 'classic':
+        if xtick_length is None:
+            xtick_length = 0
+        if xtick_rotation is None:
+            xtick_rotation = 90
+        if xlabel is None:
+            xlabel = 'position'
+        if left_spine is None:
+            left_spine = True
+        if right_spine is None:
+            right_spine = False
+        if top_spine is None:
+            top_spine = False
+        if bottom_spine is None:
+            bottom_spine = True
+
+    elif axes_type == 'naked':
+        if xticks is None:
+            xticks = []
+        if xlabel is None:
+            xlabel = ''
+        if yticks is None:
+            yticks = []
+        if ylabel is None:
+            ylabel = ''
+        if left_spine is None:
+            left_spine = False
+        if right_spine is None:
+            right_spine = False
+        if top_spine is None:
+            top_spine = False
+        if bottom_spine is None:
+            bottom_spine = False
+
+    elif axes_type == 'rails':
+        if xticks is None:
+            xticks = []
+        if xlabel is None:
+            xlabel = ''
+        if yticks is None and ylim is not None:
+            yticks = ylim
+        if left_spine is None:
+            left_spine = False
+        if right_spine is None:
+            right_spine = False
+        if top_spine is None:
+            top_spine = True
+        if bottom_spine is None:
+            bottom_spine = True
+
+    elif axes_type == 'everything':
+        if xticks is None:
+            xticks = list(matrix.index)
+        if xlabel is None:
+            xlabel = 'position'
+        if left_spine is None:
+            left_spine = True
+        if right_spine is None:
+            right_spine = True
+        if top_spine is None:
+            top_spine = True
+        if bottom_spine is None:
+            bottom_spine = True
+
+    elif axes_type == 'vlines':
+        if xticks is None:
+            xticks = list(matrix.index)
+        if xtick_length is None:
+            xtick_length = 0
+        if xlabel is None:
+            xlabel = 'position'
+        if left_spine is None:
+            left_spine = False
+        if right_spine is None:
+            right_spine = False
+        if top_spine is None:
+            top_spine = False
+        if bottom_spine is None:
+            bottom_spine = False
+        if show_vlines is None:
+            show_vlines = True
+
+    # Set xticks
+    if xticks is not None:
+        xticks = xticks
+    elif xtick_spacing is not None:
+        xticks = [pos for pos in positions if \
+                  (pos - xtick_anchor) % xtick_spacing == 0.0]
+    else:
+        xticks = positions
+
+    # Set tick labels and label rotation
+    if xticklabels is None:
+        xticklabels = xticks
+    if yticklabels is None:
+        yticklabels = yticks
+    if xtick_rotation is None:
+        xtick_rotation = 0
+    if ytick_rotation is None:
+        ytick_rotation = 0
+
+    if title is None:
+        title = ''
+
+    # Set axes style
+    axes_style = {
+        'baseline_width': baseline_width,
+        'vline_width': vline_width,
+        'vline_color': to_rgba(vline_color),
+        'show_vlines': show_vlines,
+        'title': title,
+        'ylim': ylim,
+        'yticks': yticks,
+        'yticklabels': yticklabels,
+        'ylabel': ylabel,
+        'xlim': xlim,
+        'xticks': xticks,
+        'xticklabels': xticklabels,
+        'xlabel': xlabel,
+        'left_spine': left_spine,
+        'right_spine': right_spine,
+        'top_spine': top_spine,
+        'bottom_spine': bottom_spine,
+        'xtick_length': xtick_length,
+        'xtick_rotation': xtick_rotation,
+        'ytick_length': ytick_length,
+        'ytick_rotation': ytick_rotation
+    }
+
+    ######################################################################
+    # Create Logo instance
+    logo = Logo(matrix=matrix,
+                highlight_sequence=highlight_sequence,
+                font_properties=font_properties,
+                character_style=character_style,
+                highlight_style=highlight_style,
+                placement_style=placement_style,
+                axes_style=axes_style)
 
     # Decorate logo
     logo.logo_type = logo_type
     logo.background = background
     logo.bg_mat = bg_mat
+
+    ######################################################################
+    # Optionally draw logo
 
     # Set RC parameters
     for key, value in rcparams.items():
@@ -478,108 +740,35 @@ def make_logo(matrix=None,
 class Logo:
     def __init__(self,
                  matrix,
-                 colors,
-                 characters,
-                 ignore_characters,
-                 sequence_type,
-                 uniform_stretch,
-                 max_stretched_character,
-                 alpha,
-                 edgecolors,
-                 edgewidth,
-                 boxcolors,
-                 boxalpha,
-                 positions,
-                 first_position,
-                 use_positions,
-                 use_position_range,
-                 highlight_sequence,
-                 highlight_colors,
-                 highlight_alpha,
-                 highlight_edgecolors,
-                 highlight_edgewidth,
-                 highlight_boxcolors,
-                 highlight_boxalpha,
-                 hpad,
-                 vpad,
-                 axes_style,
-                 font_family,
-                 font_weight,
-                 font_file,
-                 font_style,
                  font_properties,
-                 stack_order,
-                 use_transparency,
-                 max_alpha_val,
-                 below_shade,
-                 below_alpha,
-                 below_flip,
-                 baseline_width,
-                 vline_width,
-                 vline_color,
-                 show_vlines,
-                 width,
-                 xlim,
-                 xticks,
-                 xtick_spacing,
-                 xtick_anchor,
-                 xtick_format,
-                 xticklabels,
-                 xlabel,
-                 ylim,
-                 yticks,
-                 yticklabels,
-                 ylabel,
-                 show_binary_yaxis,
-                 title):
+                 character_style,
+                 highlight_sequence,
+                 highlight_style,
+                 placement_style,
+                 axes_style):
 
-        # Record user font input
-        self.in_font_file = font_file
-        self.in_font_style = font_style
-        self.in_font_weight = font_weight
-        self.in_font_family = font_family
-        self.in_font_properties = font_properties
+        # Set font properties
+        self.font_properties = font_properties
 
-        # If user supplies a FontProperties object, validate it
-        if self.in_font_properties is not None:
-            assert isinstance(self.in_font_properties, FontProperties),\
-                'Error: font_properties is not an instance of FontProperties.'
-            self.font_properties = self.in_font_properties.copy()
-
-        # Otherwise, create a FontProperties object based on user's input
-        else:
-            self.font_properties = FontProperties(family=self.in_font_family,
-                                                  weight=self.in_font_weight,
-                                                  fname=self.in_font_file,
-                                                  style=self.in_font_style)
-
-        # Set matrix data after filtering by columns
-        self.df = data.filter_columns(matrix=matrix,
-                                      sequence_type=sequence_type,
-                                      characters=characters,
-                                      ignore_characters=ignore_characters)
-
+        # Set matrix
+        self.df = matrix.copy()
 
         # Get list of characters
         self.chars = np.array([str(c) for c in self.df.columns])
 
+        # Get list of positions
+        self.poss = self.df.index.copy()
+
         # Set positions
         self.L = len(self.df)
 
-        # If user provides position values, use these
-        if positions is not None:
-            self.df['pos'] = positions
-            self.df.set_index('pos', inplace=True, drop=True)
+        # Set character styles
+        self.character_style = character_style.copy()
+        self.highlight_style = highlight_style.copy()
+        self.placement_style = placement_style.copy()
 
-        # Otherwise, if numbering positions from 1, do this
-        else:
-            positions = range(first_position,
-                              first_position + self.L)
-            self.df['pos'] = positions
-            self.df.set_index('pos', inplace=True, drop=True)
-
-        # Set final positions
-        self.poss = self.df.index.copy()
+        # Set axes style
+        self.axes_style = axes_style.copy()
 
         # Set wild type sequence
         self.highlight_sequence = highlight_sequence
@@ -595,173 +784,38 @@ class Logo:
         else:
             self.use_highlight = False
 
-        # If restricting to specific positions
-        if use_positions is not None:
-            indices = np.array([(pos in use_positions) for pos in self.poss])
-
-        # If restricting positions to a specific range of positions
-        elif use_position_range is not None:
-            min = use_position_range[0]
-            max = use_position_range[1]
-            indices = np.array((self.poss >= min) & (self.poss < max))
-
-        # Otherwise, use all positions
-        else:
-            indices = np.ones(self.L).astype(bool)
-
-        # Trim df, highlight_sequence, etc. accordingly
-        indices = np.array(indices, dtype=bool)
-        if highlight_sequence is not None:
-            self.highlight_sequence = \
-                ''.join([c for i, c in enumerate(self.highlight_sequence)
-                         if indices[i]])
-        self.df = self.df.loc[indices, :]
-        self.poss = self.poss[indices]
-        self.L = len(self.poss)
-
-        # Set normal character format
-        self.facecolors = colors
-        self.edgecolors = edgecolors
-        self.edgewidth = edgewidth
-        self.alpha = float(alpha)
-        self.boxcolors = boxcolors
-        self.boxalpha = float(boxalpha)
-        self.hpad = hpad
-        self.vpad = vpad
-        self.width = float(width)
-
-        # Set normal character color dicts
-        self.facecolors_dict = \
-                color.get_color_dict(color_scheme=self.facecolors,
-                                     chars=self.chars,
-                                     alpha=self.alpha)
-        self.edgecolors_dict = \
-                color.get_color_dict(color_scheme=self.edgecolors,
-                                     chars=self.chars,
-                                     alpha=self.alpha)
-        self.boxcolors_dict = \
-                color.get_color_dict(color_scheme=self.boxcolors,
-                                     chars=self.chars,
-                                     alpha=self.boxalpha)
-
-        # Set higlighted character format
-        self.highlight_facecolors = highlight_colors \
-            if highlight_colors is not None \
-            else colors
-        self.highlight_edgecolors = highlight_edgecolors\
-            if highlight_edgecolors is not None  \
-            else edgecolors
-        self.highlight_edgewidth = highlight_edgewidth\
-            if highlight_edgewidth is not None \
-            else edgewidth
-        self.highlight_alpha = float(highlight_alpha) \
-            if highlight_alpha is not None \
-            else highlight_alpha
-        self.highlight_boxcolors = highlight_boxcolors \
-            if highlight_boxcolors is not None \
-            else boxcolors
-        self.highlight_boxalpha = float(highlight_boxalpha) \
-            if highlight_boxalpha is not None \
-            else boxalpha
-
-        # Set highlight character color dicts
-        self.highlight_facecolors_dict = \
-                color.get_color_dict(color_scheme=self.highlight_facecolors,
-                                     chars=self.chars,
-                                     alpha=self.highlight_alpha)
-        self.highlight_edgecolors_dict = \
-                color.get_color_dict(color_scheme=self.highlight_edgecolors,
-                                     chars=self.chars,
-                                     alpha=self.highlight_alpha)
-        self.highlight_boxcolors_dict = \
-                color.get_color_dict(color_scheme=self.highlight_boxcolors,
-                                     chars=self.chars,
-                                     alpha=self.highlight_alpha)
-
-        # Set other character styling
-        self.logo_style = axes_style
-        self.stack_order = stack_order
-        self.use_transparency = use_transparency
-        self.neg_shade = float(below_shade)
-        self.neg_alpha = float(below_alpha)
-        self.neg_flip = below_flip
-        self.max_alpha_val = max_alpha_val
-        self.uniform_stretch = uniform_stretch
-        self.max_stretched_character = max_stretched_character
-
         # Compute characters and box
         self.compute_characters()
-
-        # Set x axis params
-        self.xlim = [self.bbox.xmin, self.bbox.xmax]\
-            if xlim is None else xlim
-
-        self.in_xticks = xticks
-        self.in_xticklabels = xticklabels
-        self.xtick_spacing = xtick_spacing
-        self.xtick_anchor = xtick_anchor
-        self.xtick_format = xtick_format
-
-        # Set xticks
-        if xticks is not None:
-            self.xticks = xticks
-        elif xtick_spacing is not None:
-            self.xticks = [pos for pos in self.poss if \
-                           (pos-xtick_anchor) % xtick_spacing == 0.0]
-        else:
-            self.xticks = self.poss
-
-        # Set xticklabels
-        if xticklabels is not None:
-            self.xticklabels = xticklabels
-        elif xtick_format is not None:
-            self.xticklabels = [xtick_format % x for x in self.xticks]
-        else:
-            self.xticklabels = self.xticks
-
-        self.xlabel = xlabel
-        self.vline_width = vline_width
-        self.vline_color = to_rgba(vline_color)
-        self.show_vlines = show_vlines
-
-        # Set y axis params
-        self.ylim = [self.bbox.ymin, self.bbox.ymax]\
-            if ylim is None else ylim
-        self.ylabel = ylabel
-        self.yticks = yticks
-        self.yticklabels = yticklabels
-        self.show_binary_yaxis = show_binary_yaxis
-
-        # Set title
-        self.title = title
-
-        # Set other formatting parameters
-        self.floor_line_width = baseline_width
 
 
     def compute_characters(self):
 
         # Get largest value for computing transparency
-        if self.max_alpha_val is None:
+        max_alpha_val = self.placement_style['max_alpha_val']
+        if max_alpha_val is None:
             max_alpha_val = abs(self.df.values).max()
-        else:
-            max_alpha_val = self.max_alpha_val
 
         # Compute hstretch values for all characters
+        width = self.placement_style['width']
+        hpad = self.placement_style['hpad']
+        vpad = self.placement_style['vpad']
         hstretch_dict, vstretch_dict = \
             character.get_stretch_vals(self.chars,
-                                    width=self.width,
+                                    width=width,
                                     height=1,
                                     font_properties=self.font_properties,
-                                    hpad=self.hpad,
-                                    vpad=self.vpad)
+                                    hpad=hpad,
+                                    vpad=vpad)
         # Set max_hstretch
-        if self.uniform_stretch:
-            self.max_hstretch = min(hstretch_dict.values())
-        elif self.max_stretched_character:
-            self.max_hstretch = hstretch_dict[self.max_stretched_character]
+        uniform_stretch = self.placement_style['uniform_stretch']
+        max_stretched_character = \
+            self.placement_style['max_stretched_character']
+        if uniform_stretch:
+            max_hstretch = min(hstretch_dict.values())
+        elif max_stretched_character:
+            max_hstretch = hstretch_dict[max_stretched_character]
         else:
-            self.max_hstretch = np.Inf
+            max_hstretch = np.Inf
 
         char_list = []
         for i, pos in enumerate(self.poss):
@@ -770,24 +824,25 @@ class Logo:
             ymin = vals[vals < 0].sum()
 
             # Reorder columns
-            if self.stack_order == 'big_on_top':
+            stack_order = self.placement_style['stack_order']
+            if stack_order == 'big_on_top':
                 indices = np.argsort(vals)
-            elif self.stack_order == 'small_on_top':
+            elif stack_order == 'small_on_top':
                 tmp_indices = np.argsort(vals)
                 pos_tmp_indices = tmp_indices[vals[tmp_indices] >= 0]
                 neg_tmp_indices = tmp_indices[vals[tmp_indices] < 0]
                 indices = np.array(list(neg_tmp_indices[::-1]) +
                                    list(pos_tmp_indices[::-1]))
-            elif self.stack_order == 'fixed':
+            elif stack_order == 'fixed':
                 indices = range(len(vals))
             else:
                 assert False, 'Error: unrecognized stack_order value %s.'%\
-                              self.stack_order
+                              stack_order
             ordered_chars = self.chars[indices]
 
             # This is the same for every character
-            x = pos - self.width/2.0
-            w = self.width
+            x = pos - width/2.0
+            w = width
 
             # Initialize y
             y = ymin
@@ -804,30 +859,34 @@ class Logo:
 
                 # Get facecolor, edgecolor, and edgewidth
                 if self.use_highlight and (char == self.highlight_sequence[i]):
-                    facecolor = self.highlight_facecolors_dict[char].copy()
-                    edgecolor = self.highlight_edgecolors_dict[char].copy()
-                    boxcolor = self.highlight_boxcolors_dict[char].copy()
-                    boxalpha = self.highlight_boxalpha
-                    edgewidth = self.highlight_edgewidth
+                    facecolor = self.highlight_style['facecolors'][char].copy()
+                    edgecolor = self.highlight_style['edgecolors'][char].copy()
+                    boxcolor = self.highlight_style['boxcolors'][char].copy()
+                    boxedgecolor = self.highlight_style['boxedgecolors'][char]\
+                        .copy()
+                    edgewidth = self.highlight_style['edgewidth']
+                    boxedgewidth = self.highlight_style['boxedgewidth']
                 else:
-                    facecolor = self.facecolors_dict[char].copy()
-                    edgecolor = self.edgecolors_dict[char].copy()
-                    boxcolor = self.boxcolors_dict[char].copy()
-                    boxalpha = self.boxalpha
-                    edgewidth = self.edgewidth
+                    facecolor = self.character_style['facecolors'][char].copy()
+                    edgecolor = self.character_style['edgecolors'][char].copy()
+                    boxcolor = self.character_style['boxcolors'][char].copy()
+                    boxedgecolor = self.character_style['boxedgecolors'][char]\
+                        .copy()
+                    edgewidth = self.character_style['edgewidth']
+                    boxedgewidth = self.character_style['boxedgewidth']
 
                 # Get flip and shade character accordingly
                 if val <= 0.0:
-                    flip = self.neg_flip
-                    shade = self.neg_shade
-                    alpha = self.neg_alpha
+                    flip = self.placement_style['below_flip']
+                    shade = self.placement_style['below_shade']
+                    alpha = self.placement_style['below_alpha']
                     facecolor *= np.array([shade, shade, shade, alpha])
                     edgecolor *= np.array([shade, shade, shade, alpha])
                 else:
                     flip = False
 
                 # Set alpha
-                if self.use_transparency:
+                if self.placement_style['use_transparency']:
                     alpha = h / max_alpha_val
                     if alpha > 1:
                         alpha = 1.0
@@ -838,16 +897,17 @@ class Logo:
 
                 # Create Character object
                 char = character.Character(
-                    c=char, xmin=x, ymin=y, width=w, height=h,
-                    facecolor=facecolor, flip=flip,
+                    c=char, xmin=x, ymin=y, width=w, height=h, flip=flip,
                     font_properties=self.font_properties,
+                    facecolor=facecolor,
                     edgecolor=edgecolor,
                     linewidth=edgewidth,
                     boxcolor=boxcolor,
-                    boxalpha=boxalpha,
-                    hpad=self.hpad,
-                    vpad=self.vpad,
-                    max_hstretch=self.max_hstretch)
+                    boxedgecolor=boxedgecolor,
+                    boxedgewidth=boxedgewidth,
+                    hpad=hpad,
+                    vpad=vpad,
+                    max_hstretch=max_hstretch)
 
                 # Store Character object
                 char_list.append(char)
@@ -869,126 +929,65 @@ class Logo:
 
     def draw(self, ax=None):
 
+        # If no axes is provided, default to current axes
         if ax is None:
             ax = plt.gca()
-
-        # Draw floor line
-        ax.axhline(0, color='k', linewidth=self.floor_line_width)
-
-        # Logo-specific formatting
-        ax.set_xlim(self.xlim)
-        ax.set_ylim(self.ylim)
-
-        if self.logo_style == 'classic':
-
-            # x axis
-            ax.set_xticks(self.xticks)
-            ax.xaxis.set_tick_params(length=0)
-            ax.set_xticklabels(self.xticklabels, rotation=90)
-
-            # y axis
-            ax.set_ylabel(self.ylabel)
-
-            # box
-            ax.spines['left'].set_visible(True)
-            ax.spines['bottom'].set_visible(True)
-            ax.spines['top'].set_visible(False)
-            ax.spines['right'].set_visible(False)
-
-        elif self.logo_style == 'naked':
-
-            # Turn everything off
-            ax.set_xticks([])
-            ax.set_yticks([])
-            ax.set_xlabel('')
-            ax.set_ylabel('')
-            ax.spines['left'].set_visible(False)
-            ax.spines['right'].set_visible(False)
-            ax.spines['top'].set_visible(False)
-            ax.spines['bottom'].set_visible(False)
-
-        elif self.logo_style == 'rails':
-            ax.set_xticks([])
-            ax.set_yticks(self.ylim)
-            ax.set_ylabel(self.ylabel)
-            ax.spines['left'].set_visible(False)
-            ax.spines['right'].set_visible(False)
-            ax.spines['top'].set_visible(True)
-            ax.spines['bottom'].set_visible(True)
-
-
-        elif self.logo_style == 'light_rails':
-            ax.set_xticks([])
-            ax.set_yticks([])
-            ax.spines['left'].set_visible(False)
-            ax.spines['right'].set_visible(False)
-            ax.spines['top'].set_visible(True)
-            ax.spines['bottom'].set_visible(True)
-            [i.set_linewidth(0.5) for i in ax.spines.itervalues()]
-
-
-        elif self.logo_style == 'everything':
-
-            # x axis
-            ax.set_xticks(self.xticks)
-            ax.set_xticklabels(self.xticklabels)
-            ax.set_xlabel(self.xlabel)
-
-            # y axis
-            ax.set_ylabel(self.ylabel)
-
-            # box
-            ax.axis('on')
-
-        elif self.logo_style == 'vlines':
-
-            ax.xaxis.set_tick_params(width=0)
-            ax.set_xticklabels(self.xticklabels)
-            ax.set_xticks(self.xticks)
-            ax.set_yticks([])
-            ax.set_ylabel(self.ylabel)
-            ax.spines['left'].set_visible(False)
-            ax.spines['right'].set_visible(False)
-            ax.spines['top'].set_visible(False)
-            ax.spines['bottom'].set_visible(False)
-
-        else:
-            assert False, 'Error! Undefined logo_style=%s' % self.logo_style
-
-        if self.yticks is not None:
-            ax.set_yticks(self.yticks)
-        if self.yticklabels is not None:
-            ax.set_yticklabels(self.yticklabels)
-
-        # Draw binary y axis if requested
-        # Override all other y-axis settings except for ylabel
-        # Note: ylims will be forced to become symmetric
-        if self.show_binary_yaxis:
-            ymin, ymax = ax.get_ylim()
-            y = max(abs(ymax), abs(ymin))
-            ax.set_ylim([-y, y])
-            ax.set_yticks([-.5*y, .5*y])
-            ax.set_yticklabels(['$-$', '$+$'])
-            ax.yaxis.set_tick_params(length=0)
-            #ax.spines['left'].set_visible(True)
-
-        # Add vlines if requested
-        if (self.show_vlines) or (self.logo_style == 'vlines'):
-            for x in self.xticks:
-                ax.axvline(x,
-                           linewidth=self.vline_width,
-                           color=self.vline_color,
-                           zorder=-1)
 
         # Draw characters
         for char in self.char_list:
             char.draw(ax)
 
-        # Render title
-        if self.title:
-            ax.set_title(self.title)
+        # Draw floor line
+        ax.axhline(0, color='k', linewidth=self.axes_style['baseline_width'])
+
+        # Set limits
+        ax.set_xlim(self.axes_style['xlim'])
+        ax.set_ylim(self.axes_style['ylim'])
+
+        # Draw x-axis annotation
+        if self.axes_style['xticks'] is not None:
+            ax.set_xticks(self.axes_style['xticks'])
+
+        if self.axes_style['xticklabels'] is not None:
+            ax.set_xticklabels(self.axes_style['xticklabels'],
+                               rotation=self.axes_style['xtick_rotation'])
+
+        if self.axes_style['xlabel'] is not None:
+            ax.set_xlabel(self.axes_style['xlabel'])
+
+        if self.axes_style['yticks'] is not None:
+            ax.set_yticks(self.axes_style['yticks'])
+
+        if self.axes_style['yticklabels'] is not None:
+            ax.set_yticklabels(self.axes_style['yticklabels'],
+                               rotation=self.axes_style['ytick_rotation'])
+
+        if self.axes_style['ylabel'] is not None:
+            ax.set_ylabel(self.axes_style['ylabel'])
+
+        if self.axes_style['title'] is not None:
+            ax.set_title(self.axes_style['title'])
+
+        if self.axes_style['xtick_length'] is not None:
+            ax.xaxis.set_tick_params(length=self.axes_style['xtick_length'])
+
+        if self.axes_style['ytick_length'] is not None:
+            ax.yaxis.set_tick_params(length=self.axes_style['ytick_length'])
+
+        if self.axes_style['left_spine'] is not None:
+            ax.spines['left'].set_visible(self.axes_style['left_spine'])
+
+        if self.axes_style['right_spine'] is not None:
+            ax.spines['right'].set_visible(self.axes_style['right_spine'])
+
+        if self.axes_style['top_spine'] is not None:
+            ax.spines['top'].set_visible(self.axes_style['top_spine'])
+
+        if self.axes_style['bottom_spine'] is not None:
+            ax.spines['bottom'].set_visible(self.axes_style['bottom_spine'])
 
         plt.draw()
+
 
 def make_styled_logo(style_file=None,
                      style_dict=None,
@@ -1068,7 +1067,9 @@ def load_parameters(file_name, print_params=True, print_warnings=True):
     params_dict = {}
 
     # Create regular expression for parsing parameter file lines
-    pattern = re.compile('^\s*(?P<param_name>[\w]+)\s*[:=]\s*(?P<param_value>.*)$')
+    pattern = re.compile(
+        '^\s*(?P<param_name>[\w]+)\s*[:=]\s*(?P<param_value>.*)$'
+    )
 
     # Quit if file_name is not specified
     if file_name is None:
