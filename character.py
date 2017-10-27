@@ -122,14 +122,16 @@ def put_char_in_box(ax,
                           bbox.width, bbox.height,
                           facecolor=boxcolor,
                           edgecolor=boxedgecolor,
-                          linewidth=boxedgewidth)
+                          linewidth=boxedgewidth,
+                          zorder=-3)
     ax.add_patch(box_patch)
 
     # Compute character patch
     char_patch = PathPatch(char_path,
                            facecolor=facecolor,
                            edgecolor=edgecolor,
-                           linewidth=linewidth)
+                           linewidth=linewidth,
+                           zorder=3)
     ax.add_patch(char_patch)
 
     # Return patches to user

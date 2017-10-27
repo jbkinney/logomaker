@@ -5,7 +5,7 @@ import ast
 import inspect
 import re
 import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
+from matplotlib.font_manager import FontProperties, FontManager
 from matplotlib.transforms import Bbox
 from matplotlib.colors import to_rgba
 import matplotlib as mpl
@@ -19,7 +19,28 @@ import data
 
 from validate import validate_parameter, validate_mat
 
+# Create global font manager instance. This takes a second or two
+font_manager = FontManager()
+
+def get_fontnames():
+    font_names = [f.name for f in font_manager.ttflist] + \
+                 [f.name for f in font_manager.afmlist]
+    font_names = list(set(font_names))
+    font_names.sort()
+    return font_names
+
 from data import load_alignment
+
+def remove_none_from_dict(d):
+    """ Removes None values from dictionary """
+    assert isinstance(d,dict), 'Error: d is not a dictionary.'
+
+    # Create new dictionary, this time without any Nones
+    new_d = {}
+    for key, value in d.items():
+        if value is not None:
+            new_d[key] = value
+    return new_d
 
 def make_logo(matrix=None,
 
@@ -78,6 +99,7 @@ def make_logo(matrix=None,
               font_family=None,
               font_weight=None,
               font_style=None,
+              font_name=None,
 
               # Character placement
               stack_order='big_on_top',
@@ -94,13 +116,19 @@ def make_logo(matrix=None,
 
               # Special axes formatting
               axes_type='classic',
+              style_sheet=None,
               baseline_width=.5,
-              vline_width=1,
-              vline_color='gray',
-              show_vlines=None,
-              show_binary_yaxis=False,
 
-              # Standard axes formatting
+              # Grid line formatting
+              show_gridlines=False,
+              gridline_axis=None,
+              gridline_width=None,
+              gridline_color=None,
+              gridline_alpha=None,
+              gridline_style=None,
+
+              # Set other standard axes formatting
+              show_binary_yaxis=False,
               xlim=None,
               xticks=None,
               xtick_spacing=None,
@@ -108,217 +136,57 @@ def make_logo(matrix=None,
               xticklabels=None,
               xtick_rotation=None,
               xtick_length=None,
+              xtick_format=None,
               xlabel=None,
               ylim=None,
               yticks=None,
               yticklabels=None,
               ytick_rotation=None,
               ytick_length=None,
+              ytick_format=None,
               ylabel=None,
               title=None,
               left_spine=None,
               right_spine=None,
               top_spine=None,
               bottom_spine=None,
+              use_tightlayout=False,
+
+              # Default axes font
+              axes_fontfile=None,
+              axes_fontfamily='sans',
+              axes_fontweight=None,
+              axes_fontstyle=None,
+              axes_fontsize=10,
+              axes_fontname=None,
+
+              # tick font
+              tick_fontfile=None,
+              tick_fontfamily=None,
+              tick_fontweight=None,
+              tick_fontstyle=None,
+              tick_fontsize=None,
+              tick_fontname=None,
+
+              # label font
+              label_fontfile=None,
+              label_fontfamily=None,
+              label_fontweight=None,
+              label_fontstyle=None,
+              label_fontsize=None,
+              label_fontname=None,
+
+              # title font
+              title_fontfile=None,
+              title_fontfamily=None,
+              title_fontweight=None,
+              title_fontstyle=None,
+              title_fontsize=None,
+              title_fontname=None,
+
+              # Any other axes formatting
               rcparams={}):
     """
-    Description:
-
-        Returns a logo representing the data matrix provided.
-
-    Returns:
-
-        logo (logomaker.Logo): Logo object. Draw by using logo.draw(ax).
-
-    Args:
-
-        matrix (pd.DataFrame): Data matrix used to make the logo. Row names are
-            the positions, column names are the characters. In what follows, L
-            refers to the number of rows.
-
-        parameters_file (str): Name of a file containing parameters. Entries in
-            this file override any other keyword arguments provided to
-            this function.
-
-        matrix_type: Type of matrix provided. Value can be 'counts',
-            'probability', 'enrichment', or 'information'.
-
-        logo_type (str): Type of logo to display. Value can be 'counts',
-            'probability', 'enrichment', 'information', or
-            None. Defaults to matrix_type if provided.
-
-        background: [WRITE]
-
-        pseudocount (float): For converting a counts matrix to a probability
-            matrix. Must be >= 0.
-
-        enrichment_logbase (str): Logarithm to use when computing enrichment.
-            Value can be '2', '10', or 'e'. [IMPLEMENT]
-
-        information_units (str): Units to use when computing information logos.
-            Values can be 'bits' or 'nats'. [IMPLEMENT]
-
-        colors (str, list, or dict): Interior colors of logo characters. Can
-            take a variety of inputs:
-            - string, specifying a LogoMaker color scheme. Options are,
-                + For DNA/RNA: 'classic', 'grays', 'base_paring'.
-                    [IMPLEMENT]
-                + For protein: 'hydrophobicity', 'chemistry', 'charge'.
-                    [IMPLEMENT]
-            - string, listing a color name  such as 'k' or 'tomato'
-            - string, listing a colormap name such as 'viridis' or 'Purples'
-            - list, specifying an RGB color or RGBA color.
-            - dictionary) mapping characters to colors, such as
-                {'A': 'green',
-                'C':[ 0.,  0.,  1.],
-                'G':'y', 'T':[ 1.,  0.,  0.,  1.]}
-                [IMPLEMENT CHECKING FOR PROPER CHARS]
-
-        characters (str, list, or dict): Characters to be used in the logo. Can
-            take a variety of inputs:
-            - string, such as 'ACGT', listing the matrix columns to be used.
-            - list, such as ['A','C','G','T'], listing the matrix columns to
-                be used. LogoMaker provides pre-specified lists, including,
-                + DNA: uppercase deoxynuclotides
-                + RNA: uppercase ribonucleotides
-                + PROTEIN: uppercase amino acids
-                + PROTEIN_STOP: same as PROTEIN but with '*' added
-                + dna, rna, protein, protein_stop: same as above but lowercase
-            - dictionary, such as {'T':'U'}, listing which characters to
-            rename. LogoMaker provides pre-specified dictionaries, including
-                + to_DNA: transform to uppercase deoxynuclotides
-                + to_RNA: transform to uppercase ribonucleotides
-                + to_PROTEIN: transform to uppercase amino acids
-                + to_dna, to_rna, to_protein: same as above but transform to
-                    lowercase characters
-
-        alpha (float): Opacity of logo characters. Values are restricted to
-            interval [0, 1].
-
-        edgecolors (str, list, or dict): Edge colors of logo characters. Same
-            inputs as parameter "colors".
-
-        edgewidth (float): Width of logo character edges. Values are restricted
-            to be  >= 0.
-
-        boxcolors (str, list): Color of the box in which each logo character is
-            drawn. Can take a variety of inputs:
-            - string, listing a color name  such as 'k' or 'tomato'
-            - list, specifying an RGB color or RGBA color.
-
-        boxalpha (float): Opacity of each logo character bounding box. Values
-            are restricted to interval [0, 1].
-
-        highlight_sequence (str, pd.DataFrame): Logo characters to highlight.
-            Can take a variety of inputs:
-            - string, listing a sequence with the same length and characters
-                as logo.
-            - dataframe, having the same rows and columns as matrix, with
-                boolean elements indicating which characters to highlight at
-                which positions
-                [IMPLEMENT!]
-
-        highlight_colors (str, list, or dictionary): Interior colors of
-            highlighted logo characters. Same inputs as parameter "colors".
-
-        highlight_alpha (float): Opacity of each highlighted logo character.
-            Values are restricted to interval [0, 1].
-
-        highlight_edgecolors (str, list, or dict): Edge colors of highlighted
-            logo characters. Same inputs as parameter "colors".
-
-        highlight_edgewidth (float): Width of highlighted logo character edges.
-            Values are restricted to be >= 0.
-
-        highlight_boxcolors (string, list, or dictionary): Color of the box in
-            which each highlighted logo character is drawn.Same inputs as
-            parameter "colors".
-
-        highlight_boxalpha (float in interval [0, 1]): Opacity of each
-            highlighted logo character bounding box.
-
-        hpad (float): Horizonal padding for each logo character. Quanitifies
-            whitespace, evenly split across both sides, as a fraction of
-            character width.
-
-        vpad (float): Vertical padding for each logo character. Quanitifies
-            whitespace, evenly split on top and bottom, as a fraction of
-            character height.
-
-        axes_style (string): Styles the logo axes. Options are 'classic',
-            'rails', 'light_rails', 'naked', and 'everything'.
-
-        font_family (string or list of strings): The logo character font name.
-            Specifically, the value passed as the 'family' parameter when
-            calling the matplotlib.font_manager.FontProperties constructor.
-            From matplotlib documentation:
-                "family: A list of font names in decreasing order of priority.
-                The items may include a generic font family name, either
-                'serif', 'sans-serif', 'cursive', 'fantasy', or 'monospace'.
-                In that case, the actual font to be used will be looked up from
-                the associated rcParam in matplotlibrc."
-
-        font_weight (string or float): The logo character font weight.
-            Specifically, the value passed as the 'weight' parameter in the
-            matplotlib.font_manager.FontProperties constructor. From matplotlib
-            documentation:
-                "weight: A numeric value in the range 0-1000 or one of
-                'ultralight', 'light', 'normal', 'regular', 'book', 'medium',
-                'roman', 'semibold', 'demibold', 'demi', 'bold', 'heavy',
-                'extra bold', 'black'."
-
-        font_file (string): The file specifying the logo character font.
-            Specifically, the value passed as the 'fname' parameter in the
-            matplotlib.font_manager.FontProperties constructor.
-
-        font_style (string): The logo character font style. Specifically, the
-            value passed as the 'style' parameter in the
-            matplotlib.font_manager.FontProperties constructor. From matplotlib
-            documentation:
-                "style: Either 'normal', 'italic' or 'oblique'."
-
-        font_properties (matplotlib.font_manager.FontProperties): The logo
-            character front properties; overrides other font_xxx parameters.
-
-        stack_order (string): Order in which to stack characters at the same
-            position. Either 'big_on_top', 'small_on_top', or 'fixed'.
-
-        use_transparency (boolean): Option to shade characters according to
-            absolute height.
-
-        max_alpha_val (float >= 0.0): Absolute matrix element value
-            corresponding to opacity of 1.0. If None is passed, this is set to
-            the largest absolute matrix element.
-
-        below_shade (float): Amount to darken any characters drawn below the
-            baseline. E.g. a value of 0.8 will cause RBG values to be reduced
-            to 80% of their initial value. Restricted to interval [0, 1].
-
-        below_alpha: (float): Amount to reduce the opacity of characters drawn
-            below the baseline. E.g., a value of 0.8 will cause alpha values to
-            be reduced to 80% of their initial value.
-
-        below_flip (boolean): Whether to flip upside down any characters that
-            are drawn below the baseline.
-
-        baseline_width (float): Width of the logo baseline. Restricted to >= 0.
-
-        xlim (tuple): Overrides the default value of (-0.5, L-0.5).
-
-        xticks (list): Overrides automatic setting of range(L).
-
-        xticklabels (list): Overrides default value given by the matrix
-            positions.
-
-        xlabel (string): Overrides value determined by "logo_style".
-
-        ylim (tuple): Overrides automatic determination by matplotlib.
-
-        yticks (list): Overrides automatic determination by matplotlib.
-
-        yticklabels (list): Overrides automatic determination by matplotlib.
-
-        ylabel (string): Overrides value determined by "logo_type".
     """
 
     ######################################################################
@@ -404,6 +272,12 @@ def make_logo(matrix=None,
             'Error: font_properties is not an instance of FontProperties.'
     # Otherwise, create font_properties from other font information
     else:
+
+        # Look up font file if name provided instead
+        if font_file is None and font_name is not None:
+            font_file = font_manager.findfont(font_name)
+
+        # Create properties
         font_properties = FontProperties(family=font_family,
                                          weight=font_weight,
                                          fname=font_file,
@@ -507,31 +381,30 @@ def make_logo(matrix=None,
         ymax = matrix.values.sum(axis=1).max()
         if ylim is None:
             ylim = [0, ymax]
-        if ylabel is None:
+        if ylabel is None and axes_type != 'naked':
             ylabel = 'counts'
     elif logo_type == 'probability':
         if ylim is None:
             ylim = [0, 1]
-        if ylabel is None:
+        if ylabel is None and axes_type != 'naked':
             ylabel = 'probability'
     elif logo_type == 'information':
         if ylim is None and (background is None):
             ylim = [0, np.log2(matrix.shape[1])]
-        if ylabel is None:
+        if ylabel is None and axes_type != 'naked':
             ylabel = 'information\n(%s)' % information_units
     elif logo_type == 'enrichment':
-        if ylabel is None:
+        if ylabel is None and axes_type != 'naked':
+            ylabel = 'enrichment\n'
             if enrichment_logbase == 2:
-                ylabel = '$\log_2$ enrichment'
+                ylabel += '($\log_2$)'
             elif enrichment_logbase == 10:
-                ylabel = '$\log_{10}$ enrichment'
+                ylabel += '($\log_{10})$'
             elif enrichment_logbase == np.e:
-                ylabel = '$\ln$ enrichment'
+                ylabel += '$(\ln)$ enrichment'
             else:
                 assert False, 'Error: invalid choice of enrichment_logbase=%f'\
                               % enrichment_logbase
-            if enrichment_centering:
-                ylabel = 'centered\n' + ylabel
     else:
         if ylabel is None:
             ylabel = ''
@@ -559,6 +432,13 @@ def make_logo(matrix=None,
         xmin = matrix.index.min() - .5
         xmax = matrix.index.max() + .5
         xlim = [xmin, xmax]
+
+    # Set xticks
+    if not (axes_type in ['rails', 'naked']):
+        xtick_spacing = 1
+    if xticks is None and xtick_spacing is not None:
+        xticks = [pos for pos in positions if
+                  (pos - xtick_anchor) % xtick_spacing == 0.0]
 
     # If axes_type is specified, make additional modifications
     if axes_type == 'classic':
@@ -612,8 +492,6 @@ def make_logo(matrix=None,
             bottom_spine = True
 
     elif axes_type == 'everything':
-        if xticks is None:
-            xticks = list(matrix.index)
         if xlabel is None:
             xlabel = 'position'
         if left_spine is None:
@@ -626,8 +504,6 @@ def make_logo(matrix=None,
             bottom_spine = True
 
     elif axes_type == 'vlines':
-        if xticks is None:
-            xticks = list(matrix.index)
         if xtick_length is None:
             xtick_length = 0
         if xlabel is None:
@@ -640,23 +516,8 @@ def make_logo(matrix=None,
             top_spine = False
         if bottom_spine is None:
             bottom_spine = False
-        if show_vlines is None:
-            show_vlines = True
 
-    # Set xticks
-    if xticks is not None:
-        xticks = xticks
-    elif xtick_spacing is not None:
-        xticks = [pos for pos in positions if \
-                  (pos - xtick_anchor) % xtick_spacing == 0.0]
-    else:
-        xticks = positions
-
-    # Set tick labels and label rotation
-    if xticklabels is None:
-        xticklabels = xticks
-    if yticklabels is None:
-        yticklabels = yticks
+    # Set label rotation
     if xtick_rotation is None:
         xtick_rotation = 0
     if ytick_rotation is None:
@@ -665,12 +526,76 @@ def make_logo(matrix=None,
     if title is None:
         title = ''
 
-    # Set axes style
+    # Translate font names into font files
+    if axes_fontfile is None and axes_fontname is not None:
+        axes_fontfile = font_manager.findfont(axes_fontname)
+    if tick_fontfile is None and tick_fontname is not None:
+        tick_fontfile = font_manager.findfont(tick_fontname)
+    if label_fontfile is None and label_fontname is not None:
+        label_fontfile = font_manager.findfont(label_fontname)
+    if title_fontfile is None and title_fontname is not None:
+        title_fontfile = font_manager.findfont(title_fontname)
+
+
+    # Default font for all axes elements
+    axes_fontdict = {
+        'fname': axes_fontfile,
+        'family': axes_fontfamily,
+        'weight': axes_fontweight,
+        'style': axes_fontstyle,
+        'size': axes_fontsize,
+    }
+    axes_fontdict = remove_none_from_dict(axes_fontdict)
+
+    # Font for x and y axis tickmarks
+    tick_fontdict = {
+        'fname': tick_fontfile,
+        'family': tick_fontfamily,
+        'weight': tick_fontweight,
+        'style': tick_fontstyle,
+        'size': tick_fontsize,
+    }
+    tick_fontdict = remove_none_from_dict(tick_fontdict)
+    tick_fontdict = dict(axes_fontdict, **tick_fontdict)
+    tick_fontproperties = FontProperties(**tick_fontdict)
+
+    # Font for x and y axis labels
+    label_fontdict = {
+        'fname': label_fontfile,
+        'family': label_fontfamily,
+        'weight': label_fontweight,
+        'style': label_fontstyle,
+        'size': label_fontsize,
+    }
+    label_fontdict = remove_none_from_dict(label_fontdict)
+    label_fontdict = dict(axes_fontdict, **label_fontdict)
+    label_fontproperties = FontProperties(**label_fontdict)
+
+    # Font for title
+    title_fontdict = {
+        'fname': title_fontfile,
+        'family': title_fontfamily,
+        'weight': title_fontweight,
+        'style': title_fontstyle,
+        'size': title_fontsize,
+    }
+    title_fontdict = remove_none_from_dict(title_fontdict)
+    title_fontdict = dict(axes_fontdict, **title_fontdict)
+    title_fontproperties = FontProperties(**title_fontdict)
+
+    # Gridline styling
+    gridline_dict = {
+        'axis': gridline_axis,
+        'alpha': gridline_alpha,
+        'color': gridline_color,
+        'linewidth': gridline_width,
+        'linestyle': gridline_style,
+    }
+    gridline_dict = remove_none_from_dict(gridline_dict)
+
+    # Set axes_style dictionary
     axes_style = {
         'baseline_width': baseline_width,
-        'vline_width': vline_width,
-        'vline_color': to_rgba(vline_color),
-        'show_vlines': show_vlines,
         'title': title,
         'ylim': ylim,
         'yticks': yticks,
@@ -686,8 +611,17 @@ def make_logo(matrix=None,
         'bottom_spine': bottom_spine,
         'xtick_length': xtick_length,
         'xtick_rotation': xtick_rotation,
+        'xtick_format': xtick_format,
         'ytick_length': ytick_length,
-        'ytick_rotation': ytick_rotation
+        'ytick_rotation': ytick_rotation,
+        'ytick_format': ytick_format,
+        'font_dict': axes_fontdict.copy(),
+        'tick_fontproperties': tick_fontproperties,
+        'label_fontproperties': label_fontproperties,
+        'title_fontproperties': title_fontproperties,
+        'show_gridlines': show_gridlines,
+        'gridline_dict': gridline_dict,
+        'use_tightlayout': use_tightlayout,
     }
 
     ######################################################################
@@ -708,6 +642,10 @@ def make_logo(matrix=None,
     ######################################################################
     # Optionally draw logo
 
+    # Set style sheet:
+    if style_sheet is not None:
+        plt.style.use(style_sheet)
+
     # Set RC parameters
     for key, value in rcparams.items():
         mpl.rcParams[key] = value
@@ -718,6 +656,11 @@ def make_logo(matrix=None,
 
         fig, ax = plt.subplots(figsize=figsize)
         logo.draw(ax)
+
+        if use_tightlayout:
+            plt.tight_layout()
+            plt.draw()
+
         if save_to_file:
             fig.savefig(save_to_file)
         plt.draw()
@@ -728,6 +671,10 @@ def make_logo(matrix=None,
     elif draw_now:
         ax = plt.gca()
         logo.draw(ax)
+
+        if use_tightlayout:
+            plt.tight_layout()
+            plt.draw()
 
         return logo, ax
 
@@ -940,6 +887,10 @@ class Logo:
         # Draw floor line
         ax.axhline(0, color='k', linewidth=self.axes_style['baseline_width'])
 
+        # Draw gridlines
+        if self.axes_style['show_gridlines']:
+            ax.grid(**self.axes_style['gridline_dict'])
+
         # Set limits
         ax.set_xlim(self.axes_style['xlim'])
         ax.set_ylim(self.axes_style['ylim'])
@@ -948,25 +899,20 @@ class Logo:
         if self.axes_style['xticks'] is not None:
             ax.set_xticks(self.axes_style['xticks'])
 
-        if self.axes_style['xticklabels'] is not None:
-            ax.set_xticklabels(self.axes_style['xticklabels'],
-                               rotation=self.axes_style['xtick_rotation'])
-
-        if self.axes_style['xlabel'] is not None:
-            ax.set_xlabel(self.axes_style['xlabel'])
-
         if self.axes_style['yticks'] is not None:
             ax.set_yticks(self.axes_style['yticks'])
 
-        if self.axes_style['yticklabels'] is not None:
-            ax.set_yticklabels(self.axes_style['yticklabels'],
-                               rotation=self.axes_style['ytick_rotation'])
+        if self.axes_style['xlabel'] is not None:
+            ax.set_xlabel(self.axes_style['xlabel'],
+                    font_properties=self.axes_style['label_fontproperties'])
 
         if self.axes_style['ylabel'] is not None:
-            ax.set_ylabel(self.axes_style['ylabel'])
+            ax.set_ylabel(self.axes_style['ylabel'],
+                    font_properties=self.axes_style['label_fontproperties'])
 
         if self.axes_style['title'] is not None:
-            ax.set_title(self.axes_style['title'])
+            ax.set_title(self.axes_style['title'],
+                    font_properties=self.axes_style['title_fontproperties'])
 
         if self.axes_style['xtick_length'] is not None:
             ax.xaxis.set_tick_params(length=self.axes_style['xtick_length'])
@@ -986,8 +932,39 @@ class Logo:
         if self.axes_style['bottom_spine'] is not None:
             ax.spines['bottom'].set_visible(self.axes_style['bottom_spine'])
 
+        # Initial rendering needed to get axes tick labels
+        if self.axes_style['use_tightlayout']:
+            plt.tight_layout()
         plt.draw()
 
+        if self.axes_style['xticklabels'] is not None:
+            xticklabels = self.axes_style['xticklabels']
+        elif self.axes_style['xtick_format'] is not None:
+            xticklabels = [self.axes_style['xtick_format'] % x
+                           for x in ax.get_xticks()]
+        else:
+            xticklabels = ax.get_xticklabels()
+
+        ax.set_xticklabels(xticklabels,
+                        rotation=self.axes_style['xtick_rotation'],
+                        font_properties=self.axes_style['tick_fontproperties'])
+
+        if self.axes_style['yticklabels'] is not None:
+            yticklabels = self.axes_style['yticklabels']
+        elif self.axes_style['ytick_format'] is not None:
+            yticklabels = [self.axes_style['ytick_format'] % y
+                           for y in ax.get_yticks()]
+        else:
+            yticklabels = ax.get_yticklabels()
+
+        ax.set_yticklabels(yticklabels,
+                        rotation=self.axes_style['ytick_rotation'],
+                        font_properties=self.axes_style['tick_fontproperties'])
+
+        # Do final drawing
+        if self.axes_style['use_tightlayout']:
+            plt.tight_layout()
+        plt.draw()
 
 def make_styled_logo(style_file=None,
                      style_dict=None,

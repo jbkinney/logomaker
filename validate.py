@@ -25,7 +25,7 @@ def _warning(message, category = UserWarning, filename = '', lineno = -1):
 warnings.showwarning = _warning
 
 # Comment this line if you don't want to see warnings multiple times
-#warnings.simplefilter('always', UserWarning)
+warnings.simplefilter('always', UserWarning)
 
 
 def _try_some_code(code_lines, **kwargs):
@@ -237,7 +237,7 @@ def validate_parameter(name, user, default):
             warnings.warn(message, UserWarning)
 
     else:
-        warnings.warn("'%s' parameter not validated." % name, UserWarning)
+        #warnings.warn("'%s' parameter not validated." % name, UserWarning)
         value = user
 
     return value

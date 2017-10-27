@@ -1,0 +1,197 @@
+    Description:
+
+        Returns a logo representing the data matrix provided.
+
+    Returns:
+
+        logo (logomaker.Logo): Logo object. Draw by using logo.draw(ax).
+
+    Args:
+
+        matrix (pd.DataFrame): Data matrix used to make the logo. Row names are
+            the positions, column names are the characters. In what follows, L
+            refers to the number of rows.
+
+        parameters_file (str): Name of a file containing parameters. Entries in
+            this file override any other keyword arguments provided to
+            this function.
+
+        matrix_type: Type of matrix provided. Value can be 'counts',
+            'probability', 'enrichment', or 'information'.
+
+        logo_type (str): Type of logo to display. Value can be 'counts',
+            'probability', 'enrichment', 'information', or
+            None. Defaults to matrix_type if provided.
+
+        background: [WRITE]
+
+        pseudocount (float): For converting a counts matrix to a probability
+            matrix. Must be >= 0.
+
+        enrichment_logbase (str): Logarithm to use when computing enrichment.
+            Value can be '2', '10', or 'e'. [IMPLEMENT]
+
+        information_units (str): Units to use when computing information logos.
+            Values can be 'bits' or 'nats'. [IMPLEMENT]
+
+        colors (str, list, or dict): Interior colors of logo characters. Can
+            take a variety of inputs:
+            - string, specifying a LogoMaker color scheme. Options are,
+                + For DNA/RNA: 'classic', 'grays', 'base_paring'.
+                    [IMPLEMENT]
+                + For protein: 'hydrophobicity', 'chemistry', 'charge'.
+                    [IMPLEMENT]
+            - string, listing a color name  such as 'k' or 'tomato'
+            - string, listing a colormap name such as 'viridis' or 'Purples'
+            - list, specifying an RGB color or RGBA color.
+            - dictionary) mapping characters to colors, such as
+                {'A': 'green',
+                'C':[ 0.,  0.,  1.],
+                'G':'y', 'T':[ 1.,  0.,  0.,  1.]}
+                [IMPLEMENT CHECKING FOR PROPER CHARS]
+
+        characters (str, list, or dict): Characters to be used in the logo. Can
+            take a variety of inputs:
+            - string, such as 'ACGT', listing the matrix columns to be used.
+            - list, such as ['A','C','G','T'], listing the matrix columns to
+                be used. LogoMaker provides pre-specified lists, including,
+                + DNA: uppercase deoxynuclotides
+                + RNA: uppercase ribonucleotides
+                + PROTEIN: uppercase amino acids
+                + PROTEIN_STOP: same as PROTEIN but with '*' added
+                + dna, rna, protein, protein_stop: same as above but lowercase
+            - dictionary, such as {'T':'U'}, listing which characters to
+            rename. LogoMaker provides pre-specified dictionaries, including
+                + to_DNA: transform to uppercase deoxynuclotides
+                + to_RNA: transform to uppercase ribonucleotides
+                + to_PROTEIN: transform to uppercase amino acids
+                + to_dna, to_rna, to_protein: same as above but transform to
+                    lowercase characters
+
+        alpha (float): Opacity of logo characters. Values are restricted to
+            interval [0, 1].
+
+        edgecolors (str, list, or dict): Edge colors of logo characters. Same
+            inputs as parameter "colors".
+
+        edgewidth (float): Width of logo character edges. Values are restricted
+            to be  >= 0.
+
+        boxcolors (str, list): Color of the box in which each logo character is
+            drawn. Can take a variety of inputs:
+            - string, listing a color name  such as 'k' or 'tomato'
+            - list, specifying an RGB color or RGBA color.
+
+        boxalpha (float): Opacity of each logo character bounding box. Values
+            are restricted to interval [0, 1].
+
+        highlight_sequence (str, pd.DataFrame): Logo characters to highlight.
+            Can take a variety of inputs:
+            - string, listing a sequence with the same length and characters
+                as logo.
+            - dataframe, having the same rows and columns as matrix, with
+                boolean elements indicating which characters to highlight at
+                which positions
+                [IMPLEMENT!]
+
+        highlight_colors (str, list, or dictionary): Interior colors of
+            highlighted logo characters. Same inputs as parameter "colors".
+
+        highlight_alpha (float): Opacity of each highlighted logo character.
+            Values are restricted to interval [0, 1].
+
+        highlight_edgecolors (str, list, or dict): Edge colors of highlighted
+            logo characters. Same inputs as parameter "colors".
+
+        highlight_edgewidth (float): Width of highlighted logo character edges.
+            Values are restricted to be >= 0.
+
+        highlight_boxcolors (string, list, or dictionary): Color of the box in
+            which each highlighted logo character is drawn.Same inputs as
+            parameter "colors".
+
+        highlight_boxalpha (float in interval [0, 1]): Opacity of each
+            highlighted logo character bounding box.
+
+        hpad (float): Horizonal padding for each logo character. Quanitifies
+            whitespace, evenly split across both sides, as a fraction of
+            character width.
+
+        vpad (float): Vertical padding for each logo character. Quanitifies
+            whitespace, evenly split on top and bottom, as a fraction of
+            character height.
+
+        axes_style (string): Styles the logo axes. Options are 'classic',
+            'rails', 'light_rails', 'naked', and 'everything'.
+
+        font_family (string or list of strings): The logo character font name.
+            Specifically, the value passed as the 'family' parameter when
+            calling the matplotlib.font_manager.FontProperties constructor.
+            From matplotlib documentation:
+                "family: A list of font names in decreasing order of priority.
+                The items may include a generic font family name, either
+                'serif', 'sans-serif', 'cursive', 'fantasy', or 'monospace'.
+                In that case, the actual font to be used will be looked up from
+                the associated rcParam in matplotlibrc."
+
+        font_weight (string or float): The logo character font weight.
+            Specifically, the value passed as the 'weight' parameter in the
+            matplotlib.font_manager.FontProperties constructor. From matplotlib
+            documentation:
+                "weight: A numeric value in the range 0-1000 or one of
+                'ultralight', 'light', 'normal', 'regular', 'book', 'medium',
+                'roman', 'semibold', 'demibold', 'demi', 'bold', 'heavy',
+                'extra bold', 'black'."
+
+        font_file (string): The file specifying the logo character font.
+            Specifically, the value passed as the 'fname' parameter in the
+            matplotlib.font_manager.FontProperties constructor.
+
+        font_style (string): The logo character font style. Specifically, the
+            value passed as the 'style' parameter in the
+            matplotlib.font_manager.FontProperties constructor. From matplotlib
+            documentation:
+                "style: Either 'normal', 'italic' or 'oblique'."
+
+        font_properties (matplotlib.font_manager.FontProperties): The logo
+            character front properties; overrides other font_xxx parameters.
+
+        stack_order (string): Order in which to stack characters at the same
+            position. Either 'big_on_top', 'small_on_top', or 'fixed'.
+
+        use_transparency (boolean): Option to shade characters according to
+            absolute height.
+
+        max_alpha_val (float >= 0.0): Absolute matrix element value
+            corresponding to opacity of 1.0. If None is passed, this is set to
+            the largest absolute matrix element.
+
+        below_shade (float): Amount to darken any characters drawn below the
+            baseline. E.g. a value of 0.8 will cause RBG values to be reduced
+            to 80% of their initial value. Restricted to interval [0, 1].
+
+        below_alpha: (float): Amount to reduce the opacity of characters drawn
+            below the baseline. E.g., a value of 0.8 will cause alpha values to
+            be reduced to 80% of their initial value.
+
+        below_flip (boolean): Whether to flip upside down any characters that
+            are drawn below the baseline.
+
+        baseline_width (float): Width of the logo baseline. Restricted to >= 0.
+
+        xlim (tuple): Overrides the default value of (-0.5, L-0.5).
+
+        xticks (list): Overrides automatic setting of range(L).
+
+        xticklabels (list): Overrides default value given by the matrix
+            positions.
+
+        xlabel (string): Overrides value determined by "logo_style".
+
+        ylim (tuple): Overrides automatic determination by matplotlib.
+
+        yticks (list): Overrides automatic determination by matplotlib.
+
+        yticklabels (list): Overrides automatic determination by matplotlib.
+
+        ylabel (string): Overrides value determined by "logo_type".

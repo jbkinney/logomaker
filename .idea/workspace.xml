@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.ipynb_checkpoints/character_transformation-checkpoint.ipynb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.ipynb_checkpoints/logomakerissues1-checkpoint.ipynb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/character_transformation.ipynb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logomakerissues1.ipynb" afterPath="" />
+    <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="Pushing changes.">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/old_comments.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/character.py" afterPath="$PROJECT_DIR$/character.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data.py" afterPath="$PROJECT_DIR$/data.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logomaker.py" afterPath="$PROJECT_DIR$/logomaker.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sortseq_test.ipynb" afterPath="$PROJECT_DIR$/sortseq_test.ipynb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_crpbindingsites.ipynb" afterPath="$PROJECT_DIR$/test_crpbindingsites.ipynb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/validate.py" afterPath="$PROJECT_DIR$/validate.py" />
     </list>
@@ -26,8 +21,8 @@
       <file leaf-file-name="validate.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/validate.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="837">
-              <caret line="160" column="1" lean-forward="false" selection-start-line="160" selection-start-column="1" selection-end-line="160" selection-end-column="1" />
+            <state relative-caret-position="535">
+              <caret line="239" column="9" lean-forward="false" selection-start-line="239" selection-start-column="9" selection-end-line="239" selection-end-column="9" />
               <folding>
                 <element signature="e#0#47#0" expanded="true" />
               </folding>
@@ -38,8 +33,8 @@
       <file leaf-file-name="character.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/character.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-16">
-              <caret line="154" column="42" lean-forward="false" selection-start-line="154" selection-start-column="42" selection-end-line="154" selection-end-column="42" />
+            <state relative-caret-position="20">
+              <caret line="128" column="29" lean-forward="true" selection-start-line="128" selection-start-column="29" selection-end-line="128" selection-end-column="29" />
               <folding>
                 <element signature="e#0#40#0" expanded="true" />
               </folding>
@@ -50,8 +45,8 @@
       <file leaf-file-name="logomaker.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/logomaker.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-3354">
-              <caret line="524" column="46" lean-forward="true" selection-start-line="524" selection-start-column="46" selection-end-line="524" selection-end-column="46" />
+            <state relative-caret-position="334">
+              <caret line="439" column="37" lean-forward="false" selection-start-line="439" selection-start-column="37" selection-end-line="439" selection-end-column="37" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -59,10 +54,20 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="old_comments.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/old_comments.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2548">
+              <caret line="196" column="67" lean-forward="false" selection-start-line="196" selection-start-column="67" selection-end-line="196" selection-end-column="67" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="color.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/color.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-7">
+            <state relative-caret-position="0">
               <caret line="147" column="36" lean-forward="false" selection-start-line="147" selection-start-column="36" selection-end-line="147" selection-end-column="36" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
@@ -82,24 +87,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>width</find>
-      <find>energy</find>
-      <find>normalize_energy_mat</find>
-      <find>enrichment</find>
-      <find>normalize_freq_mat</find>
-      <find>.logomaker_type</find>
-      <find>font_prop</find>
-      <find>boxcolors</find>
-      <find>edgealpha</find>
-      <find>edgecolors</find>
-      <find>edgewidth</find>
-      <find>axes_fontsize</find>
-      <find>first</find>
-      <find>.logomaker</find>
-      <find>font_properties</find>
-      <find>use_positions</find>
-      <find>use_positin</find>
-      <find>sequence_type</find>
       <find>positions</find>
       <find>position_range</find>
       <find>occurance</find>
@@ -107,11 +94,29 @@
       <find>self.</find>
       <find>highlight_</find>
       <find>self.max_h</find>
-      <find>axes_Style</find>
       <find>axes_style</find>
       <find>length</find>
       <find>show_vlines</find>
       <find>ytick_length</find>
+      <find>axes_Style</find>
+      <find>xticklables</find>
+      <find>yt</find>
+      <find>font_properties</find>
+      <find>font</find>
+      <find>axes_</find>
+      <find>font_dict</find>
+      <find>tick</find>
+      <find>vlines</find>
+      <find>grid_dict</find>
+      <find>family</find>
+      <find>fontname</find>
+      <find>axes</find>
+      <find>gridline_</find>
+      <find>xticks=</find>
+      <find>ylabel</find>
+      <find>use</find>
+      <find>\log_2</find>
+      <find>zorder</find>
     </findStrings>
     <replaceStrings>
       <replace>df</replace>
@@ -124,6 +129,14 @@
       <replace>character_</replace>
       <replace>axes_style</replace>
       <replace>axes_type</replace>
+      <replace>xt</replace>
+      <replace>title_</replace>
+      <replace>tick_fontdict</replace>
+      <replace>tick</replace>
+      <replace>labels</replace>
+      <replace>ticks</replace>
+      <replace>label</replace>
+      <replace>title</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -143,19 +156,19 @@
         <option value="$PROJECT_DIR$/utils.py" />
         <option value="$PROJECT_DIR$/color.py" />
         <option value="$PROJECT_DIR$/data.py" />
-        <option value="$PROJECT_DIR$/character.py" />
+        <option value="$PROJECT_DIR$/old_comments.txt" />
         <option value="$PROJECT_DIR$/validate.py" />
+        <option value="$PROJECT_DIR$/character.py" />
         <option value="$PROJECT_DIR$/logomaker.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" fullScreen="true">
-    <option name="y" value="23" />
     <option name="width" value="1280" />
-    <option name="height" value="1362" />
+    <option name="height" value="800" />
   </component>
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1">
+    <navigator proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -168,21 +181,7 @@
       <manualOrder />
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes>
-      <pane id="Scope" />
-      <pane id="Scratches" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="anylogo" type="b2602c69:ProjectViewProjectNode" />
-              <item name="anylogo" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-    </panes>
+    <panes />
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -440,7 +439,14 @@
       <option name="project" value="LOCAL" />
       <updated>1508956719312</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="Did lots of refactoring of functionality in Logo.__init__ into make_logo">
+      <created>1509071832202</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1509071832202</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TodoView">
@@ -453,13 +459,12 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="2560" height="1440" extended-state="0" />
+    <frame x="0" y="0" width="1280" height="800" extended-state="0" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.54169977" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32954547" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32291666" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.11309524" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2159091" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -471,6 +476,7 @@
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32954547" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32291666" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
@@ -505,7 +511,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Implemented much better character transformation algorithm." />
     <MESSAGE value="Added logomaker_type tag to dataframes returned by logomaker, as well as ability to read this type in Logo() and transform_mat" />
     <MESSAGE value="Had forgotten to add logomaker.py and the ipython notebooks. Fixed." />
     <MESSAGE value="[x] Create ipython notebook to show off all the kinds of logos. &#10;[x] Get count_logo working&#10;[x] Refactor logo types to ‘counts’,’probability’,’enrichment’,’energy’,’information'&#10;[x] Remove utils.py&#10;[x] Write make_logo; move functionality out of Logo class constructor" />
@@ -530,7 +535,8 @@
     <MESSAGE value="I'm stepping away for a while now." />
     <MESSAGE value="I made some changes." />
     <MESSAGE value="Added 2 ipython notebooks." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added 2 ipython notebooks." />
+    <MESSAGE value="Did lots of refactoring of functionality in Logo.__init__ into make_logo" />
+    <option name="LAST_COMMIT_MESSAGE" value="Did lots of refactoring of functionality in Logo.__init__ into make_logo" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -539,16 +545,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4771">
-          <caret line="371" column="0" lean-forward="false" selection-start-line="371" selection-start-column="0" selection-end-line="371" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/color.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1209">
@@ -593,9 +589,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4771">
           <caret line="371" column="0" lean-forward="false" selection-start-line="371" selection-start-column="0" selection-end-line="371" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -653,9 +646,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5138">
           <caret line="371" column="0" lean-forward="true" selection-start-line="371" selection-start-column="0" selection-end-line="371" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -683,9 +673,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1064">
           <caret line="60" column="33" lean-forward="false" selection-start-line="60" selection-start-column="33" selection-end-line="60" selection-end-column="33" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -713,9 +700,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1862">
           <caret line="102" column="26" lean-forward="false" selection-start-line="102" selection-start-column="20" selection-end-line="102" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -754,9 +738,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2945">
           <caret line="161" column="30" lean-forward="false" selection-start-line="161" selection-start-column="30" selection-end-line="161" selection-end-column="30" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -775,9 +756,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2945">
           <caret line="161" column="30" lean-forward="false" selection-start-line="161" selection-start-column="30" selection-end-line="161" selection-end-column="30" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -786,9 +764,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2945">
           <caret line="161" column="30" lean-forward="false" selection-start-line="161" selection-start-column="30" selection-end-line="161" selection-end-column="30" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -797,9 +772,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1805">
           <caret line="101" column="29" lean-forward="true" selection-start-line="101" selection-start-column="29" selection-end-line="101" selection-end-column="29" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -826,9 +798,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="114">
           <caret line="12" column="7" lean-forward="true" selection-start-line="12" selection-start-column="7" selection-end-line="12" selection-end-column="7" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -857,20 +826,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/color.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7">
+        <state relative-caret-position="0">
           <caret line="147" column="36" lean-forward="false" selection-start-line="147" selection-start-column="36" selection-end-line="147" selection-end-column="36" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/character.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-16">
-          <caret line="154" column="42" lean-forward="false" selection-start-line="154" selection-start-column="42" selection-end-line="154" selection-end-column="42" />
-          <folding>
-            <element signature="e#0#40#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -879,26 +838,41 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="353">
           <caret line="328" column="17" lean-forward="false" selection-start-line="328" selection-start-column="17" selection-end-line="328" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/old_comments.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2548">
+          <caret line="196" column="67" lean-forward="false" selection-start-line="196" selection-start-column="67" selection-end-line="196" selection-end-column="67" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/validate.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="837">
-          <caret line="160" column="1" lean-forward="false" selection-start-line="160" selection-start-column="1" selection-end-line="160" selection-end-column="1" />
+        <state relative-caret-position="535">
+          <caret line="239" column="9" lean-forward="false" selection-start-line="239" selection-start-column="9" selection-end-line="239" selection-end-column="9" />
           <folding>
             <element signature="e#0#47#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/character.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="20">
+          <caret line="128" column="29" lean-forward="true" selection-start-line="128" selection-start-column="29" selection-end-line="128" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#40#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/logomaker.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3354">
-          <caret line="524" column="46" lean-forward="true" selection-start-line="524" selection-start-column="46" selection-end-line="524" selection-end-column="46" />
+        <state relative-caret-position="334">
+          <caret line="439" column="37" lean-forward="false" selection-start-line="439" selection-start-column="37" selection-end-line="439" selection-end-column="37" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
