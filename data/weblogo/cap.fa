@@ -1,0 +1,98 @@
+>aldB -18->4
+attcgtgatagctgtcgtaaag
+>ansB 103->125
+ttttgttacctgcctctaactt
+>araB1 109->131
+aagtgtgacgccgtgcaaataa
+>araB2 147->169 
+tgccgtgattatagacactttt
+>cdd 1 107->129
+atttgcgatgcgtcgcgcattt
+>cdd 2 57->79
+taatgagattcagatcacatat
+>crp 1 115->137
+taatgtgacgtcctttgcatac
+>crp 2
+gaaggcgacctgggtcatgctg
+>cya 151->173 
+aggtgttaaattgatcacgttt
+>cytR 1 125->147
+cgatgcgaggcggatcgaaaaa
+>cytR 2 106->128
+aaattcaatattcatcacactt
+>dadAX 1 95->117
+agatgtgagccagctcaccata
+>dadAX 2 32->54
+agatgtgattagattattattc
+>deoP2 1 75->97
+aattgtgatgtgtatcgaagtg
+>deoP2 2 128->150 
+ttatttgaaccagatcgcatta
+>fur 136->158
+aaatgtaagctgtgccacgttt
+>gal 56->78
+aagtgtgacatggaataaatta
+>glpACB (glpTQ) 1 54->76  
+ttgtttgatttcgcgcatattc
+>glpACB (glpTQ) 2 94->116
+aaacgtgatttcatgcgtcatt
+>glpACB (glpTQ) 144->166 
+atgtgtgcggcaattcacattt
+>glpD (glpE) 95->117 
+taatgttatacatatcactcta
+>glpFK 1 120->142
+ttttatgacgaggcacacacat
+>glpFK 2 95->117
+aagttcgatatttctcgttttt
+>gut (srlA) 72->94
+ttttgcgatcaaaataacactt
+>ilvB 87->109
+aaacgtgatcaacccctcaatt
+>lac 1 (lacZ) 88->110
+taatgtgagttagctcactcat
+>lac 2 (lacZ) 16->38 
+aattgtgagcggataacaattt
+>malEpKp1 110->132
+ttgtgtgatctctgttacagaa
+>malEpKp2 139->161
+TAAtgtggagatgcgcacaTAA
+>malEpKp3 173->195
+TTTtgcaagcaacatcacgAAA
+>malEpKp4 205->227
+GACctcggtttagttcacaGAA
+>malT 121->143
+aattgtgacacagtgcaaattc
+>melR 52->74
+aaccgtgctcccactcgcagtc
+>mtl 302->324
+TCTTGTGATTCAGATCACAAAG
+>nag 156->178
+ttttgtgagttttgtcaccaaa
+>nupG2 97->119
+aaatgttatccacatcacaatt
+>nupG1 47->69
+ttatttgccacaggtaacaaaa
+>ompA 166->188
+atgcctgacggagttcacactt
+>ompR 161->183
+taacgtgatcatatcaacagaa
+>ptsH A 316->338
+Ttttgtggcctgcttcaaactt
+>ptsH B 188->210
+ttttatgatttggttcaattct
+>rhaS (rhaB) 161->183 
+aattgtgaacatcatcacgttc
+>rot 1 (ppiA) 182->204 
+ttttgtgatctgtttaaatgtt
+>rot 2 (ppiA) 129->151
+agaggtgattttgatcacggaa
+>tdcA 60->82
+atttgtgagtggtcgcacatat
+>tnaL 73->95
+gattgtgattcgattcacattt
+>tsx 2 146->168
+gtgtgtaaacgtgaacgcaatc
+>tsx 1 107->129
+aactgtgaaacgaaacatattt
+>uxuAB 165->187
+TCTTGTGATGTGGTTAACCAAT
