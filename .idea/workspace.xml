@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="Pushing changes.">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/old_comments.txt" />
+    <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/character.py" afterPath="$PROJECT_DIR$/character.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logomaker.py" afterPath="$PROJECT_DIR$/logomaker.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_crpbindingsites.ipynb" afterPath="$PROJECT_DIR$/test_crpbindingsites.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/validate.py" afterPath="$PROJECT_DIR$/validate.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -21,8 +17,8 @@
       <file leaf-file-name="validate.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/validate.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="535">
-              <caret line="239" column="9" lean-forward="false" selection-start-line="239" selection-start-column="9" selection-end-line="239" selection-end-column="9" />
+            <state relative-caret-position="522">
+              <caret line="238" column="9" lean-forward="true" selection-start-line="238" selection-start-column="9" selection-end-line="238" selection-end-column="9" />
               <folding>
                 <element signature="e#0#47#0" expanded="true" />
               </folding>
@@ -30,10 +26,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="character.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="character.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/character.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="20">
+            <state relative-caret-position="41">
               <caret line="128" column="29" lean-forward="true" selection-start-line="128" selection-start-column="29" selection-end-line="128" selection-end-column="29" />
               <folding>
                 <element signature="e#0#40#0" expanded="true" />
@@ -42,11 +38,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="logomaker.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="logomaker.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/logomaker.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="334">
-              <caret line="439" column="37" lean-forward="false" selection-start-line="439" selection-start-column="37" selection-end-line="439" selection-end-column="37" />
+            <state relative-caret-position="-348">
+              <caret line="409" column="23" lean-forward="true" selection-start-line="409" selection-start-column="23" selection-end-line="409" selection-end-column="23" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -446,7 +442,14 @@
       <option name="project" value="LOCAL" />
       <updated>1509071832202</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Lots of changes.">
+      <created>1509136596465</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1509136596465</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TodoView">
@@ -511,7 +514,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added logomaker_type tag to dataframes returned by logomaker, as well as ability to read this type in Logo() and transform_mat" />
     <MESSAGE value="Had forgotten to add logomaker.py and the ipython notebooks. Fixed." />
     <MESSAGE value="[x] Create ipython notebook to show off all the kinds of logos. &#10;[x] Get count_logo working&#10;[x] Refactor logo types to ‘counts’,’probability’,’enrichment’,’energy’,’information'&#10;[x] Remove utils.py&#10;[x] Write make_logo; move functionality out of Logo class constructor" />
     <MESSAGE value="Implemented sequence highlighting within logos" />
@@ -536,7 +538,8 @@
     <MESSAGE value="I made some changes." />
     <MESSAGE value="Added 2 ipython notebooks." />
     <MESSAGE value="Did lots of refactoring of functionality in Logo.__init__ into make_logo" />
-    <option name="LAST_COMMIT_MESSAGE" value="Did lots of refactoring of functionality in Logo.__init__ into make_logo" />
+    <MESSAGE value="Lots of changes." />
+    <option name="LAST_COMMIT_MESSAGE" value="Lots of changes." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -849,10 +852,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/logomaker.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-348">
+          <caret line="409" column="23" lean-forward="true" selection-start-line="409" selection-start-column="23" selection-end-line="409" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/validate.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="535">
-          <caret line="239" column="9" lean-forward="false" selection-start-line="239" selection-start-column="9" selection-end-line="239" selection-end-column="9" />
+        <state relative-caret-position="522">
+          <caret line="238" column="9" lean-forward="true" selection-start-line="238" selection-start-column="9" selection-end-line="238" selection-end-column="9" />
           <folding>
             <element signature="e#0#47#0" expanded="true" />
           </folding>
@@ -861,20 +874,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/character.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="20">
+        <state relative-caret-position="41">
           <caret line="128" column="29" lean-forward="true" selection-start-line="128" selection-start-column="29" selection-end-line="128" selection-end-column="29" />
           <folding>
             <element signature="e#0#40#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logomaker.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="334">
-          <caret line="439" column="37" lean-forward="false" selection-start-line="439" selection-start-column="37" selection-end-line="439" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
