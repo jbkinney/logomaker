@@ -92,7 +92,7 @@ def make_logo(matrix=None,
               # Special axes formatting
               axes_type='classic',
               style_sheet=None,
-              baseline_width=.5,
+              rcparams={},
 
               # Grid line formatting
               show_gridlines=False,
@@ -101,9 +101,9 @@ def make_logo(matrix=None,
               gridline_color=None,
               gridline_alpha=None,
               gridline_style=None,
+              baseline_width=.5,
 
-              # Set other standard axes formatting
-              show_binary_yaxis=False,
+              # x-axis formatting
               xlim=None,
               xticks=None,
               xtick_spacing=None,
@@ -113,6 +113,9 @@ def make_logo(matrix=None,
               xtick_length=None,
               xtick_format=None,
               xlabel=None,
+
+              # y-axis formatting
+              show_binary_yaxis=False,
               ylim=None,
               yticks=None,
               yticklabels=None,
@@ -120,6 +123,8 @@ def make_logo(matrix=None,
               ytick_length=None,
               ytick_format=None,
               ylabel=None,
+
+              # Other axis formatting
               title=None,
               left_spine=None,
               right_spine=None,
@@ -158,9 +163,7 @@ def make_logo(matrix=None,
               title_fontstyle=None,
               title_fontsize=None,
               title_fontname=None,
-
-              # Any other axes formatting
-              rcparams={}):
+              ):
     """
     Description:
 
@@ -190,7 +193,8 @@ def make_logo(matrix=None,
             must be in {'counts','probability', 'enrichment', 'information'}.
             If None, defaults to matrix_type. Default None.
 
-        background: [WRITE]
+        background (array, dict, pd.DataFrame, None): Specifies the background
+            probability of each character at each position. [GIVE EXAMPLES]
 
         pseudocount (float >= 0): For converting a counts matrix to a
             probability matrix. Default 1.
@@ -338,7 +342,9 @@ def make_logo(matrix=None,
         highlight_boxedgewidth (float >= 0, None): See boxedgewidth.
 
         #######################################################################
-        ### Highlighted logo character styling
+        ### Logo character font
+
+        # Logo characters #
 
         font_properties (FontProperties, None): The logo character font
             properties. If FontProperties, overrides all of the font_*
@@ -350,9 +356,9 @@ def make_logo(matrix=None,
             font_file, font_family, and maybe other parameters below. If None,
             is ignored. Default None
 
-        font_file (str): The local file specifying the logo character font.
-            Specifically, the value passed as the 'fname' parameter in the
-            FontProperties constructor. Default None.
+        font_file (str, None): The local file specifying the logo character
+            font. Specifically, the value passed as the 'fname' parameter in
+            the FontProperties constructor. Default None.
 
         font_family (str, list, None): The logo character font family name.
             Specifically, the value passed as the 'family' parameter when
@@ -365,7 +371,7 @@ def make_logo(matrix=None,
                 the associated rcParam in matplotlibrc."
             Default None.
 
-        font_weight (str, float): The logo character font weight.
+        font_weight (str, float, None): The logo character font weight.
             Specifically, the value passed as the 'weight' parameter in the
             FontProperties constructor. From matplotlib documentation:
                 "weight: A numeric value in the range 0-1000 or one of
@@ -374,8 +380,8 @@ def make_logo(matrix=None,
                 'extra bold', 'black'."
             Default None.
 
-        font_style (str): The logo character font style. Specifically, the
-            value passed as the 'style' parameter in the FontProperties
+        font_style (str, None): The logo character font style. Specifically,
+            the value passed as the 'style' parameter in the FontProperties
             constructor. From matplotlib documentation:
                 "style: Either 'normal', 'italic' or 'oblique'."
             Default None.
@@ -455,6 +461,10 @@ def make_logo(matrix=None,
                     defined in the popular seaborn plotting package.
             Ignored if None is passed. Default None.
 
+        rcparams (dict): Default parameter values to used for matplotlib
+            plotting. Warning: using this changes defaults for all subsequent
+            plots, not just the current logo. Default {}.
+
         #######################################################################
         ### Gridline formatting
 
@@ -516,58 +526,148 @@ def make_logo(matrix=None,
         xlabel (str, None): Text to display below the x-axis. Determined
             automatically if None. Default None.
 
+        #######################################################################
+        ### y-axis formatting
+
+        show_binary_yaxis (bool): If True, y-axis is labeled with '+' and '-'.
+            in place of numerically labeled ticks. Default False.
+
         ylim ([float, float], None): y-axis limits. Determined automatically if
             None. Default None.
 
-        yticks=None,
-        yticklabels=None,
-        ytick_rotation=None,
-        ytick_length=None,
-        ytick_format=None,
-        ylabel=None,
-        show_binary_yaxis=False,
+        yticks (array, None): Location of tick marks on y-axis. Overrides
+            ytick_spacing and ytick_anchor if not None. Default None.
 
-        title=None,
-        left_spine=None,
-        right_spine=None,
-        top_spine=None,
-        bottom_spine=None,
-        use_tightlayout=False,
+        yticklabels (array, None): Values to display below y-axis tickmarks.
+            Labels are determined automatically if None. Default None.
 
-        ### Default axes font ###
-        axes_fontfile=None,
-        axes_fontfamily='sans',
-        axes_fontweight=None,
-        axes_fontstyle=None,
-        axes_fontsize=10,
-        axes_fontname=None,
+        ytick_rotation (float, None): Angle in degrees at which to draw y-axis
+            tick labels. Angle is determined automatically if None. Default
+            None.
 
-        ### tick font ###
-        tick_fontfile=None,
-        tick_fontfamily=None,
-        tick_fontweight=None,
-        tick_fontstyle=None,
-        tick_fontsize=None,
-        tick_fontname=None,
+        ytick_length (float >= 0, None): Length of x-axis tick marks. Length is
+            determined automatically if None. Default None.
 
-        ### label font ###
-        label_fontfile=None,
-        label_fontfamily=None,
-        label_fontweight=None,
-        label_fontstyle=None,
-        label_fontsize=None,
-        label_fontname=None,
+        ytick_format (str, None): Formatting string used for making x-axis
+            labels. Overridden by xticklabels. Ignored if None. Default None.
 
-        ### title font ###
-        title_fontfile=None,
-        title_fontfamily=None,
-        title_fontweight=None,
-        title_fontstyle=None,
-        title_fontsize=None,
-        title_fontname=None,
+        ylabel (str, None): Text to display below the x-axis. Determined
+            automatically if None. Default None.
 
-        # Any other axes formatting
-        rcparams={}):
+        #######################################################################
+        ### Other axes formatting
+
+        title (str, None): Title of plot if not None. Default None.
+
+        left_spine (bool, None): Whether to show the left axis spine. If None,
+            spine choice is set by axes_type. Default None.
+
+        right_spine (bool, None): Whether to show the right axis spine. If
+            None, spine choice is set by axes_type. Default None.
+
+        top_spine (bool, None): Whether to show the top axis spine. If None,
+            spine choice is set by axes_type. Default None.
+
+        bottom_spine (bool, None): Whether to show the bottom axis spine. If
+            None, spine choice is set by axes_type. Default None.
+
+        use_tightlayout (bool): Whether to call plt.tight_layout() after
+            logo is plotted. If called, this will reformat the plot to try and
+            ensure that all plotted elements are visible. Note: this will
+            reformat the entire figure, not just the logo axes.
+
+            #######################################################################
+            ### Default axes font
+
+        axes_fontname (FontProperties, None): See font_name. Default to use for
+            axes labels, axes tick labels, and title. Ignored if None. Default
+            None.
+
+        axes_fontfile (str, None): See font_file. Default to use for axes
+            labels, axes tick labels, and title. Ignored if None. Default None.
+
+        axes_fontfamily (str, None): See font_family. Default to use for
+            axes labels, axes tick labels, and title. Ignored if None. Default
+            None.
+
+        axes_fontweight (str, float, None): See font_weight. Default to use for
+            axes labels, axes tick labels, and title. Ignored if None. Default
+            None.
+
+        axes_fontstyle (str, None): See font_style. Default to use for axes
+            labels, axes tick labels, and title. Ignored if None. Default None.
+
+        axes_fontsize (str, float, None): Font size to be used for axes
+            labels, axes tick labels, and title. Passed as 'size' parameter to
+            the FontProperties constructor. From matplotlib documentation:
+                "size: Either an relative value of 'xx-small', 'x-small',
+                'small', 'medium', 'large', 'x-large', 'xx-large' or an
+                 absolute font size, e.g., 12"
+            Ignored if value is None. Default None.
+
+        #######################################################################
+        ### Tick label font
+
+        tick_fontname (FontProperties, None): Overrides axes_fontname for tick
+            label styling if value is not None. Default None.
+
+        tick_fontfile (str, None): Overrides axes_fontfile for tick label
+            styling if value is not None. Default None.
+
+        tick_fontfamily (str, None): Overrides axes_fontfamily for tick label
+            styling if value is not None. Default None.
+
+        tick_fontweight (str, float, None): Overrides axes_fontweight for tick
+            label styling if value is not None. Default None.
+
+        tick_fontstyle (str, None): Overrides axes_fontstyle for tick label
+            styling if value is not None. Default None.
+
+        tick_fontsize (str, float, None): Overrides axes_fontsize for tick
+            label styling if value is not None. Default None.
+
+        #######################################################################
+        ### Axis label font
+
+        label_fontname (FontProperties, None): Overrides axes_fontname for axis
+            label styling if value is not None. Default None.
+
+        label_fontfile (str, None): Overrides axes_fontfile for axis label
+            styling if value is not None. Default None.
+
+        label_fontfamily (str, None): Overrides axes_fontfamily for axis label
+            styling if value is not None. Default None.
+
+        label_fontweight (str, float, None): Overrides axes_fontweight for axis
+            label styling if value is not None. Default None.
+
+        label_fontstyle (str, None): Overrides axes_fontstyle for axis label
+            styling if value is not None. Default None.
+
+        label_fontsize (str, float, None): Overrides axes_fontsize for axis
+            label styling if value is not None. Default None.
+
+        #######################################################################
+        ### Title font
+
+        title_fontname (FontProperties, None): Overrides axes_fontname for
+            title styling if value is not None. Default None.
+
+        title_fontfile (str, None): Overrides axes_fontfile for title styling
+            if value is not None. Default None.
+
+        title_fontfamily (str, None): Overrides axes_fontfamily for title
+            styling if value is not None. Default None.
+
+        title_fontweight (str, float, None): Overrides axes_fontweight for
+            title label styling if value is not None. Default None.
+
+        title_fontstyle (str, None): Overrides axes_fontstyle for title
+            styling if value is not None. Default None.
+
+        title_fontsize (str, float, None): Overrides axes_fontsize for title
+            styling if value is not None. Default None.
+
     """
 
     ######################################################################
