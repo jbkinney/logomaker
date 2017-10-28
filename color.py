@@ -1,10 +1,7 @@
 from __future__ import division
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgb
-
-import validate
 import warnings
 
 # Create facecolor scheme dict
