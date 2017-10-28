@@ -101,7 +101,13 @@ def make_logo(matrix=None,
               gridline_color=None,
               gridline_alpha=None,
               gridline_style=None,
-              baseline_width=.5,
+
+              # Baseline formatting
+              show_baseline=True,
+              baseline_width=None,
+              baseline_color=None,
+              baseline_alpha=None,
+              baseline_style=None,
 
               # x-axis formatting
               xlim=None,
@@ -182,8 +188,11 @@ def make_logo(matrix=None,
         ### Matrix transformation
 
         matrix (pd.DataFrame): Data matrix used to make the logo. Row names are
-            the positions, column names are the characters. In what follows, L
-            refers to the number of rows.
+            the positions, column names are the characters, and values are
+            floats (or ints). If the matrix_type is set to 'counts',
+            'probability', or 'information', all elements of matrix must be
+            floats >= 0. In what follows, L refers to the number of matrix rows
+            and C refers to the number of matrix columns.
 
         matrix_type (str in set, None): Type of data passed in matrix. If str,
             value must be in {'counts','probability', 'enrichment',
@@ -193,8 +202,39 @@ def make_logo(matrix=None,
             must be in {'counts','probability', 'enrichment', 'information'}.
             If None, defaults to matrix_type. Default None.
 
-        background (array, dict, pd.DataFrame, None): Specifies the background
-            probability of each character at each position. [GIVE EXAMPLES]
+        background (array, dict, pd.DataFrame, None): Only used when creating
+            logos of logo_type='enrichment' from matrices of matrix_type=
+            'counts' or matrix_type='probability'. Specifies the background
+            probability of each character at each position. Different value
+            types are interpreted in different ways:
+            - None: Each character in each column of matrix is assumed to
+                occur with equal background probability
+            - array: Must contain floats >= 0 and be of length C. If so, these
+                float values are interpreted as the background probabilities of
+                the characters corresponding to each column of matrix.
+                E.g., for a GC content of 60% and matrix columns ['A','C','G',
+                'T'], one can pass,
+                    background=[0.2, 0.3, 0.3, 0.2]
+            - dict: All characters specified by matrix must be keys of this
+                dictionary, and the corresponding values must be floats >= 0.
+                If so, the value is interpreted as the relative background
+                probability of the character corresponding to each key. E.g.,
+                for a GC content of 60% one can pass
+                    background = { 'A':0.2, 'C':0.3, 'G':0.3, 'T':0.2}
+            - pd.DataFrame, 1 row: Columns must list the same chaarcters as
+                the columns of matrix, and values must be floats >= 0. If so,
+                each float is interpreted as the relative background
+                probability of the character corresponding to each column.
+                E.g., for a GC content of 60% one can pass a DataFrame that
+                that looks like:
+                        'A'     'C'     'G'     'T'
+                 0      0.2     0.3     0.3     0.2
+            - pd.DataFrame, L rows: Columns must list the same characters as
+                the columns of matrix, and values must be floats >= 0. If so,
+                the float in each row and column is interpreted as the relative
+                background probability of the corresponding character at that
+                corresponding position. This option is particularly useful
+                when
 
         pseudocount (float >= 0): For converting a counts matrix to a
             probability matrix. Default 1.
@@ -468,7 +508,9 @@ def make_logo(matrix=None,
         #######################################################################
         ### Gridline formatting
 
-        show_gridlines (bool): Whether to show gridlines. Default False.
+        show_gridlines (bool): Whether to show gridlines. Note: gridlines are
+            plotted below logo characters but above logo bounding boxes.
+            Default False.
 
         gridline_axis (str in set, None): If str, specifies axes on which to
             plot gridlines value in {'x', 'y', 'both'}. Passed as the 'axis'
@@ -490,8 +532,27 @@ def make_logo(matrix=None,
             Is passed as the 'linestyle' argument to ax.grid if not None.
             Default None.
 
-        baseline_width (float >= 0): Width of the logo baseline, which is drawn
-            at value 0.
+        #######################################################################
+        ### Baseline formatting
+
+        show_baseline (bool): Whether to show the baseline at y=0. Note: the
+            baseline is plotted above logo characters. Default True.
+
+        baseline_width (float >= 0, None): If not None, specifies the width of
+            plotted baseline. Is passed as the 'linewidth' argument to
+            ax.axhline() if not None. Default None.
+
+        baseline_color (color): If not None, specifies the color of the
+            baseline. Is passed as the 'color' argument to ax.axhline() if not
+            None. Default None.
+
+        baseline_alpha (float in [0,1], None): If not None, specifies the
+            opacity of baseline. Is passed as the 'alpha' argument to
+            ax.axhline() if not None. Default None.
+
+        baseline_style (str, None): If not None, specifies baseline line style.
+            Is passed as the 'linestyle' argument to ax.axhline() if not None.
+            Default None.
 
         #######################################################################
         ### x-axis formatting
@@ -1074,9 +1135,19 @@ def make_logo(matrix=None,
     }
     gridline_dict = remove_none_from_dict(gridline_dict)
 
+    # Baseline styling
+    baseline_dict = {
+        'color': baseline_color,
+        'alpha': baseline_alpha,
+        'linewidth': baseline_width,
+        'linestyle': baseline_style,
+    }
+    baseline_dict = remove_none_from_dict(baseline_dict)
+
     # Set axes_style dictionary
     axes_style = {
-        'baseline_width': baseline_width,
+        'show_baseline': show_baseline,
+        'baseline_dict': baseline_dict,
         'title': title,
         'ylim': ylim,
         'yticks': yticks,

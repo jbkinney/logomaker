@@ -153,7 +153,6 @@ params_that_cant_be_none = {
     'hpad',
     'vpad',
     'stack_order',
-    'baseline_width',
     'vline_width',
     'vline_color',
     'width',

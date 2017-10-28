@@ -207,8 +207,9 @@ class Logo:
         for char in self.char_list:
             char.draw(ax)
 
-        # Draw floor line
-        ax.axhline(0, color='k', linewidth=self.axes_style['baseline_width'])
+        # Draw baseline
+        if self.axes_style['show_baseline']:
+            ax.axhline(0, zorder=10, **self.axes_style['baseline_dict'])
 
         # Draw gridlines
         if self.axes_style['show_gridlines']:
