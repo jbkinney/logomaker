@@ -78,8 +78,8 @@
           <file leaf-file-name="make_logo.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/make_logo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="776">
-                  <caret line="101" column="35" lean-forward="false" selection-start-line="101" selection-start-column="25" selection-end-line="101" selection-end-column="35" />
+                <state relative-caret-position="429">
+                  <caret line="980" column="28" lean-forward="false" selection-start-line="980" selection-start-column="28" selection-end-line="980" selection-end-column="28" />
                   <folding>
                     <element signature="e#0#31#0" expanded="true" />
                   </folding>
@@ -138,7 +138,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>color</find>
       <find>color)</find>
       <find>gridline_coor</find>
       <find>gridline_color</find>
@@ -168,6 +167,7 @@
       <find>baseline</find>
       <find>or']style_sheet</find>
       <find>xtick</find>
+      <find>axes_type == 'naked</find>
     </findStrings>
     <replaceStrings>
       <replace>df</replace>
@@ -586,7 +586,14 @@
       <option name="project" value="LOCAL" />
       <updated>1509319059193</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="Fixed bug in xtick_spacing execution">
+      <created>1509319388394</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1509319388394</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TodoView">
@@ -600,12 +607,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="2560" height="1440" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.54119545" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32954547" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32291666" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2157738" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2157738" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -651,7 +659,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed load_parameters() to use re and accept multi-line input." />
     <MESSAGE value="Created 'vlines' axis format. Implemented xtick_spacing and xtick_anchor also." />
     <MESSAGE value="Minor changes." />
     <MESSAGE value="Added sortseq_test.ipynb" />
@@ -676,7 +683,8 @@
     <MESSAGE value="Have made a number of changes. Added validation, including for FontProperties parameters, and removed font_name parameters from make_logo in favor of just using font_family parameters." />
     <MESSAGE value="Wrote examples.ipynb, which creates example logos illustrating different parameter values." />
     <MESSAGE value="Fixed bug in baseline format specification in make_logo" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed bug in baseline format specification in make_logo" />
+    <MESSAGE value="Fixed bug in xtick_spacing execution" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed bug in xtick_spacing execution" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1012,8 +1020,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/make_logo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="776">
-          <caret line="101" column="35" lean-forward="false" selection-start-line="101" selection-start-column="25" selection-end-line="101" selection-end-column="35" />
+        <state relative-caret-position="429">
+          <caret line="980" column="28" lean-forward="false" selection-start-line="980" selection-start-column="28" selection-end-line="980" selection-end-column="28" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>

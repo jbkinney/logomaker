@@ -977,6 +977,8 @@ def make_logo(matrix=None,
     elif axes_type == 'naked':
         if xticks is None:
             xticks = []
+        if xtick_length is None:
+            xtick_length = 0
         if xlabel is None:
             xlabel = ''
         if yticks is None:
