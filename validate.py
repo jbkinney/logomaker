@@ -60,7 +60,8 @@ params_with_float_values = {
 
 # Names of numerical parameters that must be > 0
 params_greater_than_0 = {
-    'xtick_spacing'
+    'dpi',
+    'xtick_spacing',
 }
 
 # Names of numerical parameters that must be >= 0
@@ -523,7 +524,6 @@ def _validate_colorscheme(name, user, default):
         'color.color_scheme_dict[user]',
         'plt.get_cmap(user)',
         'to_rgb(user)',
-        'assert(user in ["none", "random"])',
         'expand_color_dict(user)'
     ]
 
@@ -535,6 +535,10 @@ def _validate_colorscheme(name, user, default):
             is_valid = True
         except:
             pass
+
+    # For some reason, this needs to be tested separately.
+    if user == 'random':
+        is_valid = True
 
     # If so, then colorscheme is valid
     if is_valid:

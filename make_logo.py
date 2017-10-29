@@ -30,6 +30,7 @@ def make_logo(matrix=None,
               figsize=None,
               draw_now=False,
               save_to_file=None,
+              dpi=300,
 
               # Position choice
               position_range=None,
@@ -132,7 +133,7 @@ def make_logo(matrix=None,
               right_spine=None,
               top_spine=None,
               bottom_spine=None,
-              use_tightlayout=False,
+              use_tightlayout=True,
 
               # Default axes font
               axes_fontfile=None,
@@ -1173,7 +1174,7 @@ def make_logo(matrix=None,
             plt.draw()
 
         if save_to_file:
-            fig.savefig(save_to_file)
+            fig.savefig(save_to_file, dpi=dpi)
         plt.draw()
 
         logo.ax = ax
