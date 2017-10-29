@@ -12,6 +12,14 @@ import color
 # Create global font manager instance. This takes a second or two
 font_manager = FontManager()
 
+def get_fontnames():
+    """ Return a list of available font names. """
+    font_names = [f.name for f in font_manager.ttflist] + \
+                 [f.name for f in font_manager.afmlist]
+    font_names = list(set(font_names))
+    font_names.sort()
+    return font_names
+
 def remove_none_from_dict(d):
     """ Removes None values from a dictionary """
     assert isinstance(d, dict), 'Error: d is not a dictionary.'

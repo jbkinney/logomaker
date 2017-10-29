@@ -15,16 +15,8 @@ from validate import validate_parameter, validate_mat
 
 from data import load_alignment
 from Logo import Logo
-from make_logo import make_logo
+from make_logo import make_logo, get_fontnames
 from make_styled_logo import make_styled_logo
-
-def get_fontnames():
-    """ Return a list of available font names. """
-    font_names = [f.name for f in font_manager.ttflist] + \
-                 [f.name for f in font_manager.afmlist]
-    font_names = list(set(font_names))
-    font_names.sort()
-    return font_names
 
 
 

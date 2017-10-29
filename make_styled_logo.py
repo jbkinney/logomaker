@@ -2,6 +2,8 @@ from __future__ import division
 import ast
 import re
 from make_logo import make_logo
+import inspect
+import warnings
 
 def make_styled_logo(style_file=None,
                      style_dict=None,
@@ -49,6 +51,15 @@ def make_styled_logo(style_file=None,
         file_kwargs = load_parameters(style_file, print_params, print_warnings)
         kwargs = dict(file_kwargs, **kwargs)
 
+    # Make sure all arguments are actually valid
+    names, x, xx, default_values = inspect.getargspec(make_logo)
+    keys = kwargs.keys()
+    for key in keys:
+        if not key in names:
+            del kwargs[key]
+            message = "Parameter '%s' is invalid. Ignoring it." % key
+            warnings.warn(message, UserWarning)
+
     # Make logo
     logo = make_logo(*args, **kwargs)
 
@@ -82,7 +93,7 @@ def load_parameters(file_name, print_params=True, print_warnings=True):
 
     # Create regular expression for parsing parameter file lines
     pattern = re.compile(
-        '^\s*(?P<param_name>[\w]+)\s*[:=]\s*(?P<param_value>.*)$'
+        '^\s*(?P<param_name>[\w]+)\s*[:=]\s*(?P<param_value>.*),+$'
     )
 
     # Quit if file_name is not specified

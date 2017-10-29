@@ -25,7 +25,7 @@ def _warning(message, category = UserWarning, filename = '', lineno = -1):
 warnings.showwarning = _warning
 
 # Comment this line if you don't want to see warnings multiple times
-warnings.simplefilter('always', UserWarning)
+# warnings.simplefilter('always', UserWarning)
 
 
 def _try_some_code(code_lines, **kwargs):
@@ -409,7 +409,7 @@ def _validate_colorscheme(name, user, default):
     is_valid = False
     for code_line in code_lines:
         try:
-            exec(code_line)
+            eval(code_line)
             is_valid = True
         except:
             pass
