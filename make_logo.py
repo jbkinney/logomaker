@@ -951,7 +951,7 @@ def make_logo(matrix=None,
         xlim = [xmin, xmax]
 
     # Set xticks
-    if not (axes_type in ['rails', 'naked']):
+    if xtick_spacing is None and (axes_type in ['classic', 'everything']):
         xtick_spacing = 1
     if xticks is None and xtick_spacing is not None:
         xticks = [pos for pos in positions if

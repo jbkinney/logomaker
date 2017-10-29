@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data.py" afterPath="$PROJECT_DIR$/data.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/make_logo.py" afterPath="$PROJECT_DIR$/make_logo.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/make_styled_logo.py" afterPath="$PROJECT_DIR$/make_styled_logo.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sortseq_test.ipynb" afterPath="$PROJECT_DIR$/sortseq_test.ipynb" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -80,8 +78,8 @@
           <file leaf-file-name="make_logo.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/make_logo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="867">
-                  <caret line="1119" column="31" lean-forward="true" selection-start-line="1119" selection-start-column="31" selection-end-line="1119" selection-end-column="31" />
+                <state relative-caret-position="776">
+                  <caret line="101" column="35" lean-forward="false" selection-start-line="101" selection-start-column="25" selection-end-line="101" selection-end-column="35" />
                   <folding>
                     <element signature="e#0#31#0" expanded="true" />
                   </folding>
@@ -140,7 +138,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>array</find>
       <find>color</find>
       <find>color)</find>
       <find>gridline_coor</find>
@@ -170,6 +167,7 @@
       <find>validate_colors</find>
       <find>baseline</find>
       <find>or']style_sheet</find>
+      <find>xtick</find>
     </findStrings>
     <replaceStrings>
       <replace>df</replace>
@@ -581,7 +579,14 @@
       <option name="project" value="LOCAL" />
       <updated>1509312195210</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="Fixed bug in baseline format specification in make_logo">
+      <created>1509319059193</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1509319059193</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="TodoView">
@@ -646,7 +651,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="test commit" />
     <MESSAGE value="fixed load_parameters() to use re and accept multi-line input." />
     <MESSAGE value="Created 'vlines' axis format. Implemented xtick_spacing and xtick_anchor also." />
     <MESSAGE value="Minor changes." />
@@ -671,7 +675,8 @@
     <MESSAGE value="Removed trailing commas from style file paring." />
     <MESSAGE value="Have made a number of changes. Added validation, including for FontProperties parameters, and removed font_name parameters from make_logo in favor of just using font_family parameters." />
     <MESSAGE value="Wrote examples.ipynb, which creates example logos illustrating different parameter values." />
-    <option name="LAST_COMMIT_MESSAGE" value="Wrote examples.ipynb, which creates example logos illustrating different parameter values." />
+    <MESSAGE value="Fixed bug in baseline format specification in make_logo" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed bug in baseline format specification in make_logo" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1007,8 +1012,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/make_logo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="867">
-          <caret line="1119" column="31" lean-forward="true" selection-start-line="1119" selection-start-column="31" selection-end-line="1119" selection-end-column="31" />
+        <state relative-caret-position="776">
+          <caret line="101" column="35" lean-forward="false" selection-start-line="101" selection-start-column="25" selection-end-line="101" selection-end-column="35" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
