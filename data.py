@@ -230,7 +230,9 @@ def set_bg_mat(background, matrix):
         new_bg_mat = background.copy()
 
     else:
+        pdb.set_trace()
         assert False, 'Error: bg_mat and df are incompatible'
+
     new_bg_mat = normalize_probability_matrix(new_bg_mat)
     return new_bg_mat
 

@@ -889,6 +889,10 @@ def make_logo(matrix=None,
     ######################################################################
     # axes_style
 
+    # Set style sheet:
+    if style_sheet is not None:
+        plt.style.use(style_sheet)
+
     # Modify ylim and ylabel according to logo_type
     if logo_type == 'counts':
         ymax = matrix.values.sum(axis=1).max()
@@ -1095,6 +1099,16 @@ def make_logo(matrix=None,
     }
     gridline_dict = remove_none_from_dict(gridline_dict)
 
+    # Set baseline defaults
+    if baseline_color is None:
+        baseline_color = mpl.rcParams['axes.edgecolor']
+    if baseline_alpha is None:
+        baseline_alpha = 1
+    if baseline_width is None:
+        baseline_width = mpl.rcParams['axes.linewidth']
+    if baseline_style is None:
+        baseline_style = '-'
+
     # Baseline styling
     baseline_dict = {
         'color': baseline_color,
@@ -1102,7 +1116,6 @@ def make_logo(matrix=None,
         'linewidth': baseline_width,
         'linestyle': baseline_style,
     }
-    baseline_dict = remove_none_from_dict(baseline_dict)
 
     # Set axes_style dictionary
     axes_style = {
@@ -1153,10 +1166,6 @@ def make_logo(matrix=None,
 
     ######################################################################
     # Optionally draw logo
-
-    # Set style sheet:
-    if style_sheet is not None:
-        plt.style.use(style_sheet)
 
     # Set RC parameters
     for key, value in rcparams.items():

@@ -93,7 +93,7 @@ def load_parameters(file_name, print_params=True, print_warnings=True):
 
     # Create regular expression for parsing parameter file lines
     pattern = re.compile(
-        '^\s*(?P<param_name>[\w]+)\s*[:=]\s*(?P<param_value>.*),+$'
+        '^\s*(?P<param_name>[\w]+)\s*[:=]\s*(?P<param_value>.*)$'
     )
 
     # Quit if file_name is not specified
