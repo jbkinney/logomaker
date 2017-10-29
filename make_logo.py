@@ -926,23 +926,23 @@ def make_logo(matrix=None,
         if ylabel is None:
             ylabel = ''
 
+    # Set ylim (will not be None)
+    if ylim is None:
+        ymax = (matrix.values * (matrix.values > 0)).sum(axis=1).max()
+        ymin = (matrix.values * (matrix.values < 0)).sum(axis=1).min()
+        ylim = [ymin, ymax]
+
     # If showing binary yaxis, symmetrize ylim and set yticks to +/-
     if show_binary_yaxis:
         if ylim is None:
             y = np.max(abs(ylim[0]), abs(ylim[1]))
             ylim = [-y, y]
         if yticks is None:
-            yticks = ylim
+            yticks = [.5*ylim[0], .5*ylim[1]]
         if yticklabels is None:
             yticklabels = ['$-$', '$+$']
         if ytick_length is None:
             ytick_length = 0
-
-    # Set ylim (will not be None)
-    if ylim is None:
-        ymax = (matrix.values * (matrix.values > 0)).sum(axis=1).max()
-        ymin = (matrix.values * (matrix.values < 0)).sum(axis=1).min()
-        ylim = [ymin, ymax]
 
     # Set xlim (will not be None)
     if xlim is None:

@@ -224,7 +224,7 @@ def set_bg_mat(background, matrix):
 
     # Use full background dataframe
     elif type(background) == pd.core.frame.DataFrame and \
-                    all(background.index == matrix.index):
+                    len(background.index) == len(matrix.index):
         assert all(matrix.columns == background.columns), \
             'Error: df and bg_mat have different columns.'
         new_bg_mat = background.copy()
@@ -233,6 +233,11 @@ def set_bg_mat(background, matrix):
         pdb.set_trace()
         assert False, 'Error: bg_mat and df are incompatible'
 
+    # Match indices of new_bg_mat to matrix
+    new_bg_mat['pos'] = matrix.index
+    new_bg_mat.set_index('pos', inplace=True, drop=True)
+
+    # Normalize new_bg_mat as probability matrix
     new_bg_mat = normalize_probability_matrix(new_bg_mat)
     return new_bg_mat
 

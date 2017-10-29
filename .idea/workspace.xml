@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data.py" afterPath="$PROJECT_DIR$/data.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/make_logo.py" afterPath="$PROJECT_DIR$/make_logo.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sortseq_test.ipynb" afterPath="$PROJECT_DIR$/sortseq_test.ipynb" />
     </list>
@@ -78,8 +79,8 @@
           <file leaf-file-name="make_logo.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/make_logo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="429">
-                  <caret line="980" column="28" lean-forward="false" selection-start-line="980" selection-start-column="28" selection-end-line="980" selection-end-column="28" />
+                <state relative-caret-position="611">
+                  <caret line="770" column="48" lean-forward="true" selection-start-line="770" selection-start-column="48" selection-end-line="770" selection-end-column="48" />
                   <folding>
                     <element signature="e#0#31#0" expanded="true" />
                   </folding>
@@ -91,21 +92,21 @@
       </split-first>
       <split-second>
         <leaf>
-          <file leaf-file-name="data.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="data.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/data.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-7">
-                  <caret line="338" column="27" lean-forward="false" selection-start-line="338" selection-start-column="27" selection-end-line="338" selection-end-column="27" />
+                <state relative-caret-position="793">
+                  <caret line="239" column="48" lean-forward="false" selection-start-line="239" selection-start-column="48" selection-end-line="239" selection-end-column="48" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="Logo.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="Logo.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Logo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="138">
-                  <caret line="235" column="0" lean-forward="true" selection-start-line="235" selection-start-column="0" selection-end-line="235" selection-end-column="0" />
+                <state relative-caret-position="461">
+                  <caret line="252" column="28" lean-forward="true" selection-start-line="252" selection-start-column="28" selection-end-line="252" selection-end-column="28" />
                   <folding>
                     <element signature="e#0#31#0" expanded="true" />
                   </folding>
@@ -138,10 +139,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>color)</find>
-      <find>gridline_coor</find>
-      <find>gridline_color</find>
-      <find>size</find>
       <find>font_family</find>
       <find>family</find>
       <find>load_paramete</find>
@@ -168,6 +165,10 @@
       <find>or']style_sheet</find>
       <find>xtick</find>
       <find>axes_type == 'naked</find>
+      <find>enrichment</find>
+      <find>show_binary</find>
+      <find>shift_first</find>
+      <find>set_bg</find>
     </findStrings>
     <replaceStrings>
       <replace>df</replace>
@@ -213,8 +214,8 @@
         <option value="$PROJECT_DIR$/character.py" />
         <option value="$PROJECT_DIR$/validate.py" />
         <option value="$PROJECT_DIR$/make_styled_logo.py" />
-        <option value="$PROJECT_DIR$/data.py" />
         <option value="$PROJECT_DIR$/make_logo.py" />
+        <option value="$PROJECT_DIR$/data.py" />
       </list>
     </option>
   </component>
@@ -593,7 +594,14 @@
       <option name="project" value="LOCAL" />
       <updated>1509319388394</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="Fixed bug in xtick_length specification under axes_type = ‘naked'">
+      <created>1509319528284</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1509319528284</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TodoView">
@@ -659,7 +667,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Created 'vlines' axis format. Implemented xtick_spacing and xtick_anchor also." />
     <MESSAGE value="Minor changes." />
     <MESSAGE value="Added sortseq_test.ipynb" />
     <MESSAGE value="Fixed bug associated with position restriction in make_logo()" />
@@ -684,7 +691,8 @@
     <MESSAGE value="Wrote examples.ipynb, which creates example logos illustrating different parameter values." />
     <MESSAGE value="Fixed bug in baseline format specification in make_logo" />
     <MESSAGE value="Fixed bug in xtick_spacing execution" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed bug in xtick_spacing execution" />
+    <MESSAGE value="Fixed bug in xtick_length specification under axes_type = ‘naked'" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed bug in xtick_length specification under axes_type = ‘naked'" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -960,16 +968,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/validate.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3021">
-          <caret line="672" column="0" lean-forward="false" selection-start-line="672" selection-start-column="0" selection-end-line="672" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#47#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/color.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="632">
@@ -977,14 +975,6 @@
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="839">
-          <caret line="234" column="0" lean-forward="false" selection-start-line="234" selection-start-column="0" selection-end-line="234" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1008,23 +998,41 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Logo.py">
+    <entry file="file://$PROJECT_DIR$/make_logo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="235" column="0" lean-forward="true" selection-start-line="235" selection-start-column="0" selection-end-line="235" selection-end-column="0" />
+        <state relative-caret-position="611">
+          <caret line="770" column="48" lean-forward="true" selection-start-line="770" selection-start-column="48" selection-end-line="770" selection-end-column="48" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/make_logo.py">
+    <entry file="file://$PROJECT_DIR$/Logo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="429">
-          <caret line="980" column="28" lean-forward="false" selection-start-line="980" selection-start-column="28" selection-end-line="980" selection-end-column="28" />
+        <state relative-caret-position="461">
+          <caret line="252" column="28" lean-forward="true" selection-start-line="252" selection-start-column="28" selection-end-line="252" selection-end-column="28" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/validate.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3021">
+          <caret line="672" column="0" lean-forward="false" selection-start-line="672" selection-start-column="0" selection-end-line="672" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#47#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="793">
+          <caret line="239" column="48" lean-forward="false" selection-start-line="239" selection-start-column="48" selection-end-line="239" selection-end-column="48" />
+          <folding />
         </state>
       </provider>
     </entry>
