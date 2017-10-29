@@ -15,7 +15,8 @@ from validate import validate_parameter, validate_mat
 
 from data import load_alignment
 from Logo import Logo
-from make_logo import make_logo, get_fontnames
+from make_logo import make_logo
+from character import get_fontnames_dict, get_fontnames
 from make_styled_logo import make_styled_logo
 
 

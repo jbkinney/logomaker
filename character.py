@@ -1,9 +1,23 @@
 from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch, Rectangle
 from matplotlib.transforms import Affine2D, Bbox
+from matplotlib.font_manager import FontManager
 
 import numpy as np
 import pdb
+
+# Create global font manager instance. This takes a second or two
+font_manager = FontManager()
+
+def get_fontnames_dict():
+    ttf_dict = dict([(f.name,f.fname) for f in font_manager.ttflist])
+    return ttf_dict
+
+def get_fontnames():
+    fontnames_dict = get_fontnames_dict()
+    fontnames = list(fontnames_dict.keys())
+    fontnames.sort()
+    return fontnames
 
 class Character:
     def __init__(self,

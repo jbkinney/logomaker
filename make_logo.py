@@ -2,23 +2,12 @@ from __future__ import division
 import numpy as np
 import inspect
 import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties, FontManager
+from matplotlib.font_manager import FontProperties
 import matplotlib as mpl
 from validate import validate_parameter, validate_mat
 from Logo import Logo
 import data
 import color
-
-# Create global font manager instance. This takes a second or two
-font_manager = FontManager()
-
-def get_fontnames():
-    """ Return a list of available font names. """
-    font_names = [f.name for f in font_manager.ttflist] + \
-                 [f.name for f in font_manager.afmlist]
-    font_names = list(set(font_names))
-    font_names.sort()
-    return font_names
 
 def remove_none_from_dict(d):
     """ Removes None values from a dictionary """
@@ -82,7 +71,6 @@ def make_logo(matrix=None,
               font_family=None,
               font_weight=None,
               font_style=None,
-              font_name=None,
 
               # Character placement
               stack_order='big_on_top',
@@ -152,7 +140,6 @@ def make_logo(matrix=None,
               axes_fontweight=None,
               axes_fontstyle=None,
               axes_fontsize=10,
-              axes_fontname=None,
 
               # tick font
               tick_fontfile=None,
@@ -160,7 +147,6 @@ def make_logo(matrix=None,
               tick_fontweight=None,
               tick_fontstyle=None,
               tick_fontsize=None,
-              tick_fontname=None,
 
               # label font
               label_fontfile=None,
@@ -168,7 +154,6 @@ def make_logo(matrix=None,
               label_fontweight=None,
               label_fontstyle=None,
               label_fontsize=None,
-              label_fontname=None,
 
               # title font
               title_fontfile=None,
@@ -176,7 +161,6 @@ def make_logo(matrix=None,
               title_fontweight=None,
               title_fontstyle=None,
               title_fontsize=None,
-              title_fontname=None,
               ):
     """
     Description:
@@ -202,9 +186,10 @@ def make_logo(matrix=None,
             floats >= 0. In what follows, L refers to the number of matrix rows
             and C refers to the number of matrix columns.
 
-        matrix_type (str in set, None): Type of data passed in matrix. If str,
+        matrix_type (str in set): Type of data passed in matrix. If str,
             value must be in {'counts','probability', 'enrichment',
-            'information'}. If None, a generic logo is created. Default None.
+            'information'}. If None, a generic logo is created. Default
+            'counts'.
 
         logo_type (str in set, None): Type of logo to display. If str, value
             must be in {'counts','probability', 'enrichment', 'information'}.
@@ -282,7 +267,7 @@ def make_logo(matrix=None,
         #######################################################################
         ### Position choice
 
-        position_range ([int >= 0, int >= 0], None): Rows of matrix to use when
+        position_range ([float >= 0, float >= 0], None): Rows of matrix to use when
             drawing logo. If None, all rows are used. Default None.
 
         shift_first_position_to (float): Position value to be assigned to the
@@ -397,12 +382,6 @@ def make_logo(matrix=None,
         font_properties (FontProperties, None): The logo character font
             properties. If FontProperties, overrides all of the font_*
             parameters below. If None, is ignored. Default None.
-
-        font_name (str, None): Name of the font used for logo characters. This
-            name corresponds to a specific font_file, which is determined
-            using the FontManager.findfont() method. If str, overrides the
-            font_file, font_family, and maybe other parameters below. If None,
-            is ignored. Default None
 
         font_file (str, None): The local file specifying the logo character
             font. Specifically, the value passed as the 'fname' parameter in
@@ -528,7 +507,7 @@ def make_logo(matrix=None,
             plotted gridlines. Is passed as the 'linewidth' argument to
             ax.grid() if not None. Default None.
 
-        gridline_color (color): If not None, specifies the color of the
+        gridline_color (color, None): If not None, specifies the color of the
             gridlines. Is passed as the 'color' argument to ax.grid() if not
             None. Default None.
 
@@ -536,9 +515,9 @@ def make_logo(matrix=None,
             opacity of the gridlines. Is passed as the 'alpha' argument to
             ax.grid() if not None. Default None.
 
-        gridline_style (str, None): If not None, specifies gridline line style.
-            Is passed as the 'linestyle' argument to ax.grid if not None.
-            Default None.
+        gridline_style (str, list, None): If not None, specifies gridline line
+            style. Is passed as the 'linestyle' argument to ax.grid if not
+            None. Default None.
 
         #######################################################################
         ### Baseline formatting
@@ -550,7 +529,7 @@ def make_logo(matrix=None,
             plotted baseline. Is passed as the 'linewidth' argument to
             ax.axhline() if not None. Default None.
 
-        baseline_color (color): If not None, specifies the color of the
+        baseline_color (color, None): If not None, specifies the color of the
             baseline. Is passed as the 'color' argument to ax.axhline() if not
             None. Default None.
 
@@ -558,9 +537,9 @@ def make_logo(matrix=None,
             opacity of baseline. Is passed as the 'alpha' argument to
             ax.axhline() if not None. Default None.
 
-        baseline_style (str, None): If not None, specifies baseline line style.
-            Is passed as the 'linestyle' argument to ax.axhline() if not None.
-            Default None.
+        baseline_style (str, list, None): If not None, specifies baseline line
+            style. Is passed as the 'linestyle' argument to ax.axhline() if not
+            None. Default None.
 
         #######################################################################
         ### x-axis formatting
@@ -648,14 +627,10 @@ def make_logo(matrix=None,
             #######################################################################
             ### Default axes font
 
-        axes_fontname (FontProperties, None): See font_name. Default to use for
-            axes labels, axes tick labels, and title. Ignored if None. Default
-            None.
-
         axes_fontfile (str, None): See font_file. Default to use for axes
             labels, axes tick labels, and title. Ignored if None. Default None.
 
-        axes_fontfamily (str, None): See font_family. Default to use for
+        axes_fontfamily (str, list, None): See font_family. Default to use for
             axes labels, axes tick labels, and title. Ignored if None. Default
             None.
 
@@ -677,14 +652,11 @@ def make_logo(matrix=None,
         #######################################################################
         ### Tick label font
 
-        tick_fontname (FontProperties, None): Overrides axes_fontname for tick
-            label styling if value is not None. Default None.
-
         tick_fontfile (str, None): Overrides axes_fontfile for tick label
             styling if value is not None. Default None.
 
-        tick_fontfamily (str, None): Overrides axes_fontfamily for tick label
-            styling if value is not None. Default None.
+        tick_fontfamily (str, list, None): Overrides axes_fontfamily for tick
+            label styling if value is not None. Default None.
 
         tick_fontweight (str, float, None): Overrides axes_fontweight for tick
             label styling if value is not None. Default None.
@@ -698,14 +670,11 @@ def make_logo(matrix=None,
         #######################################################################
         ### Axis label font
 
-        label_fontname (FontProperties, None): Overrides axes_fontname for axis
-            label styling if value is not None. Default None.
-
         label_fontfile (str, None): Overrides axes_fontfile for axis label
             styling if value is not None. Default None.
 
-        label_fontfamily (str, None): Overrides axes_fontfamily for axis label
-            styling if value is not None. Default None.
+        label_fontfamily (str, list, None): Overrides axes_fontfamily for axis
+            label styling if value is not None. Default None.
 
         label_fontweight (str, float, None): Overrides axes_fontweight for axis
             label styling if value is not None. Default None.
@@ -719,13 +688,10 @@ def make_logo(matrix=None,
         #######################################################################
         ### Title font
 
-        title_fontname (FontProperties, None): Overrides axes_fontname for
-            title styling if value is not None. Default None.
-
         title_fontfile (str, None): Overrides axes_fontfile for title styling
             if value is not None. Default None.
 
-        title_fontfamily (str, None): Overrides axes_fontfamily for title
+        title_fontfamily (str, list, None): Overrides axes_fontfamily for title
             styling if value is not None. Default None.
 
         title_fontweight (str, float, None): Overrides axes_fontweight for
@@ -822,10 +788,6 @@ def make_logo(matrix=None,
             'Error: font_properties is not an instance of FontProperties.'
     # Otherwise, create font_properties from other font information
     else:
-
-        # Look up font file if name provided instead
-        if font_file is None and font_name is not None:
-            font_file = font_manager.findfont(font_name)
 
         # Create properties
         font_properties = FontProperties(family=font_family,
@@ -1075,17 +1037,6 @@ def make_logo(matrix=None,
 
     if title is None:
         title = ''
-
-    # Translate font names into font files
-    if axes_fontfile is None and axes_fontname is not None:
-        axes_fontfile = font_manager.findfont(axes_fontname)
-    if tick_fontfile is None and tick_fontname is not None:
-        tick_fontfile = font_manager.findfont(tick_fontname)
-    if label_fontfile is None and label_fontname is not None:
-        label_fontfile = font_manager.findfont(label_fontname)
-    if title_fontfile is None and title_fontname is not None:
-        title_fontfile = font_manager.findfont(title_fontname)
-
 
     # Default font for all axes elements
     axes_fontdict = {
