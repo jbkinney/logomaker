@@ -47,9 +47,9 @@ class Logo:
                 'Error: highlight_sequence is not a string.'
             assert len(self.highlight_sequence ) == len(self.poss), \
                 'Error: highlight_sequence has a different length than matrix.'
-            assert set(list(str(self.highlight_sequence))) == set(self.chars),\
-                'Error: highlight_sequence %s contains invalid characters'\
-                %self.highlight_sequence
+            #assert set(list(str(self.highlight_sequence))) == set(self.chars),\
+            #    'Error: highlight_sequence %s contains invalid characters'\
+            #    %self.highlight_sequence
             self.use_highlight = True
         else:
             self.use_highlight = False

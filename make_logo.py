@@ -9,6 +9,11 @@ from Logo import Logo
 import data
 import color
 
+import pdb
+
+default_fig_width = 8
+default_fig_height_per_line = 2
+
 def remove_none_from_dict(d):
     """ Removes None values from a dictionary """
     assert isinstance(d, dict), 'Error: d is not a dictionary.'
@@ -28,9 +33,10 @@ def make_logo(matrix=None,
 
               # Immediate drawing (make_logo only)
               figsize=None,
-              draw_now=False,
+              draw_now=True,
               save_to_file=None,
               dpi=300,
+              max_positions_per_line=50,
 
               # Position choice
               position_range=None,
@@ -170,10 +176,11 @@ def make_logo(matrix=None,
 
     Returns:
 
-        logo (logomaker.Logo): Logo object.
-            logo.ax: Axes logo is drawn on. Set if figsize or draw_now=True
-                is passed.
-            logo.fig: Figure logo is drawn on. Set if figsize is set.
+        If a single-line logo is drawn:
+            logo (a logomaker.Logo object). The figure and axes on which the
+                logo is drawn are saved in logo.fig and logo.ax respectively.
+        If a multi-line logo is drawn:
+            list of logomaker.Logo objects, one for each line.
 
     Arguments:
 
@@ -251,19 +258,27 @@ def make_logo(matrix=None,
         ### Immediate drawing
 
         figsize ([float >= 0, float >=0], None): Size of figure in inches. If
-            not None, a new figure object and axes object will be created and
-            the Logo object will be drawn. The .fig and .ax attributes of the
-            returned Logo object will store these figure and axes objects.
-            Default None
+            not None, a default size for the figure will be used. If draw_now
+            is True, a new figure will be created of this size, and will be
+            stored in logo.fig. The axes on which the logo is drawn will be
+            saved to logo.ax. Default None.
 
-        draw_now (bool): If True, the logo object will be drawn on plt.gca(),
-            which will be stored in the .ax attribute of the returned Logo
-            object. Default False
+        draw_now (bool): If True, a new figure will be created of size figsize
+            and the logo will be drawn. If not, the logo will not be drawn.
 
         save_to_file (str, None): If string, specifies the name of file that
             logo is saved to. File type is determined automatically from the
             extension of the file name. If None, no file is stored. Default
             None.
+
+        dpi (int): The resolution at which to save the logo image if writing
+            to a non-vector format.
+
+        max_positions_per_line (int): The maximum number of positions per line. If
+            the number of positions within a matrix exceeds this number, the
+            logo will be split over multiple lines. If figsize is None, a
+            figure whose height is proportional to the number of lines will
+            be created.
 
         #######################################################################
         ### Position choice
@@ -782,6 +797,92 @@ def make_logo(matrix=None,
                                 information_units=information_units)
 
     ######################################################################
+    # multi-line logos
+    if L > max_positions_per_line:
+
+        # Compute the number of lines needed
+        num_lines = int(np.ceil(L / max_positions_per_line))
+
+        # Set figsize
+        fig_height = num_lines * default_fig_height_per_line
+        if figsize is None:
+            figsize = [default_fig_width, fig_height]
+
+        # Pad matrix with zeros
+        rows = matrix.index[0] + \
+               np.arange(L, num_lines * max_positions_per_line)
+        for r in rows:
+            matrix.loc[r, :] = 0.0
+
+        # If there is a highlight sequence, pad it too
+        if highlight_sequence is not None:
+            highlight_sequence = highlight_sequence + \
+                                 ' '*(num_lines * max_positions_per_line - L)
+
+        # Get arguments passed by user
+        kwargs = dict(zip(names, user_values))
+
+        # Set ylim (will not be None)
+        if ylim is None:
+            ymax = (matrix.values * (matrix.values > 0)).sum(axis=1).max()
+            ymin = (matrix.values * (matrix.values < 0)).sum(axis=1).min()
+            ylim = [ymin, ymax]
+
+        # Set style sheet:
+        if style_sheet is not None:
+            plt.style.use(style_sheet)
+            print 'Using style sheet %s.' %  style_sheet
+
+        # Create figure
+        if draw_now:
+            fig, axs = plt.subplots(num_lines, 1, figsize=figsize)
+
+        logos = []
+        for n in range(num_lines):
+
+            # Section matrix
+            start = n * max_positions_per_line
+            stop = (n+1) * max_positions_per_line
+            n_matrix = matrix.iloc[start:stop, :]
+
+            # If there is a highlight sequence, section it too
+            if highlight_sequence is not None:
+                n_highlight_sequence = highlight_sequence[start:stop]
+            else:
+                n_highlight_sequence = None
+
+            # Adjust kwargs
+            n_kwargs = kwargs.copy()
+            n_kwargs['matrix'] = n_matrix
+            n_kwargs['matrix_type'] = logo_type
+            n_kwargs['logo_type'] = logo_type
+            n_kwargs['figsize'] = None
+            n_kwargs['draw_now'] = False
+            n_kwargs['background'] = None
+            n_kwargs['highlight_sequence'] = n_highlight_sequence
+            n_kwargs['shift_first_position_to'] = matrix.index[0]+start
+            n_kwargs['ylim'] = ylim
+
+            # Adjust annotation
+            if n != 0:
+                n_kwargs['title'] = ''
+            if n != num_lines-1:
+                n_kwargs['xlabel'] = ''
+
+            # Create logo
+            logo = make_logo(**n_kwargs)
+            if draw_now:
+                logo.fig = fig
+                logo.ax = axs[n]
+                logo.draw(logo.ax)
+            else:
+                logo.fig = None
+                logo.ax = None
+            logos.append(logo)
+
+        return logos
+
+    ######################################################################
     # font_properties
 
     # If font_properties is set directly by user, validate it
@@ -1040,8 +1141,6 @@ def make_logo(matrix=None,
             gridline_alpha = .5
         if show_baseline is None:
             show_baseline = True
-        if show_binary_yaxis is None:
-            show_binary_yaxis = True
 
     # If showing binary yaxis, symmetrize ylim and set yticks to +/-
     if show_binary_yaxis:
@@ -1192,9 +1291,13 @@ def make_logo(matrix=None,
     for key, value in rcparams.items():
         mpl.rcParams[key] = value
 
+    # Set default figsize
+    if figsize is None:
+        figsize = [default_fig_width, default_fig_height_per_line]
+
     # If user specifies a figure size, make figure and axis,
     # draw logo, then return all three
-    if figsize is not None:
+    if draw_now:
 
         fig, ax = plt.subplots(figsize=figsize)
         logo.draw(ax)
@@ -1210,19 +1313,7 @@ def make_logo(matrix=None,
         logo.ax = ax
         logo.fig = fig
 
-    # If draw_now, get current axes, draw logo, and return both
-    elif draw_now:
-        ax = plt.gca()
-        logo.draw(ax)
-
-        if use_tightlayout:
-            plt.tight_layout()
-            plt.draw()
-
-        logo.ax = ax
-        logo.fig = None
-
-    # Otherwise, just return logo to user
+    # Otherwise, just return logo to user without drawing
     else:
         logo.ax = None
         logo.fig = None

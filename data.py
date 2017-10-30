@@ -45,6 +45,10 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
     # Check that matrix is valid
     matrix = validate_mat(matrix)
 
+    # If not changing types, just return matrix
+    if from_type == to_type:
+        return matrix
+
     # Create background matrix
     bg_mat = set_bg_mat(background=background, matrix=matrix)
 
