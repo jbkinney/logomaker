@@ -92,7 +92,7 @@ def make_logo(matrix=None,
               rcparams={},
 
               # Grid line formatting
-              show_gridlines=False,
+              show_gridlines=None,
               gridline_axis=None,
               gridline_width=None,
               gridline_color=None,
@@ -100,7 +100,7 @@ def make_logo(matrix=None,
               gridline_style=None,
 
               # Baseline formatting
-              show_baseline=True,
+              show_baseline=None,
               baseline_width=None,
               baseline_color=None,
               baseline_alpha=None,
@@ -118,7 +118,7 @@ def make_logo(matrix=None,
               xlabel=None,
 
               # y-axis formatting
-              show_binary_yaxis=False,
+              show_binary_yaxis=None,
               ylim=None,
               yticks=None,
               yticklabels=None,
@@ -475,7 +475,7 @@ def make_logo(matrix=None,
         ### Axes formatting
 
         axes_type (str in set): Axes logo style. Value must be in {'classic',
-            'rails', 'naked', 'everything'}. Default 'classic'.
+            'rails', 'naked', 'everything, 'vlines'}. Default 'classic'.
 
         style_sheet (str, None): Matplotlib style sheet to use for default axis
             styling. This value is passed to plt.style.use(). Available style
@@ -578,8 +578,9 @@ def make_logo(matrix=None,
         #######################################################################
         ### y-axis formatting
 
-        show_binary_yaxis (bool): If True, y-axis is labeled with '+' and '-'.
-            in place of numerically labeled ticks. Default False.
+        show_binary_yaxis (bool, None): If True, y-axis is labeled with '+' and
+            '-'. in place of numerically labeled ticks. Overrides ylim, yticks,
+            and yticklabels. Default None.
 
         ylim ([float, float], None): y-axis limits. Determined automatically if
             None. Default None.
@@ -932,18 +933,6 @@ def make_logo(matrix=None,
         ymin = (matrix.values * (matrix.values < 0)).sum(axis=1).min()
         ylim = [ymin, ymax]
 
-    # If showing binary yaxis, symmetrize ylim and set yticks to +/-
-    if show_binary_yaxis:
-        if ylim is None:
-            y = np.max(abs(ylim[0]), abs(ylim[1]))
-            ylim = [-y, y]
-        if yticks is None:
-            yticks = [.5*ylim[0], .5*ylim[1]]
-        if yticklabels is None:
-            yticklabels = ['$-$', '$+$']
-        if ytick_length is None:
-            ytick_length = 0
-
     # Set xlim (will not be None)
     if xlim is None:
         xmin = matrix.index.min() - .5
@@ -973,6 +962,8 @@ def make_logo(matrix=None,
             top_spine = False
         if bottom_spine is None:
             bottom_spine = True
+        if show_baseline is None:
+            show_baseline = True
 
     elif axes_type == 'naked':
         if xticks is None:
@@ -993,6 +984,8 @@ def make_logo(matrix=None,
             top_spine = False
         if bottom_spine is None:
             bottom_spine = False
+        if show_baseline is None:
+            show_baseline = True
 
     elif axes_type == 'rails':
         if xticks is None:
@@ -1009,6 +1002,8 @@ def make_logo(matrix=None,
             top_spine = True
         if bottom_spine is None:
             bottom_spine = True
+        if show_baseline is None:
+            show_baseline = True
 
     elif axes_type == 'everything':
         if xlabel is None:
@@ -1021,6 +1016,8 @@ def make_logo(matrix=None,
             top_spine = True
         if bottom_spine is None:
             bottom_spine = True
+        if show_baseline is None:
+            show_baseline = True
 
     elif axes_type == 'vlines':
         if xtick_length is None:
@@ -1035,6 +1032,27 @@ def make_logo(matrix=None,
             top_spine = False
         if bottom_spine is None:
             bottom_spine = False
+        if show_gridlines is None:
+            show_gridlines = True
+        if gridline_axis is None:
+            gridline_axis = 'x'
+        if gridline_alpha is None:
+            gridline_alpha = .5
+        if show_baseline is None:
+            show_baseline = True
+        if show_binary_yaxis is None:
+            show_binary_yaxis = True
+
+    # If showing binary yaxis, symmetrize ylim and set yticks to +/-
+    if show_binary_yaxis:
+
+        # Force set of ylim, yticks, and yticklabels
+        y = np.max(np.abs([y for y in ylim]))
+        ylim = [-y, y]
+        yticks = [.5 * ylim[0], .5 * ylim[1]]
+        yticklabels = ['$-$', '$+$']
+        if ytick_length is None:
+            ytick_length = 0
 
     # Set label rotation
     if xtick_rotation is None:
@@ -1121,6 +1139,7 @@ def make_logo(matrix=None,
 
     # Set axes_style dictionary
     axes_style = {
+        'show_binary_yaxis': show_binary_yaxis,
         'show_baseline': show_baseline,
         'baseline_dict': baseline_dict,
         'title': title,

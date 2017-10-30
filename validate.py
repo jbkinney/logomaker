@@ -106,7 +106,7 @@ params_with_values_in_dict = {
     'information_units': ['bits', 'nats'],
     'sequence_type': ['dna','DNA', 'rna', 'RNA', 'protein', 'PROTEIN'],
     'stack_order': ['big_on_top', 'small_on_top', 'fixed'],
-    'axes_type': ['classic', 'naked', 'everything', 'rails'],
+    'axes_type': ['classic', 'naked', 'everything', 'rails', 'vlines'],
     'gridline_axis': ['x','y','both'],
 }
 
@@ -238,10 +238,7 @@ params_that_cant_be_none = {
     'uniform_stretch',
     'axes_type',
     'rcparams',
-    'show_gridlines',
-    'show_baseline',
     'xtick_anchor',
-    'show_binary_yaxis',
     'use_tightlayout',
 }
 
