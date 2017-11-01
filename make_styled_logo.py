@@ -19,7 +19,7 @@ def make_styled_logo(style_file=None,
 
     Return:
 
-        logo (logomaker.Logo): a rendered logo.
+        logo (__init__.Logo): a rendered logo.
 
     Args:
 

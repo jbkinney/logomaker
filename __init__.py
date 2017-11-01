@@ -11,6 +11,7 @@ from matplotlib.colors import to_rgba
 import matplotlib as mpl
 import pdb
 
+import validate
 from validate import validate_parameter, validate_mat
 
 from data import load_alignment
