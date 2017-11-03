@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
 import character
+import pdb
 
 SMALL = 1E-6
 
@@ -14,6 +15,8 @@ class Logo:
                  character_style,
                  highlight_sequence,
                  highlight_style,
+                 fixedchar_dict,
+                 fixedchar_style,
                  placement_style,
                  axes_style):
 
@@ -36,6 +39,7 @@ class Logo:
         self.character_style = character_style.copy()
         self.highlight_style = highlight_style.copy()
         self.placement_style = placement_style.copy()
+        self.fixedchar_style = fixedchar_style.copy()
 
         # Set axes style
         self.axes_style = axes_style.copy()
@@ -47,12 +51,18 @@ class Logo:
                 'Error: highlight_sequence is not a string.'
             assert len(self.highlight_sequence ) == len(self.poss), \
                 'Error: highlight_sequence has a different length than matrix.'
-            #assert set(list(str(self.highlight_sequence))) == set(self.chars),\
-            #    'Error: highlight_sequence %s contains invalid characters'\
-            #    %self.highlight_sequence
             self.use_highlight = True
         else:
             self.use_highlight = False
+
+        # Set fixedchar_dict
+        self.fixedchar_dict = fixedchar_dict
+        if self.fixedchar_dict is not None:
+            assert isinstance(self.fixedchar_dict, dict), \
+                'Error: fixedchar_dict is not a dictionary.'
+            self.use_fixedchar = True
+        else:
+            self.use_fixedchar = False
 
         # Compute characters and box
         self.compute_characters()
@@ -63,7 +73,10 @@ class Logo:
         # Get largest value for computing transparency
         max_alpha_val = self.placement_style['max_alpha_val']
         if max_alpha_val is None:
-            max_alpha_val = abs(self.df.values).max()
+            try:
+                max_alpha_val = abs(self.df.values).max()
+            except:
+                pdb.set_trace()
 
         # Compute hstretch values for all characters
         width = self.placement_style['width']
@@ -166,7 +179,7 @@ class Logo:
                     edgecolor[3] *= alpha
 
                 # Create Character object
-                char = character.Character(
+                char_obj = character.Character(
                     c=char, xmin=x, ymin=y, width=w, height=h, flip=flip,
                     font_properties=self.font_properties,
                     facecolor=facecolor,
@@ -180,16 +193,61 @@ class Logo:
                     max_hstretch=max_hstretch)
 
                 # Store Character object
-                char_list.append(char)
+                char_list.append(char_obj)
 
                 # Increment y
                 y += h
 
-        # Get box
-        xmin = min([c.bbox.xmin for c in char_list])
-        xmax = max([c.bbox.xmax for c in char_list])
+        # Get ybox
         ymin = min([c.bbox.ymin for c in char_list])
         ymax = max([c.bbox.ymax for c in char_list])
+
+        # Process fixed characters
+        if self.use_fixedchar:
+            for pos, char in self.fixedchar_dict.items():
+
+                # This is the same for every character
+                y = ymin
+                h = ymax-ymin
+                x = pos - width/2.0
+                w = width
+
+                # Set patch style
+                facecolor = self.fixedchar_style['facecolors'][char].copy()
+                edgecolor = self.fixedchar_style['edgecolors'][char].copy()
+                boxcolor = self.fixedchar_style['boxcolors'][char].copy()
+                boxedgecolor = self.fixedchar_style['boxedgecolors'][char] \
+                    .copy()
+                edgewidth = self.fixedchar_style['edgewidth']
+                boxedgewidth = self.fixedchar_style['boxedgewidth']
+
+
+                # Create Character object
+                char_obj = character.Character(
+                    c=char,
+                    xmin=x,
+                    ymin=y,
+                    width=w,
+                    height=h, flip=False,
+                    font_properties=self.font_properties,
+                    facecolor=facecolor,
+                    edgecolor=edgecolor,
+                    linewidth=edgewidth,
+                    boxcolor=boxcolor,
+                    boxedgecolor=boxedgecolor,
+                    boxedgewidth=boxedgewidth,
+                    hpad=hpad,
+                    vpad=vpad,
+                    max_hstretch=max_hstretch,
+                    zorder=20)
+
+                # Store Character object
+                char_list.append(char_obj)
+
+        # Get xbox
+        xmin = min([c.bbox.xmin for c in char_list])
+        xmax = max([c.bbox.xmax for c in char_list])
+
         bbox = Bbox([[xmin, ymin], [xmax, ymax]])
 
         # Set char_list and box
@@ -207,17 +265,20 @@ class Logo:
         for char in self.char_list:
             char.draw(ax)
 
+        # Set limits
+        ax.set_xlim(self.axes_style['xlim'])
+        ax.set_ylim(self.axes_style['ylim'])
+
         # Draw baseline
         if self.axes_style['show_baseline']:
             ax.axhline(0, zorder=10, **self.axes_style['baseline_dict'])
 
-        # Draw gridlines
-        if self.axes_style['show_gridlines']:
-            ax.grid(**self.axes_style['gridline_dict'])
+        # Style gridlines
+        ax.grid(**self.axes_style['gridline_dict'])
 
-        # Set limits
-        ax.set_xlim(self.axes_style['xlim'])
-        ax.set_ylim(self.axes_style['ylim'])
+        # Draw vlines
+        for x in self.axes_style['vline_positions']:
+            ax.axvline(x, zorder=30, **self.axes_style['vline_dict'])
 
         # Draw x-axis annotation
         if self.axes_style['xticks'] is not None:
@@ -261,29 +322,31 @@ class Logo:
             plt.tight_layout()
         plt.draw()
 
+        # Set xticklabels
         if self.axes_style['xticklabels'] is not None:
             xticklabels = self.axes_style['xticklabels']
         elif self.axes_style['xtick_format'] is not None:
             xticklabels = [self.axes_style['xtick_format'] % x
                            for x in ax.get_xticks()]
         else:
-            xticklabels = ax.get_xticklabels()
-
+            xticklabels = ax.get_xticks()
         ax.set_xticklabels(xticklabels,
-                        rotation=self.axes_style['xtick_rotation'],
-                        font_properties=self.axes_style['tick_fontproperties'])
+                           rotation=self.axes_style['xtick_rotation'],
+                           font_properties=
+                           self.axes_style['tick_fontproperties'])
 
+        # Set yticklabels
         if self.axes_style['yticklabels'] is not None:
             yticklabels = self.axes_style['yticklabels']
         elif self.axes_style['ytick_format'] is not None:
             yticklabels = [self.axes_style['ytick_format'] % y
                            for y in ax.get_yticks()]
         else:
-            yticklabels = ax.get_yticklabels()
-
+            yticklabels = ax.get_yticks()
         ax.set_yticklabels(yticklabels,
-                        rotation=self.axes_style['ytick_rotation'],
-                        font_properties=self.axes_style['tick_fontproperties'])
+                           rotation=self.axes_style['ytick_rotation'],
+                           font_properties=
+                                self.axes_style['tick_fontproperties'])
 
         # Do final drawing
         if self.axes_style['use_tightlayout']:
