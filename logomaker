@@ -17,8 +17,6 @@ from matplotlib.transforms import Bbox
 from matplotlib.colors import to_rgba
 import pdb
 
-
-
 import validate
 from validate import validate_parameter, validate_mat
 
