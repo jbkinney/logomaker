@@ -28,15 +28,19 @@ from make_styled_logo import make_styled_logo
 
 import argparse
 from validate import params_with_values_in_dict
+from documentation_parser import parse_documentation_file
 
 # logomaker only works at the commandline
 assert __name__ == '__main__'
 
 parser = argparse.ArgumentParser(description='Create logo from FASTA file.')
 
+doc_file = 'make_logo_arguments.txt'
+doc_dict = parse_documentation_file(doc_file)
+
 # Register all variable names and default values with argparse
 names, x, xx, default_values = inspect.getargspec(make_logo)
-for name, default in zip(names,default_values):
+for name, default in zip(names, default_values):
 
     # Create dict to hold keyword arguments
     tmp_dict = {}
@@ -47,10 +51,21 @@ for name, default in zip(names,default_values):
     elif name in params_with_values_in_dict:
         tmp_dict['choices'] = params_with_values_in_dict[name]
 
+    # Get documentation for that function
+    if name in doc_dict:
+
+        # Get entry
+        entry = doc_dict[name]
+        entry.set_default(default)
+
+        # Set documentation string
+        tmp_dict['help'] = entry.get_argparse_doc()
+    else:
+        tmp_dict['help'] = 'NOT DOCUMENTED.'
+
     parser.add_argument('--%s' % name, **tmp_dict)
 
 # Create parsers for *all*
-
 args = parser.parse_args()
 kwargs = vars(args)
 logo = make_logo(**kwargs)

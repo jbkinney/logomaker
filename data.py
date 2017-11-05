@@ -26,7 +26,7 @@ to_rna = {'A': 'a', 'C': 'c', 'G': 'g', 'T': 'u', 't': 'u', 'U': 'u'}
 to_PROTEIN = dict(zip(protein, PROTEIN))
 to_protein = dict(zip(PROTEIN, protein))
 
-from validate import validate_mat, validate_probability_mat
+from validate import validate_mat, validate_probability_mat, iupac_dict
 
 def transform_mat(matrix, to_type, from_type=None, background=None,
                   pseudocount=1, enrichment_logbase=2,
@@ -138,7 +138,9 @@ def probability_mat_to_enrichment_mat(freq_mat, bg_mat, base=2,
     Converts a probability matrix to an enrichment matrix
     '''
     # Validate mat before use
-    freq_mat = validate_probability_mat(freq_mat)
+    freq_mat = validate_probability_mat(freq_mat + SMALL)
+
+    # Make sure base is a float
 
     # Compute weight_mat
     weight_mat = freq_mat.copy()
@@ -167,7 +169,7 @@ def probability_mat_to_information_mat(freq_mat, bg_mat, units='bits'):
         assert False, 'Error: invalid selection for units = %s' % units
 
     # Validate mat before use
-    freq_mat = validate_probability_mat(freq_mat)
+    freq_mat = validate_probability_mat(freq_mat + SMALL)
     info_mat = freq_mat.copy()
 
     info_list = (freq_mat.values * multiplier *
@@ -347,13 +349,29 @@ def filter_columns(matrix,
         warnings.warn(message, UserWarning)
         translation_dict = {}
 
+    # Remove any characters to ignore
+    new_matrix = matrix.copy()
+    for char in ignore_characters:
+        if char in new_matrix.columns:
+            del new_matrix[char]
+
     # If manually restricting to specific characters, do it:
     if characters is not None:
         new_columns = [c for c in characters if c in matrix.columns]
-        new_matrix = matrix.loc[:,new_columns]
+        new_matrix = matrix.loc[:, new_columns]
 
     # Otherwise performing translation, do it
     elif len(translation_dict) > 0:
+
+        # Union of keys and values.
+        allowed_chars = set(translation_dict.values()) | \
+                        set(translation_dict.keys())
+        invalid_chars = set(new_matrix.columns) - allowed_chars
+        assert len(invalid_chars)==0, \
+            'Matrix contains invalid characters %s ' % \
+            repr(list(invalid_chars)) + \
+            ' for sequence_type %s ' % sequence_type
+
         # Rename columns
         new_matrix = matrix.rename(columns=translation_dict)
 
@@ -361,7 +379,7 @@ def filter_columns(matrix,
         new_matrix = new_matrix.groupby(new_matrix.columns, axis=1).sum()
 
         # Order columns alphabetically
-        new_columns = list(set(translation_dict.values()))
+        new_columns = list(new_matrix.columns)
         new_columns.sort()
         new_matrix = new_matrix.loc[:, new_columns]
 
@@ -369,9 +387,30 @@ def filter_columns(matrix,
     else:
         new_matrix = matrix.copy()
 
-    # Remove any characters to ignore
-    for char in ignore_characters:
-        if char in new_matrix.columns:
-            del new_matrix[char]
+
+    # Validate new matrix
+    new_matrix = validate_mat(new_matrix)
 
     return new_matrix
+
+
+def iupac_to_probability_mat(iupac):
+    """Returns a probability matrix correspondign to a specified iupac string
+    """
+
+    # Create counts matrix based on IUPAC string
+    L = len(iupac)
+    rows = range(L)
+    cols = list('ACGT')
+    counts_mat = pd.DataFrame(index=rows, columns=cols).fillna(0)
+    for i, c in enumerate(list(iupac)):
+        bs = iupac_dict[c]
+        for b in bs:
+            counts_mat.loc[i, b] = 1
+
+    # Convert counts matrix to probability matrix
+    probability_mat = counts_mat_to_probability_mat(counts_mat,
+                                                    pseudocount=SMALL)
+
+    # Return probability matrix to user
+    return probability_mat

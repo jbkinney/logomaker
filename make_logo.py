@@ -5,9 +5,12 @@ import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 import matplotlib as mpl
 from validate import validate_parameter, validate_mat
+from data import load_alignment, iupac_to_probability_mat
 from Logo import Logo
 import data
 import color
+from load_meme import load_meme
+from documentation_parser import document_function
 
 import pdb
 
@@ -20,9 +23,14 @@ def remove_none_from_dict(d):
     return dict([(k, v) for k, v in d.items() if v is not None])
 
 def make_logo(matrix=None,
+              fasta_file=None,
+              meme_file=None,
+              meme_motifname=None,
+              meme_motifnum=None,
+              iupac_string=None,
 
               # Matrix transformation (make_logo only)
-              matrix_type='counts',
+              matrix_type=None,
               logo_type=None,
               background=None,
               pseudocount=1.0,
@@ -40,7 +48,7 @@ def make_logo(matrix=None,
 
               # Position choice
               position_range=None,
-              shift_first_position_to=1,
+              shift_first_position_to=None,
 
               # Character choice
               sequence_type=None,
@@ -48,9 +56,9 @@ def make_logo(matrix=None,
               ignore_characters='.-',
 
               # Character formatting
-              colors='gray',
+              colors='dodgerblue',
               alpha=1,
-              edgecolors='k',
+              edgecolors='black',
               edgealpha=1,
               edgewidth=0,
               boxcolors='white',
@@ -72,11 +80,24 @@ def make_logo(matrix=None,
               highlight_boxedgewidth=None,
               highlight_boxedgealpha=None,
 
+              # Fixed character formatting
+              fixedchar_dict={},
+              fixedchar_colors='silver',
+              fixedchar_alpha=1,
+              fixedchar_edgecolors='black',
+              fixedchar_edgewidth=0,
+              fixedchar_edgealpha=1,
+              fixedchar_boxcolors='white',
+              fixedchar_boxalpha=0,
+              fixedchar_boxedgecolors='black',
+              fixedchar_boxedgewidth=0,
+              fixedchar_boxedgealpha=1,
+
               # Character font
               font_properties=None,
               font_file=None,
-              font_family=None,
-              font_weight=None,
+              font_family=('Arial Rounded MT Bold', 'Arial', 'sans'),
+              font_weight='bold',
               font_style=None,
 
               # Character placement
@@ -88,7 +109,8 @@ def make_logo(matrix=None,
               below_flip=True,
               hpad=0.,
               vpad=0.,
-              width=1,
+              width=1.,
+              vsep=0.,
               uniform_stretch=False,
               max_stretched_character=None,
 
@@ -111,6 +133,13 @@ def make_logo(matrix=None,
               baseline_color=None,
               baseline_alpha=None,
               baseline_style=None,
+
+              # vlines formatting
+              vline_positions=(),
+              vline_width=None,
+              vline_color=None,
+              vline_alpha=None,
+              vline_style=None,
 
               # x-axis formatting
               xlim=None,
@@ -183,543 +212,6 @@ def make_logo(matrix=None,
             list of logomaker.Logo objects, one for each line.
 
     Arguments:
-
-        #######################################################################
-        ### Matrix transformation
-
-        matrix (pd.DataFrame): Data matrix used to make the logo. Row names are
-            the positions, column names are the characters, and values are
-            floats (or ints). If the matrix_type is set to 'counts',
-            'probability', or 'information', all elements of matrix must be
-            floats >= 0. In what follows, L refers to the number of matrix rows
-            and C refers to the number of matrix columns.
-
-        matrix_type (str in set): Type of data passed in matrix. If str,
-            value must be in {'counts','probability', 'enrichment',
-            'information'}. If None, a generic logo is created. Default
-            'counts'.
-
-        logo_type (str in set, None): Type of logo to display. If str, value
-            must be in {'counts','probability', 'enrichment', 'information'}.
-            If None, defaults to matrix_type. Default None.
-
-        background (array, dict, pd.DataFrame, None): Only used when creating
-            logos of logo_type='enrichment' from matrices of matrix_type=
-            'counts' or matrix_type='probability'. Specifies the background
-            probability of each character at each position. Different value
-            types are interpreted in different ways:
-            - None: Each character in each column of matrix is assumed to
-                occur with equal background probability
-            - array: Must contain floats >= 0 and be of length C. If so, these
-                float values are interpreted as the background probabilities of
-                the characters corresponding to each column of matrix.
-                E.g., for a GC content of 60% and matrix columns ['A','C','G',
-                'T'], one can pass,
-                    background=[0.2, 0.3, 0.3, 0.2]
-            - dict: All characters specified by matrix must be keys of this
-                dictionary, and the corresponding values must be floats >= 0.
-                If so, the value is interpreted as the relative background
-                probability of the character corresponding to each key. E.g.,
-                for a GC content of 60% one can pass
-                    background = { 'A':0.2, 'C':0.3, 'G':0.3, 'T':0.2}
-            - pd.DataFrame, 1 row: Columns must list the same chaarcters as
-                the columns of matrix, and values must be floats >= 0. If so,
-                each float is interpreted as the relative background
-                probability of the character corresponding to each column.
-                E.g., for a GC content of 60% one can pass a DataFrame that
-                that looks like:
-                        'A'     'C'     'G'     'T'
-                 0      0.2     0.3     0.3     0.2
-            - pd.DataFrame, L rows: Columns must list the same characters as
-                the columns of matrix, and values must be floats >= 0. If so,
-                the float in each row and column is interpreted as the relative
-                background probability of the corresponding character at that
-                corresponding position. This option is particularly useful
-                when
-
-        pseudocount (float >= 0): For converting a counts matrix to a
-            probability matrix. Default 1.
-
-        enrichment_logbase (float in set): Logarithm to use when computing
-            enrichment. Value must be in {2, 10, np.e}. Default 2.
-
-        enrichment_centering (bool): If True, log enrichment values at each
-            position are shifted so that their mean value is 0. Default True.
-
-        information_units (str in set): Units to use when computing information
-            logos. Values must be in {'bits', 'nats'}. Default 'bits'.
-
-        counts_threshold (float >= 0): The total number of sequences in an
-            alignment that must have a non-deletion character for that position
-            to be included in the resulting counts matrix and derived matrices.
-            Default 0.
-
-        #######################################################################
-        ### Immediate drawing
-
-        figsize ([float >= 0, float >=0], None): Size of figure in inches. If
-            not None, a default size for the figure will be used. If draw_now
-            is True, a new figure will be created of this size, and will be
-            stored in logo.fig. The axes on which the logo is drawn will be
-            saved to logo.ax. Default None.
-
-        draw_now (bool): If True, a new figure will be created of size figsize
-            and the logo will be drawn. If not, the logo will not be drawn.
-
-        save_to_file (str, None): If string, specifies the name of file that
-            logo is saved to. File type is determined automatically from the
-            extension of the file name. If None, no file is stored. Default
-            None.
-
-        dpi (int): The resolution at which to save the logo image if writing
-            to a non-vector format.
-
-        max_positions_per_line (int): The maximum number of positions per line. If
-            the number of positions within a matrix exceeds this number, the
-            logo will be split over multiple lines. If figsize is None, a
-            figure whose height is proportional to the number of lines will
-            be created.
-
-        #######################################################################
-        ### Position choice
-
-        position_range ([float >= 0, float >= 0], None): Rows of matrix to use when
-            drawing logo. If None, all rows are used. Default None.
-
-        shift_first_position_to (float): Position value to be assigned to the
-            first row of matrix that is actually used. Default 1.
-
-        #######################################################################
-        ### Position choice
-
-        sequence_type (str in set, None): Specifies the set of characters to
-            used in the sequence logo. Non-sequene characters will be ignored.
-            If str, must be in {'DNA', 'dna', 'RNA', 'rna', 'PROTEIN', or
-            'protein'}. If None, this option is ignored. Default None.
-
-        characters (str, None): Specifies the set of characters to be used in
-            the sequence logo. If str, any of the non-whitespace characters
-            listed in the string can be used. If None, this option is ignored.
-            Overridden by sequence_type. Default None.
-
-        ignore_characters (str, None): Specifies the set of characters to not
-            be used in the sequence logo. If str, all of the characters listed
-            will be ignored. If None, all characters will be used. Overridden
-            by characters. Default '-.'.
-
-        #######################################################################
-        ### Logo character styling
-
-        colors (color scheme):  Face color of logo characters. Default 'gray'.
-            Here and in what follows a variable of type 'color' can
-            take a variety of value types.
-            - (str) A LogoMaker color scheme in which the color is determined
-                by the specific character being drawn. Options are,
-                + For DNA/RNA: 'classic', 'grays', 'base_paring'.
-                + For protein: 'hydrophobicity', 'chemistry', 'charge'.
-            - (str) A built-in matplotlib color name  such as 'k' or 'tomato'
-            - (str) A built-in matplotlib colormap name such as  'viridis' or
-                'Purples'. In this case, the color within the colormap will
-                depend on the character being drawn.
-            - (list) An RGB color (3 floats in interval [0,1]) or RGBA color
-                (4 floats in interval [0,1]).
-            - (dict) A dictionary mapping of characters to colors, in which
-                case the color will depend on the character being drawn. E.g.,
-                {'A': 'green',
-                 'C': [ 0.,  0.,  1.],
-                 'G': 'y',
-                 'T': [ 1.,  0.,  0.,  0.5]}
-
-        alpha (float in [0,1]): Opacity of logo character face color. Here and
-            in what follows, if the corresponding color is specified by an
-            RGBA array, this alpha value will be multiplied by the 'A' value
-            that array to yield the final alpha value. Default 1.
-
-        edgecolors (color scheme): Edge color of the logo characters. Default
-            'black'.
-
-        edgealpha (float in [0,1]): Opacity of character edge color. Default 1.
-
-        edgewidth (float >= 0): Width of character edges. Default 0.
-
-        boxcolors (color scheme): Face color of the box containing each logo
-            character. Default 'white'.
-
-        boxalpha (float in [0,1]): Opacity box face color. Default 0.
-
-        boxedgecolors (color scheme): Edge color of the box containing each
-            logo character. Default 'black'.
-
-        boxedgealpha (float in [0,1]): Opacity of box edge coclor. Default 0.
-
-        boxedgewidth (float >= 0): Width of box edges. Default 1.
-
-        #######################################################################
-        ### Highlighted logo character styling
-
-        highlight_sequence (str, None): Sequence to highlight within the logo.
-            If str, sequence must be the same length as the logo. The valid
-            character at each position in this sequence will then be drawn
-            using style parameters highlight_colors, highlight_alpha, etc.,
-            instead of colors, alpha, etc. If None, no characters are
-            highlighted. Default None.
-
-            In what follows, each highlight_* parameter behaves behaves as the
-            * parameter listed above, but is used only for highlighted
-            characters. Each parameter can also be None, and in fact is None
-            by default. Each highlight_* parameter, when None is passed,
-            defaults to the value provided in the corresponding * parameter.
-
-        highlight_colors (color scheme, None): See colors.
-
-        highlight_alpha (float in [0,1], None): See alpha.
-
-        highlight_edgecolors (color scheme, None): See edgecolors.
-
-        highlight_edgealpha (float in [0,1], None): See edgealpha.
-
-        highlight_edgewidth (float >= 0, None): See edge_width.
-
-        highlight_boxcolors (color scheme, None: See boxcolors.
-
-        highlight_boxalpha (float in [0,1], None): See boxalpha.
-
-        highlight_boxedgecolors (color scheme, None): See boxedgecolors.
-
-        highlight_boxedgealpha (float in [0,1], None): see boxedgealpha.
-
-        highlight_boxedgewidth (float >= 0, None): See boxedgewidth.
-
-        #######################################################################
-        ### Logo character font
-
-        # Logo characters #
-
-        font_properties (FontProperties, None): The logo character font
-            properties. If FontProperties, overrides all of the font_*
-            parameters below. If None, is ignored. Default None.
-
-        font_file (str, None): The local file specifying the logo character
-            font. Specifically, the value passed as the 'fname' parameter in
-            the FontProperties constructor. Default None.
-
-        font_family (str, list, None): The logo character font family name.
-            Specifically, the value passed as the 'family' parameter when
-            calling the FontProperties constructor. From matplotlib
-            documentation:
-                "family: A list of font names in decreasing order of priority.
-                The items may include a generic font family name, either
-                'serif', 'sans-serif', 'cursive', 'fantasy', or 'monospace'.
-                In that case, the actual font to be used will be looked up from
-                the associated rcParam in matplotlibrc."
-            Default None.
-
-        font_weight (str, float, None): The logo character font weight.
-            Specifically, the value passed as the 'weight' parameter in the
-            FontProperties constructor. From matplotlib documentation:
-                "weight: A numeric value in the range 0-1000 or one of
-                'ultralight', 'light', 'normal', 'regular', 'book', 'medium',
-                'roman', 'semibold', 'demibold', 'demi', 'bold', 'heavy',
-                'extra bold', 'black'."
-            Default None.
-
-        font_style (str, None): The logo character font style. Specifically,
-            the value passed as the 'style' parameter in the FontProperties
-            constructor. From matplotlib documentation:
-                "style: Either 'normal', 'italic' or 'oblique'."
-            Default None.
-
-        #######################################################################
-        ### Character placement
-
-        stack_order (str in set): Order in which to stack characters at the
-            same position. Either 'big_on_top', 'small_on_top', or 'fixed'.
-            Default 'big_on_top'.
-
-        use_transparency (boolean): Option to render characters with an opacity
-            proportional to character height. Default False.
-
-        max_alpha_val (float >= 0.0, None): Absolute matrix element value
-            corresponding to opacity of 1. If None, this is set to the largest
-            absolute-value matrix element. Default None.
-
-        below_shade (float in [0,1]): Amount by which to darken logo characters
-            drawn below the baseline. E.g., a value of 0.8 will cause RBG
-            values to be reduced to 80% of their initial value. Default 1.
-
-        below_alpha (float in [0,1]): Amount by which to reduce the opacity of
-            logo characters drawn below the baseline. E.g., a value of 0.8 will
-            cause opacity values to be reduced to 80% of their initial value.
-            Default 1.
-
-        below_flip (bool): Whether to flip upside down all characters drawn
-            below the baseline.
-
-        hpad (float >= 0): Relative amount of empty space to include on the
-            sides of each character within its bounding box. E.g., a value of
-            0.2 will result in empty space totaling 20% of that character's
-            width (10% on each side). Default 0.
-
-        vpad (float >= 0): Relative amount of empty space to include above and
-            below each character within its bounding box. E.g., a value of
-            0.2 will result in empty space totaling 20% of that character's
-            height (10% above and 10% below). Default 0.
-
-        width (float in [0,1]): Width of each character bounding box in
-            position units. Default 1.
-
-        uniform_stretch (bool): If True, each logo character will be
-            horizontally stretched by the same factor. This factor will be
-            determined by the natrually widest character that appears in the
-            logo, and the stretch factor will be computed to accomodate the
-            value of hpad specified by the user. Most characters will thus be
-            drawn with additional varying blank space on either side. Default
-            False.
-
-        max_stretched_character (str length 1, None): If a character is
-            specified, logo characters will be horizontally stretched in the
-            following manner: The specified character and characters naturally
-            wider than it will be stretched according to width and hpad, while
-            narrower characters will be stretched the same amount as the
-            specified character. Specifying a value like 'A' allows wide
-            characters like 'W' and 'A' to be stretched to fill the avaliable
-            width while preventing naturally narrow characters like 'I' from
-            being stretched an absurdly large amount.
-
-        #######################################################################
-        ### Axes formatting
-
-        axes_type (str in set): Axes logo style. Value must be in {'classic',
-            'rails', 'naked', 'everything, 'vlines'}. Default 'classic'.
-
-        style_sheet (str, None): Matplotlib style sheet to use for default axis
-            styling. This value is passed to plt.style.use(). Available style
-            sheets are listed in plt.style.available. Examples include
-                - 'classic': Standard Matplotlib style prior to v2.0
-                - 'dark_background': White text/lines on black background
-                - 'ggplot': Mimics the default style of ggplot in R
-                - 'fivethirtyeight': Mimics the style used by
-                    fivethirtyeight.com
-                - 'seaborn-pastel', 'seaborn-darkgrid', etc: Mimics the style
-                    defined in the popular seaborn plotting package.
-            Ignored if None is passed. Default None.
-
-        rcparams (dict): Default parameter values to used for matplotlib
-            plotting. Warning: using this changes defaults for all subsequent
-            plots, not just the current logo. Default {}.
-
-        #######################################################################
-        ### Gridline formatting
-
-        show_gridlines (bool): Whether to show gridlines. Note: gridlines are
-            plotted below logo characters but above logo bounding boxes.
-            Default False.
-
-        gridline_axis (str in set, None): If str, specifies axes on which to
-            plot gridlines value in {'x', 'y', 'both'}. Passed as the 'axis'
-            argument to ax.grid() if not None. Default None.
-
-        gridline_width (float >= 0, None): If not None, specifies the width of
-            plotted gridlines. Is passed as the 'linewidth' argument to
-            ax.grid() if not None. Default None.
-
-        gridline_color (color, None): If not None, specifies the color of the
-            gridlines. Is passed as the 'color' argument to ax.grid() if not
-            None. Default None.
-
-        gridline_alpha (float in [0,1], None): If not None, specifies the
-            opacity of the gridlines. Is passed as the 'alpha' argument to
-            ax.grid() if not None. Default None.
-
-        gridline_style (str, list, None): If not None, specifies gridline line
-            style. Is passed as the 'linestyle' argument to ax.grid if not
-            None. Default None.
-
-        #######################################################################
-        ### Baseline formatting
-
-        show_baseline (bool): Whether to show the baseline at y=0. Note: the
-            baseline is plotted above logo characters. Default True.
-
-        baseline_width (float >= 0, None): If not None, specifies the width of
-            plotted baseline. Is passed as the 'linewidth' argument to
-            ax.axhline() if not None. Default None.
-
-        baseline_color (color, None): If not None, specifies the color of the
-            baseline. Is passed as the 'color' argument to ax.axhline() if not
-            None. Default None.
-
-        baseline_alpha (float in [0,1], None): If not None, specifies the
-            opacity of baseline. Is passed as the 'alpha' argument to
-            ax.axhline() if not None. Default None.
-
-        baseline_style (str, list, None): If not None, specifies baseline line
-            style. Is passed as the 'linestyle' argument to ax.axhline() if not
-            None. Default None.
-
-        #######################################################################
-        ### x-axis formatting
-
-        xlim ([float, float], None): x-axis limits. Determined automatically if
-            None. Default None.
-
-        xticks (array, None): Location of tick marks on x-axis. Overrides
-            xtick_spacing and xtick_anchor if not None. Default None.
-
-        xtick_spacing (float, None): Spacing between x-axis tick marks.
-            Tickmarks drawn at xtick_anchor + z*xtick_spacing for all integers
-            if value is not None. Overrides axes_type if not None. Default
-            None.
-
-        xtick_anchor (float): Determines positioning of xticks as described
-            above. Default 0.
-
-        xticklabels (array, None): Values to display below x-axis tickmarks.
-            Labels are determined automatically if None. Default None.
-
-        xtick_rotation (float, None): Angle in degrees at which to draw x-axis
-            tick labels. Angle is determined automatically if None. Default
-            None.
-
-        xtick_length (float >= 0, None): Length of x-axis tick marks. Length is
-            determined automatically if None. Default None.
-
-        xtick_format (str, None): Formatting string used for making x-axis
-            labels. Overridden by xticklabels. Ignored if None. Default None.
-
-        xlabel (str, None): Text to display below the x-axis. Determined
-            automatically if None. Default None.
-
-        #######################################################################
-        ### y-axis formatting
-
-        show_binary_yaxis (bool, None): If True, y-axis is labeled with '+' and
-            '-'. in place of numerically labeled ticks. Overrides ylim, yticks,
-            and yticklabels. Default None.
-
-        ylim ([float, float], None): y-axis limits. Determined automatically if
-            None. Default None.
-
-        yticks (array, None): Location of tick marks on y-axis. Overrides
-            ytick_spacing and ytick_anchor if not None. Default None.
-
-        yticklabels (array, None): Values to display below y-axis tickmarks.
-            Labels are determined automatically if None. Default None.
-
-        ytick_rotation (float, None): Angle in degrees at which to draw y-axis
-            tick labels. Angle is determined automatically if None. Default
-            None.
-
-        ytick_length (float >= 0, None): Length of x-axis tick marks. Length is
-            determined automatically if None. Default None.
-
-        ytick_format (str, None): Formatting string used for making x-axis
-            labels. Overridden by xticklabels. Ignored if None. Default None.
-
-        ylabel (str, None): Text to display below the x-axis. Determined
-            automatically if None. Default None.
-
-        #######################################################################
-        ### Other axes formatting
-
-        title (str, None): Title of plot if not None. Default None.
-
-        left_spine (bool, None): Whether to show the left axis spine. If None,
-            spine choice is set by axes_type. Default None.
-
-        right_spine (bool, None): Whether to show the right axis spine. If
-            None, spine choice is set by axes_type. Default None.
-
-        top_spine (bool, None): Whether to show the top axis spine. If None,
-            spine choice is set by axes_type. Default None.
-
-        bottom_spine (bool, None): Whether to show the bottom axis spine. If
-            None, spine choice is set by axes_type. Default None.
-
-        use_tightlayout (bool): Whether to call plt.tight_layout() after
-            logo is plotted. If called, this will reformat the plot to try and
-            ensure that all plotted elements are visible. Note: this will
-            reformat the entire figure, not just the logo axes.
-
-            #######################################################################
-            ### Default axes font
-
-        axes_fontfile (str, None): See font_file. Default to use for axes
-            labels, axes tick labels, and title. Ignored if None. Default None.
-
-        axes_fontfamily (str, list, None): See font_family. Default to use for
-            axes labels, axes tick labels, and title. Ignored if None. Default
-            None.
-
-        axes_fontweight (str, float, None): See font_weight. Default to use for
-            axes labels, axes tick labels, and title. Ignored if None. Default
-            None.
-
-        axes_fontstyle (str, None): See font_style. Default to use for axes
-            labels, axes tick labels, and title. Ignored if None. Default None.
-
-        axes_fontsize (str, float, None): Font size to be used for axes
-            labels, axes tick labels, and title. Passed as 'size' parameter to
-            the FontProperties constructor. From matplotlib documentation:
-                "size: Either an relative value of 'xx-small', 'x-small',
-                'small', 'medium', 'large', 'x-large', 'xx-large' or an
-                 absolute font size, e.g., 12"
-            Ignored if value is None. Default None.
-
-        #######################################################################
-        ### Tick label font
-
-        tick_fontfile (str, None): Overrides axes_fontfile for tick label
-            styling if value is not None. Default None.
-
-        tick_fontfamily (str, list, None): Overrides axes_fontfamily for tick
-            label styling if value is not None. Default None.
-
-        tick_fontweight (str, float, None): Overrides axes_fontweight for tick
-            label styling if value is not None. Default None.
-
-        tick_fontstyle (str, None): Overrides axes_fontstyle for tick label
-            styling if value is not None. Default None.
-
-        tick_fontsize (str, float, None): Overrides axes_fontsize for tick
-            label styling if value is not None. Default None.
-
-        #######################################################################
-        ### Axis label font
-
-        label_fontfile (str, None): Overrides axes_fontfile for axis label
-            styling if value is not None. Default None.
-
-        label_fontfamily (str, list, None): Overrides axes_fontfamily for axis
-            label styling if value is not None. Default None.
-
-        label_fontweight (str, float, None): Overrides axes_fontweight for axis
-            label styling if value is not None. Default None.
-
-        label_fontstyle (str, None): Overrides axes_fontstyle for axis label
-            styling if value is not None. Default None.
-
-        label_fontsize (str, float, None): Overrides axes_fontsize for axis
-            label styling if value is not None. Default None.
-
-        #######################################################################
-        ### Title font
-
-        title_fontfile (str, None): Overrides axes_fontfile for title styling
-            if value is not None. Default None.
-
-        title_fontfamily (str, list, None): Overrides axes_fontfamily for title
-            styling if value is not None. Default None.
-
-        title_fontweight (str, float, None): Overrides axes_fontweight for
-            title label styling if value is not None. Default None.
-
-        title_fontstyle (str, None): Overrides axes_fontstyle for title
-            styling if value is not None. Default None.
-
-        title_fontsize (str, float, None): Overrides axes_fontsize for title
-            styling if value is not None. Default None.
-
     """
 
     ######################################################################
@@ -740,6 +232,52 @@ def make_logo(matrix=None,
 
         # Set parameter value equal to the valid value
         exec("%s = valid_value" % name)
+
+    ######################################################################
+    # matrix
+
+    # Make sure that only one of the following is specified
+    exclusive_list = ['matrix', 'fasta_file', 'meme_file', 'iupac_string']
+    assert sum([eval(x) is not None for x in exclusive_list]) == 1,\
+        'Error: exactly one of the following must be specified: %s.' %\
+        repr(exclusive_list)
+
+    # If matrix is specified
+    if matrix is not None:
+        matrix = validate_mat(matrix)
+
+    # Otherwise, if FASTA file is specifieid
+    elif fasta_file is not None:
+        matrix = load_alignment(fasta_file=fasta_file)
+        matrix_type = 'counts'
+
+    # Otherwise, if MEME file is specified
+    elif meme_file is not None:
+        matrix = load_meme(file_name=meme_file,
+                           motif_name=meme_motifname,
+                           motif_num=meme_motifnum)
+        matrix_type = 'probability'
+
+        # Set background based on MEME file if background is currently None
+        meme_background = load_meme(file_name=meme_file, get_background=True)
+        if background is None and meme_background is not None:
+            background = meme_background
+
+        # Set title to be matrix name if none is specified
+        if title is None:
+            title = matrix.name
+
+    # Otherwise, if iupac_string is specified
+    elif iupac_string is not None:
+        matrix = iupac_to_probability_mat(iupac_string)
+        matrix_type = 'probability'
+
+        # Set title to be matrix name if none is specified
+        if title is None:
+            title = iupac_string
+
+    else:
+        assert False, 'Error: must specify matrix, FASTA file, or MEME file.'
 
     ######################################################################
     # matrix.columns
@@ -768,9 +306,12 @@ def make_logo(matrix=None,
     # Matrix length is now set. Record it.
     L = len(matrix)
 
-    # Shift positions to requested start
-    positions = np.arange(shift_first_position_to, shift_first_position_to + L)
-    matrix['pos'] = positions
+    # Shift positions to requested start if so requested
+    if shift_first_position_to is None:
+        matrix['pos'] = matrix.index
+    else:
+        matrix['pos'] = shift_first_position_to + matrix.index \
+                        - matrix.index[0]
     matrix.set_index('pos', inplace=True, drop=True)
     matrix = validate_mat(matrix)
     positions = matrix.index
@@ -830,8 +371,10 @@ def make_logo(matrix=None,
 
         # Set style sheet:
         if style_sheet is not None:
-            plt.style.use(style_sheet)
-            print 'Using style sheet %s.' %  style_sheet
+            if style_sheet == 'default':
+                mpl.rcdefaults()
+            else:
+                plt.style.use(style_sheet)
 
         # Create figure
         if draw_now:
@@ -972,6 +515,28 @@ def make_logo(matrix=None,
     }
 
     ######################################################################
+    # fixedchar_style
+
+    fixed_characters = set(fixedchar_dict.values())
+    fixedchar_style = {
+        'facecolors': color.get_color_dict(color_scheme=fixedchar_colors,
+                                           chars=fixed_characters,
+                                           alpha=fixedchar_alpha),
+        'edgecolors': color.get_color_dict(color_scheme=fixedchar_edgecolors,
+                                           chars=fixed_characters,
+                                           alpha=fixedchar_edgealpha),
+        'boxcolors': color.get_color_dict(color_scheme=fixedchar_boxcolors,
+                                          chars=fixed_characters,
+                                          alpha=fixedchar_boxalpha),
+        'boxedgecolors': color.get_color_dict(
+                                          color_scheme=fixedchar_boxedgecolors,
+                                          chars=fixed_characters,
+                                          alpha=fixedchar_boxedgealpha),
+        'edgewidth': fixedchar_edgewidth,
+        'boxedgewidth': fixedchar_boxedgewidth,
+    }
+
+    ######################################################################
     # placement_style
 
     placement_style = {
@@ -983,6 +548,7 @@ def make_logo(matrix=None,
         'below_flip': below_flip,
         'hpad': hpad,
         'vpad': vpad,
+        'vsep': vsep,
         'width': width,
         'uniform_stretch': uniform_stretch,
         'max_stretched_character': max_stretched_character
@@ -1020,7 +586,7 @@ def make_logo(matrix=None,
             elif enrichment_logbase == 10:
                 ylabel += '($\log_{10})$'
             elif enrichment_logbase == np.e:
-                ylabel += '$(\ln)$ enrichment'
+                ylabel += '$(\ln)$ '
             else:
                 assert False, 'Error: invalid choice of enrichment_logbase=%f'\
                               % enrichment_logbase
@@ -1065,6 +631,8 @@ def make_logo(matrix=None,
             bottom_spine = True
         if show_baseline is None:
             show_baseline = True
+        if show_gridlines is None:
+            show_gridlines = False
 
     elif axes_type == 'naked':
         if xticks is None:
@@ -1087,6 +655,8 @@ def make_logo(matrix=None,
             bottom_spine = False
         if show_baseline is None:
             show_baseline = True
+        if show_gridlines is None:
+            show_gridlines = False
 
     elif axes_type == 'rails':
         if xticks is None:
@@ -1105,6 +675,8 @@ def make_logo(matrix=None,
             bottom_spine = True
         if show_baseline is None:
             show_baseline = True
+        if show_gridlines is None:
+            show_gridlines = False
 
     elif axes_type == 'everything':
         if xlabel is None:
@@ -1119,6 +691,8 @@ def make_logo(matrix=None,
             bottom_spine = True
         if show_baseline is None:
             show_baseline = True
+        if show_gridlines is None:
+            show_gridlines = False
 
     elif axes_type == 'vlines':
         if xtick_length is None:
@@ -1215,6 +789,7 @@ def make_logo(matrix=None,
         'color': gridline_color,
         'linewidth': gridline_width,
         'linestyle': gridline_style,
+        'visible': show_gridlines,
     }
     gridline_dict = remove_none_from_dict(gridline_dict)
 
@@ -1236,11 +811,31 @@ def make_logo(matrix=None,
         'linestyle': baseline_style,
     }
 
+    # Set vlines defaults
+    if vline_color is None:
+        vline_color = mpl.rcParams['axes.edgecolor']
+    if vline_alpha is None:
+        vline_alpha = 1
+    if vline_width is None:
+        vline_width = mpl.rcParams['axes.linewidth']
+    if vline_style is None:
+        vline_style = '-'
+
+    # vlines styling
+    vline_dict = {
+        'color': vline_color,
+        'alpha': vline_alpha,
+        'linewidth': vline_width,
+        'linestyle': vline_style,
+    }
+
     # Set axes_style dictionary
     axes_style = {
         'show_binary_yaxis': show_binary_yaxis,
         'show_baseline': show_baseline,
         'baseline_dict': baseline_dict,
+        'vline_positions': vline_positions,
+        'vline_dict': vline_dict,
         'title': title,
         'ylim': ylim,
         'yticks': yticks,
@@ -1273,9 +868,11 @@ def make_logo(matrix=None,
     # Create Logo instance
     logo = Logo(matrix=matrix,
                 highlight_sequence=highlight_sequence,
+                fixedchar_dict=fixedchar_dict,
                 font_properties=font_properties,
                 character_style=character_style,
                 highlight_style=highlight_style,
+                fixedchar_style=fixedchar_style,
                 placement_style=placement_style,
                 axes_style=axes_style)
 
@@ -1321,3 +918,6 @@ def make_logo(matrix=None,
     # Return logo to user
     return logo
 
+
+# Document make_logo
+document_function(make_logo, 'make_logo_arguments.txt')

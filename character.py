@@ -36,7 +36,8 @@ class Character:
                  boxedgewidth,
                  hpad,
                  vpad,
-                 max_hstretch):
+                 max_hstretch,
+                 zorder=None):
         assert width > 0
         assert height > 0
 
@@ -55,6 +56,7 @@ class Character:
         self.hpad = hpad
         self.vpad = vpad
         self.max_hstretch = max_hstretch
+        self.zorder = zorder
 
 
     def draw(self, ax):
@@ -77,7 +79,8 @@ class Character:
                         boxedgewidth=self.boxedgewidth,
                         hpad=self.hpad,
                         vpad=self.vpad,
-                        max_hstretch=self.max_hstretch)
+                        max_hstretch=self.max_hstretch,
+                        zorder=self.zorder)
 
 
 def put_char_in_box(ax,
@@ -93,7 +96,8 @@ def put_char_in_box(ax,
                     flip,
                     hpad,
                     vpad,
-                    max_hstretch):
+                    max_hstretch,
+                    zorder):
 
     # Create raw path
     tmp_path = TextPath((0, 0), char, size=1, prop=font_properties)
@@ -131,13 +135,17 @@ def put_char_in_box(ax,
         .translate(tx=bbox.xmin+char_shift, ty=bbox.ymin)
     char_path = transformation.transform_path(tmp_path)
 
+    # Compute z-orders
+    box_zorder = -3 if zorder is None else zorder
+    char_zorder = 3 if zorder is None else zorder
+
     # Compute patch for box containing character
     box_patch = Rectangle((bbox.xmin, bbox.ymin),
                           bbox.width, bbox.height,
                           facecolor=boxcolor,
                           edgecolor=boxedgecolor,
                           linewidth=boxedgewidth,
-                          zorder=-3)
+                          zorder=box_zorder)
     ax.add_patch(box_patch)
 
     # Compute character patch
@@ -145,7 +153,7 @@ def put_char_in_box(ax,
                            facecolor=facecolor,
                            edgecolor=edgecolor,
                            linewidth=linewidth,
-                           zorder=3)
+                           zorder=char_zorder)
     ax.add_patch(char_patch)
 
     # Return patches to user

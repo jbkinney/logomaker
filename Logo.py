@@ -78,6 +78,14 @@ class Logo:
             except:
                 pdb.set_trace()
 
+        # Get final yspan of everything
+        ymax = self.df.values.max()
+        ymin = min(0, self.df.values.min())
+        yspan = ymax-ymin
+
+        # Set ysep
+        ysep = yspan * self.placement_style['vsep']
+
         # Compute hstretch values for all characters
         width = self.placement_style['width']
         hpad = self.placement_style['hpad']
@@ -87,8 +95,8 @@ class Logo:
                                     width=width,
                                     height=1,
                                     font_properties=self.font_properties,
-                                    hpad=hpad,
-                                    vpad=vpad)
+                                    hpad=0,
+                                    vpad=0)
         # Set max_hstretch
         uniform_stretch = self.placement_style['uniform_stretch']
         max_stretched_character = \
@@ -137,7 +145,10 @@ class Logo:
 
                 # Get height
                 h = abs(val)
-                if h < SMALL:
+
+                # Make sure character has finite height
+                if h - ysep < SMALL:
+                    y += h
                     continue
 
                 # Get facecolor, edgecolor, and edgewidth
@@ -180,7 +191,12 @@ class Logo:
 
                 # Create Character object
                 char_obj = character.Character(
-                    c=char, xmin=x, ymin=y, width=w, height=h, flip=flip,
+                    c=char,
+                    xmin=x,
+                    ymin=y+ysep/2,
+                    width=w,
+                    height=h-ysep,
+                    flip=flip,
                     font_properties=self.font_properties,
                     facecolor=facecolor,
                     edgecolor=edgecolor,
@@ -226,9 +242,10 @@ class Logo:
                 char_obj = character.Character(
                     c=char,
                     xmin=x,
-                    ymin=y,
+                    ymin=y+ysep/2,
                     width=w,
-                    height=h, flip=False,
+                    height=h - ysep,
+                    flip=False,
                     font_properties=self.font_properties,
                     facecolor=facecolor,
                     edgecolor=edgecolor,

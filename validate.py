@@ -7,9 +7,13 @@ import re
 import sys
 import numbers
 import matplotlib.pyplot as plt
+import numbers
+import pdb
+import os
 
 from matplotlib.font_manager import FontProperties
 from matplotlib.textpath import TextPath
+from matplotlib.lines import Line2D
 from character import font_manager
 
 # Need for testing colors
@@ -18,6 +22,25 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgb, to_rgba
 
 import warnings
+
+# Specifies IUPAC string transformations
+iupac_dict = {
+    'A': 'A',
+    'C': 'C',
+    'G': 'G',
+    'T': 'T',
+    'R': 'AG',
+    'Y': 'CT',
+    'S': 'GC',
+    'W': 'AT',
+    'K': 'GT',
+    'M': 'AC',
+    'B': 'CGT',
+    'D': 'AGT',
+    'H': 'ACT',
+    'V': 'ACG',
+    'N': 'ACGT'
+}
 
 # Revise warning output to just show warning, not file name or line number
 def _warning(message, category = UserWarning, filename = '', lineno = -1):
@@ -62,6 +85,7 @@ params_with_float_values = {
 params_greater_than_0 = {
     'dpi',
     'xtick_spacing',
+    'max_positions_per_line',
 }
 
 # Names of numerical parameters that must be >= 0
@@ -72,11 +96,14 @@ params_greater_or_equal_to_0 = {
     'boxedgewidth',
     'highlight_edgewidth',
     'highlight_boxedgewidth',
+    'fixedchar_edgewidth',
+    'fixedchar_boxedgewidth',
     'max_alpha_val',
     'hpad',
     'vpad',
     'gridline_width',
     'baseline_width',
+    'vline_width',
     'xtick_length',
     'ytick_length',
 }
@@ -91,9 +118,14 @@ params_between_0_and_1 = {
     'highlight_edgealpha',
     'highlight_boxalpha',
     'highlight_boxedgealpha',
+    'fixedchar_alpha',
+    'fixedchar_edgealpha',
+    'fixedchar_boxalpha',
+    'fixedchar_boxedgealpha',
     'below_shade',
     'below_alpha',
     'width',
+    'vsep',
     'gridline_alpha',
     'baseline_alpha',
 }
@@ -104,10 +136,10 @@ params_with_values_in_dict = {
     'logo_type': LOGOMAKER_TYPES,
     'enrichment_logbase': [2, np.e, 10],
     'information_units': ['bits', 'nats'],
-    'sequence_type': ['dna','DNA', 'rna', 'RNA', 'protein', 'PROTEIN'],
+    'sequence_type': ['dna', 'DNA', 'rna', 'RNA', 'protein', 'PROTEIN'],
     'stack_order': ['big_on_top', 'small_on_top', 'fixed'],
     'axes_type': ['classic', 'naked', 'everything', 'rails', 'vlines'],
-    'gridline_axis': ['x','y','both'],
+    'gridline_axis': ['x', 'y', 'both'],
 }
 
 # Names of parameters whose values are True or False
@@ -129,6 +161,7 @@ params_with_boolean_values = {
 
 # Names of parameters whose values are strings
 params_with_string_values = {
+    'meme_motifname',
     'save_to_file',
     'characters',
     'ignore_characters',
@@ -165,12 +198,17 @@ params_that_specify_colorschemes = {
     'highlight_edgecolors',
     'highlight_boxcolors',
     'highlight_boxedgecolors',
+    'fixedchar_colors',
+    'fixedchar_edgecolors',
+    'fixedchar_boxcolors',
+    'fixedchar_boxedgecolors',
 }
 
 # Names of parameters that specify colors:
 params_that_specify_colors = {
     'gridline_color',
     'baseline_color',
+    'vline_color',
 }
 
 
@@ -206,17 +244,20 @@ params_that_specify_FontProperties = {
     'title_fontsize': 'size',
 }
 
+params_that_specify_linestyles = {
+    'gridline_style',
+    'baseline_style',
+    'vline_style',
+}
+
 # Names of parameters that cannot have None value
 params_that_cant_be_none = {
-    'matrix',
-    'matrix_type',
     'pseudocount',
     'enrichment_logbase',
     'enrichment_centering',
     'information_units',
     'counts_threshold',
     'draw_now',
-    'shift_first_position_to',
     'colors',
     'alpha',
     'edgecolors',
@@ -242,21 +283,21 @@ params_that_cant_be_none = {
     'use_tightlayout',
 }
 
+# Parameters that specify tick labels
+params_that_specify_ticklabels = {
+    'xticklabels',
+    'yticklabels',
+}
+
+# Parameters that specify file names
+params_that_specify_filenames = {
+    'fasta_file',
+    'meme_file',
+}
+
 # Names of parameters to leave for later validatation
 params_for_later_validation = {
-    'font_family',
-    'font_weight',
-    'gridline_style',
-    'baseline_style',
-    'axes_fontfamily',
-    'axes_fontweight',
-    'tick_fontfamily',
-    'tick_fontweight',
-    'tick_fontize',
-    'label_fontfamily',
-    'label_fontweight',
-    'title_fontfamily',
-    'title_fontweight',
+    'meme_motifnum'
 }
 
 #
@@ -277,6 +318,14 @@ def validate_parameter(name, user, default):
             raise ValueError("Parameter '%s' cannot be None." % name)
         else:
             value = user
+
+    # Special case: enrichment_logbase: validate as string
+    elif name == 'enrichment_logbase':
+        str_to_num_dict = {'2': 2, '10': 10, 'e': np.e}
+        if isinstance(user, str):
+            user = str_to_num_dict[user]
+        value = _validate_in_set(name, user, default,
+                               params_with_values_in_dict[name])
 
     #  If value is in a set
     elif name in params_with_values_in_dict:
@@ -333,6 +382,22 @@ def validate_parameter(name, user, default):
          value = _validate_FontProperties_parameter(name, user, default,
                                                     passedas=passedas)
 
+    # If value specifies a linestyle
+    elif name in params_that_specify_linestyles:
+        value = _validate_linestyle(name, user, default)
+
+    # If value specifies ticklabels
+    elif name in params_that_specify_ticklabels:
+        value = _validate_ticklabels(name, user, default)
+
+    # If value specifies a filename
+    elif name in params_that_specify_filenames:
+        value = _validate_filename(name, user, default)
+
+    # Special case: iupac_string
+    elif name == 'iupac_string':
+        value = _validate_iupac(name, user, default)
+
     # Special case: matrix
     elif name == 'matrix':
         value = validate_mat(user)
@@ -341,14 +406,23 @@ def validate_parameter(name, user, default):
     elif name == 'figsize':
         value = _validate_array(name, user, default, length=2)
 
+    # Special case: vline_positions
+    elif name == 'vline_positions':
+        value = _validate_array(name, user, default)
+
+    # Special case: fixedchar_dict
+    elif name == 'fixedchar_dict':
+        value = _validate_fixedchar_dict(name, user, default)
+
     # Special case: rcparams
     elif name == 'rcparams':
-        if type(user)==dict:
+        if type(user) == dict:
             value = user
         else:
             message = "rcparams = %s is not a dictionary. Using %s instead." \
             % (repr(user), repr(default))
             warnings.warn(message, UserWarning)
+            value = default
 
     # Parameters left for validation later on
     elif name in params_for_later_validation:
@@ -380,7 +454,7 @@ def _validate_float(name,
     try:
         value = float(user)
 
-    except ValueError:
+    except (ValueError, TypeError):
         value = default
         message = "Cannot interpret value %s for parameter '%s' as float. " +\
                   "Using default value %s instead."
@@ -432,7 +506,20 @@ def _validate_float(name,
 
 
 def _validate_bool(name, user, default):
-    """ Validates a floating point parameter. """
+    """ Validates a boolean parameter parameter. """
+
+    # Convert to bool if string is passed
+    if isinstance(user, basestring):
+        if user == 'True':
+            user = True
+        elif user == 'False':
+            user = False
+        else:
+            user = default
+            message = "Parameter '%s', if string, must be " + \
+                      "'True' or 'False'. Using default value %s instead."
+            message = message % (name, repr(default))
+            warnings.warn(message, UserWarning)
 
     # Test whether parameter is already a boolean
     # (not just whether it can be interpreted as such)
@@ -456,6 +543,20 @@ def _validate_in_set(name, user, default, in_set):
     # If user is valid, use that
     if user in in_set:
         value = user
+
+    # Otherwise, if user is string, try evaluating as literal
+    elif isinstance(user, basestring):
+        try:
+            tmp = ast.literal_eval(user)
+            if tmp in in_set:
+                value = tmp
+
+        except:
+            value = default
+            message = "Invalid value %s for parameter '%s'. " + \
+                      "Using default value %s instead."
+            message = message % (repr(user), name, repr(default))
+            warnings.warn(message, UserWarning)
 
     # If user value is not valid, set to default and issue warning
     else:
@@ -487,11 +588,120 @@ def _validate_str(name, user, default):
     # Return valid value to user
     return value
 
+def _validate_iupac(name, user, default):
+    """ Validates an IUPAC string """
+
+    message = None
+
+    # Check that user input is a string
+    if not isinstance(user, basestring):
+        value = default
+        message = "Value %s for parameter '%s' is not a string. " + \
+                  "Using default value %s instead."
+        message = message % (repr(user), name, repr(default))
+
+    # Make sure string has nonzero length
+    elif len(user) == 0:
+        value = default
+        message = "String %s, set for parameter '%s', is empty. " + \
+                  "Using default value %s instead."
+        message = message % (repr(user), name, repr(default))
+
+    # Make sure string contains valid characters
+    elif not set(list(user.upper())) <= set(iupac_dict.keys()):
+        value = default
+        message = "String %s, set for parameter '%s', contains " + \
+                  "invalid characters. Using default value %s instead."
+        message = message % (repr(user), name, repr(default))
+
+    # Make sure string is all capitals
+    elif any([c == c.lower() for c in list(user)]):
+        value = user.upper()
+        message = "String %s, set for parameter '%s', contains lowercase " + \
+                  "characters. Using capitalized characters instead."
+        message = message % (repr(user), name)
+
+    # If all tests pass, use user input
+    else:
+        value = user
+
+    if message is not None:
+        warnings.warn(message, UserWarning)
+
+    return value
+
+
+def _validate_filename(name, user, default):
+    """ Validates a string parameter. """
+
+    # Test whether file exists and can be opened
+    message = None
+    try:
+
+        if not os.path.isfile(user):
+            value = default
+            message = "File %s passed for parameter '%s' does not exist. " +\
+                      "Using default value %s instead."
+            message = message % (repr(user), name, repr(default))
+
+        elif open(user, 'r'):
+            value = user
+        else:
+            value = default
+            message = "File %s passed for parameter '%s' cannot be opened." + \
+                      " Using default value %s instead."
+            message = message % (repr(user), name, repr(default))
+
+    except (ValueError,TypeError):
+        value = default
+        if message is None:
+            message = "Value %s passed for parameter '%s' is invalid." + \
+                      " Using default value %s instead."
+            message = message % (repr(user), name, repr(default))
+
+    if message is not None:
+        warnings.warn(message, UserWarning)
+
+    # Return valid value to user
+    return value
+
+
+def _validate_fixedchar_dict(name, user, default):
+    """ Validates a string parameter. """
+
+    # Test whether parameter can be interpreted as a string
+    try:
+        if isinstance(user, basestring):
+            user = ast.literal_eval(user)
+
+        assert isinstance(user, dict)
+        for key, val in user.items():
+            assert isinstance(key, numbers.Number)
+            assert np.isfinite(key)
+            assert isinstance(val, basestring)
+            assert len(val)==1
+        value = user
+
+    # If user value is not valid, set to default and issue warning
+    except (AssertionError, ValueError):
+        value = default
+        message = "Invalid value %s for parameter %s. " +\
+                  "Using default %s instead."
+        message = message % (repr(user), name, repr(default))
+        warnings.warn(message, UserWarning)
+
+    # Return valid value to user
+    return value
+
 
 def _validate_array(name, user, default, length=None, increasing=False):
     """ Validates an array of numbers. """
 
     try:
+        # If string, convert to list of numbers
+        if isinstance(user, basestring):
+            user = ast.literal_eval(user)
+
         if length is not None:
             assert len(user) == length
 
@@ -504,14 +714,16 @@ def _validate_array(name, user, default, length=None, increasing=False):
 
         value = np.array(user).copy()
 
-    except AssertionError:
+    except (AssertionError, ValueError):
         value = default
         message = "Improper value %s for parameter '%s'. " + \
                   "Using default value %s instead."
         message = message % (repr(user), name, repr(default))
         warnings.warn(message, UserWarning)
+
     # Return valid value to user
     return value
+
 
 def _validate_colorscheme(name, user, default):
     """ Tests whether user input can be interpreted as a colorschme. """
@@ -578,6 +790,7 @@ def _validate_color(name, user, default):
     # Return valid value to user
     return value
 
+
 def _validate_FontProperties_parameter(name, user, default, passedas):
     """ Validates any parameter passed to the FontProperties constructor. """
 
@@ -598,6 +811,58 @@ def _validate_FontProperties_parameter(name, user, default, passedas):
     return value
 
 
+def _validate_linestyle(name, user, default):
+    """ Validates any parameter that specifies a linestyle. """
+
+    try:
+        # Create a FontProperties object and try to use it for something
+        Line2D((0, 1), (0, 1), linestyle=user)
+        value = user
+
+    except (ValueError, TypeError):
+        value = default
+        message = ("Invalid string specification '%s' for parameter '%s'. "
+                   + "Using default value %s instead.") \
+                  % (user, name, default)
+        warnings.warn(message, UserWarning)
+
+    # Return valid value to user
+    return value
+
+
+def _validate_ticklabels(name, user, default):
+    """ Validates parameters passed as tick labels. """
+
+    message = None
+    # Check that user can be read as list
+    try:
+        user = list(user)
+    except TypeError:
+        message = ("Cant interpret value '%s' for parameter '%s' as list. "
+                   + "Using default value %s instead.") \
+                  % (user, name, default)
+
+    # Test that elements of user are strings or numbers
+    tests = [isinstance(u, basestring) or isinstance(u, numbers.Number) \
+                for u in user]
+    if len(tests) > 0 and not all(tests):
+        message = ("Cant interpret all elements of '%s', "
+                   + "assigned to parameter '%s', as string or number. "
+                   + "Using default value %s instead.") \
+                  % (user, name, default)
+
+    # If any errors were encountered, use default as value and display warning
+    # Otherwise, use user input as value.
+    if message is None:
+        value = user
+    else:
+        value = default
+        warnings.warn(message, UserWarning)
+
+    # Return valid value to user
+    return value
+
+
 def validate_mat(matrix):
     '''
     Runs assert statements to verify that df is indeed a motif dataframe.
@@ -609,6 +874,14 @@ def validate_mat(matrix):
 
     assert type(matrix) == pd.core.frame.DataFrame, 'Error: df is not a dataframe'
     cols = matrix.columns
+
+    # Make sure the matrix has a finite number of rows and columns
+    assert matrix.shape[0] >= 1, 'Error: matrix has zero rows.'
+    assert matrix.shape[1] >= 1, 'Error: matrix has zero columns.'
+
+    # Make sure all entries are finite numbers
+    assert np.isfinite(matrix.values).all(), \
+        'Error: not all matrix elements are well-defined, finite numbers.'
 
     for i, col_name in enumerate(cols):
         # Ok to have a 'pos' column
