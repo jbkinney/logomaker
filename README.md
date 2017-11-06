@@ -1,2 +1,2 @@
-# anylogo
-Software for the visualization of sequence-function relationships
+# logomaker
+Software for creating highly customized sequence logos
