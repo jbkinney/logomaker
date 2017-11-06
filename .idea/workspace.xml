@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_meme.ipynb" afterPath="$PROJECT_DIR$/test_meme.ipynb" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -440,13 +438,6 @@
       <option name="presentableId" value="Default" />
       <updated>1507225961489</updated>
     </task>
-    <task id="LOCAL-00003" summary="Changed a lot of stuff, including font handling and anylogo -&gt; logomaker">
-      <created>1508103163130</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1508103163130</updated>
-    </task>
     <task id="LOCAL-00004" summary="Implemented much better character transformation algorithm.">
       <created>1508105346223</created>
       <option name="number" value="00004" />
@@ -783,7 +774,14 @@
       <option name="project" value="LOCAL" />
       <updated>1509985798418</updated>
     </task>
-    <option name="localTasksCounter" value="52" />
+    <task id="LOCAL-00052" summary="Added .gitignore appropriate for python">
+      <created>1509991203575</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1509991203575</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="TodoView">
@@ -849,7 +847,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="I made some changes." />
     <MESSAGE value="Added 2 ipython notebooks." />
     <MESSAGE value="Did lots of refactoring of functionality in Logo.__init__ into make_logo" />
     <MESSAGE value="Lots of changes." />
@@ -874,7 +871,8 @@
     <MESSAGE value="Moved make_logo documentation to make_logo_arguments.txt. Added in automated parsing of this documentation to build the make_logo docstring as well as the help documentation in argparse." />
     <MESSAGE value="Enabled CSV parsing" />
     <MESSAGE value="Added MEME data files" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added MEME data files" />
+    <MESSAGE value="Added .gitignore appropriate for python" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added .gitignore appropriate for python" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
