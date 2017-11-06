@@ -2,22 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/iupac_ATCTGHRT.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/meme_motif.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/molm13_1.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/molm13_1_10k.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/molm13_1_fdr.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/molm13_2.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/molm13_2_fdr.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/nomo1_1.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/nomo1_1_fdr.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/nomo1_2.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/nomo1_2_fdr.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/ZNF64_meme_motif.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/dreme.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/meme_example.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_meme.ipynb" afterPath="$PROJECT_DIR$/test_meme.ipynb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/17_vakoc/meme_motif.txt" afterPath="$PROJECT_DIR$/data/17_vakoc/meme_motif.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/ZNF64_meme_motif.txt" afterPath="$PROJECT_DIR$/data/ZNF64_meme_motif.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/make_logo_arguments.txt" afterPath="$PROJECT_DIR$/make_logo_arguments.txt" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -43,8 +31,8 @@
           <file leaf-file-name="make_logo_arguments.txt" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/make_logo_arguments.txt">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="380">
-                  <caret line="20" column="36" lean-forward="false" selection-start-line="20" selection-start-column="36" selection-end-line="20" selection-end-column="36" />
+                <state relative-caret-position="57">
+                  <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -442,13 +430,6 @@
       <option name="presentableId" value="Default" />
       <updated>1507225961489</updated>
     </task>
-    <task id="LOCAL-00002" summary="Deleted derived classes of Logo">
-      <created>1507606098560</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1507606098560</updated>
-    </task>
     <task id="LOCAL-00003" summary="Changed a lot of stuff, including font handling and anylogo -&gt; logomaker">
       <created>1508103163130</created>
       <option name="number" value="00003" />
@@ -785,7 +766,14 @@
       <option name="project" value="LOCAL" />
       <updated>1509979666740</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="Added MEME data files">
+      <created>1509985798418</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1509985798418</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="TodoView">
@@ -799,12 +787,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="2560" height="1440" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2807784" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32954547" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3224432" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.328125" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.328125" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -850,7 +839,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="I'm stepping away for a while now." />
     <MESSAGE value="I made some changes." />
     <MESSAGE value="Added 2 ipython notebooks." />
     <MESSAGE value="Did lots of refactoring of functionality in Logo.__init__ into make_logo" />
@@ -875,7 +863,8 @@
     <MESSAGE value="Fixed bug in MEME parsing. And added IUPAC support." />
     <MESSAGE value="Moved make_logo documentation to make_logo_arguments.txt. Added in automated parsing of this documentation to build the make_logo docstring as well as the help documentation in argparse." />
     <MESSAGE value="Enabled CSV parsing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Enabled CSV parsing" />
+    <MESSAGE value="Added MEME data files" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added MEME data files" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1161,14 +1150,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/make_logo_arguments.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="20" column="36" lean-forward="false" selection-start-line="20" selection-start-column="36" selection-end-line="20" selection-end-column="36" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/make_logo.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1439">
@@ -1176,6 +1157,14 @@
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/make_logo_arguments.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

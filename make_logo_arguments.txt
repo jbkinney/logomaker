@@ -1,6 +1,7 @@
 #######################################################################
 ### Matrix transformation
 
+
 matrix (pd.DataFrame, None): Data matrix used to make the logo. Row names are
     the positions, column names are the characters, and values are
     floats (or ints). If the matrix_type is set to 'counts',
