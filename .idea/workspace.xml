@@ -2,12 +2,22 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/iupac_ATCTGHRT.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/meme_motif.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/molm13_1.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/molm13_1_10k.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/molm13_1_fdr.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/molm13_2.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/molm13_2_fdr.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/nomo1_1.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/nomo1_1_fdr.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/nomo1_2.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/17_vakoc/nomo1_2_fdr.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/ZNF64_meme_motif.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/dreme.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/meme_example.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data.py" afterPath="$PROJECT_DIR$/data.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/make_logo.py" afterPath="$PROJECT_DIR$/make_logo.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/make_logo_arguments.txt" afterPath="$PROJECT_DIR$/make_logo_arguments.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_meme.ipynb" afterPath="$PROJECT_DIR$/test_meme.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/validate.py" afterPath="$PROJECT_DIR$/validate.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -30,7 +40,7 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="make_logo_arguments.txt" pinned="false" current-in-tab="false">
+          <file leaf-file-name="make_logo_arguments.txt" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/make_logo_arguments.txt">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="380">
@@ -52,11 +62,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="documentation_parser.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="documentation_parser.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/documentation_parser.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="181">
-                  <caret line="12" column="21" lean-forward="false" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="21" />
+                <state relative-caret-position="1273">
+                  <caret line="67" column="11" lean-forward="true" selection-start-line="67" selection-start-column="11" selection-end-line="67" selection-end-column="19" />
                   <folding>
                     <element signature="e#0#9#0" expanded="true" />
                   </folding>
@@ -81,8 +91,8 @@
           <file leaf-file-name="logomaker" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/logomaker">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-7">
-                  <caret line="13" column="31" lean-forward="false" selection-start-line="13" selection-start-column="31" selection-end-line="13" selection-end-column="31" />
+                <state relative-caret-position="423">
+                  <caret line="24" column="6" lean-forward="false" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="6" />
                   <folding>
                     <element signature="e#23#54#0" expanded="true" />
                   </folding>
@@ -105,8 +115,8 @@
           <file leaf-file-name="make_logo.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/make_logo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="4389">
-                  <caret line="231" column="7" lean-forward="true" selection-start-line="231" selection-start-column="7" selection-end-line="231" selection-end-column="7" />
+                <state relative-caret-position="1439">
+                  <caret line="974" column="0" lean-forward="true" selection-start-line="974" selection-start-column="0" selection-end-line="974" selection-end-column="0" />
                   <folding>
                     <element signature="e#0#31#0" expanded="true" />
                   </folding>
@@ -264,6 +274,17 @@
               <item name="logomaker" type="b2602c69:ProjectViewProjectNode" />
               <item name="logomaker" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="logomaker" type="b2602c69:ProjectViewProjectNode" />
+              <item name="logomaker" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="logomaker" type="b2602c69:ProjectViewProjectNode" />
+              <item name="logomaker" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
+              <item name="17_vakoc" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -420,13 +441,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1507225961489</updated>
-    </task>
-    <task id="LOCAL-00001" summary="Major revision, including working Logo() class">
-      <created>1507606071324</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1507606071324</updated>
     </task>
     <task id="LOCAL-00002" summary="Deleted derived classes of Logo">
       <created>1507606098560</created>
@@ -764,7 +778,14 @@
       <option name="project" value="LOCAL" />
       <updated>1509899249723</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="Enabled CSV parsing">
+      <created>1509979666739</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1509979666740</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="TodoView">
@@ -779,7 +800,7 @@
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="2560" height="1440" extended-state="0" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28109854" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2807784" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32954547" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3224432" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -829,7 +850,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added splicesite_test.ipynb" />
     <MESSAGE value="I'm stepping away for a while now." />
     <MESSAGE value="I made some changes." />
     <MESSAGE value="Added 2 ipython notebooks." />
@@ -854,7 +874,8 @@
     <MESSAGE value="Added MEME file parsing capabilities." />
     <MESSAGE value="Fixed bug in MEME parsing. And added IUPAC support." />
     <MESSAGE value="Moved make_logo documentation to make_logo_arguments.txt. Added in automated parsing of this documentation to build the make_logo docstring as well as the help documentation in argparse." />
-    <option name="LAST_COMMIT_MESSAGE" value="Moved make_logo documentation to make_logo_arguments.txt. Added in automated parsing of this documentation to build the make_logo docstring as well as the help documentation in argparse." />
+    <MESSAGE value="Enabled CSV parsing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Enabled CSV parsing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1100,16 +1121,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logomaker">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7">
-          <caret line="13" column="31" lean-forward="false" selection-start-line="13" selection-start-column="31" selection-end-line="13" selection-end-column="31" />
-          <folding>
-            <element signature="e#23#54#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-16">
@@ -1130,6 +1141,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/logomaker">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="423">
+          <caret line="24" column="6" lean-forward="false" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="6" />
+          <folding>
+            <element signature="e#23#54#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/documentation_parser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1273">
+          <caret line="67" column="11" lean-forward="true" selection-start-line="67" selection-start-column="11" selection-end-line="67" selection-end-column="19" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/make_logo_arguments.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="380">
@@ -1140,20 +1171,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/make_logo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4389">
-          <caret line="231" column="7" lean-forward="true" selection-start-line="231" selection-start-column="7" selection-end-line="231" selection-end-column="7" />
+        <state relative-caret-position="1439">
+          <caret line="974" column="0" lean-forward="true" selection-start-line="974" selection-start-column="0" selection-end-line="974" selection-end-column="0" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/documentation_parser.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="12" column="21" lean-forward="false" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
