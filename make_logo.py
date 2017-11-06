@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 import matplotlib as mpl
 from validate import validate_parameter, validate_mat
-from data import load_alignment, iupac_to_probability_mat
+from data import load_alignment, iupac_to_probability_mat, \
+    counts_mat_to_probability_mat
 from Logo import Logo
 import data
 import color
@@ -23,11 +24,27 @@ def remove_none_from_dict(d):
     return dict([(k, v) for k, v in d.items() if v is not None])
 
 def make_logo(matrix=None,
+
+              # FASTA file processing
               fasta_file=None,
+
+              # MEME file processing
               meme_file=None,
               meme_motifname=None,
               meme_motifnum=None,
+
+              # IUPAC processing
               iupac_string=None,
+
+              # CSV file processing
+              csv_file=None,
+              seq_col=None,
+              ct_col=None,
+              csv_kwargs={},
+              background_csvfile=None,
+              background_seqcol=None,
+              background_ctcol=None,
+              background_csvkwargs=None,
 
               # Matrix transformation (make_logo only)
               matrix_type=None,
@@ -236,11 +253,20 @@ def make_logo(matrix=None,
     ######################################################################
     # matrix
 
+    # Initialize background matrix to none
+    bg_mat = None
+
     # Make sure that only one of the following is specified
-    exclusive_list = ['matrix', 'fasta_file', 'meme_file', 'iupac_string']
-    assert sum([eval(x) is not None for x in exclusive_list]) == 1,\
-        'Error: exactly one of the following must be specified: %s.' %\
-        repr(exclusive_list)
+    exclusive_list = ['matrix',
+                      'fasta_file',
+                      'meme_file',
+                      'iupac_string',
+                      'csv_file']
+    num_input_sources = sum([eval(x) is not None for x in exclusive_list])
+    if num_input_sources != 1:
+        assert False, \
+            'Error: exactly one of the following must be specified: %s.' %\
+            repr(exclusive_list)
 
     # If matrix is specified
     if matrix is not None:
@@ -276,8 +302,41 @@ def make_logo(matrix=None,
         if title is None:
             title = iupac_string
 
+    # Otherwise, if csv file is specified
+    elif csv_file is not None:
+        matrix = load_alignment(csv_file=csv_file,
+                                seq_col=seq_col,
+                                ct_col=ct_col,
+                                csv_kwargs=csv_kwargs)
+        matrix_type = 'counts'
+
+        # If either a background counts column or a
+        # background csv file is specified
+        if (background_ctcol is not None) or (background_csvfile is not None):
+
+            # Set background csv parameters, defaulting to foreground
+            # CSV parameters
+            if background_csvfile is None:
+                background_csvfile = csv_file
+            if background_seqcol is None:
+                background_seqcol = seq_col
+            if background_ctcol is None:
+                background_ctcol = ct_col
+            if background_csvkwargs is None:
+                background_csvkwargs = csv_kwargs
+
+            # Load background counts from csv file
+            bg_countsmat = load_alignment(csv_file=background_csvfile,
+                                          seq_col=background_seqcol,
+                                          ct_col=background_ctcol,
+                                          csv_kwargs=background_csvkwargs)
+
+            # Transform background counts matrix to a probability matrix
+            bg_mat = counts_mat_to_probability_mat(count_mat=bg_countsmat,
+                                                   pseudocount=pseudocount)
+
     else:
-        assert False, 'Error: must specify matrix, FASTA file, or MEME file.'
+        assert False, 'This should never happen.'
 
     ######################################################################
     # matrix.columns
@@ -301,7 +360,12 @@ def make_logo(matrix=None,
     if position_range is not None:
         min = position_range[0]
         max = position_range[1]
-        matrix = matrix.loc[(matrix.index >= min) & (matrix.index < max), :]
+        indices = (matrix.index >= min) & (matrix.index < max)
+        matrix = matrix.loc[indices, :]
+
+        # Process bg_mat if that has been set
+        if bg_mat is not None:
+            bg_mat = bg_mat.loc[indices, :]
 
     # Matrix length is now set. Record it.
     L = len(matrix)
@@ -312,6 +376,9 @@ def make_logo(matrix=None,
     else:
         matrix['pos'] = shift_first_position_to + matrix.index \
                         - matrix.index[0]
+
+    # Enforce integer positions and set as index
+    matrix['pos'] = matrix['pos'].astype(int)
     matrix.set_index('pos', inplace=True, drop=True)
     matrix = validate_mat(matrix)
     positions = matrix.index
@@ -324,8 +391,9 @@ def make_logo(matrix=None,
         logo_type = matrix_type
     logo_type = validate_parameter('logo_type', logo_type, None)
 
-    # Get background matrix
-    bg_mat = data.set_bg_mat(background, matrix)
+    # Get background matrix, only if it has not yet been set
+    if bg_mat is None:
+        bg_mat = data.set_bg_mat(background, matrix)
 
     # Transform matrix:
     matrix = data.transform_mat(matrix=matrix,
@@ -354,6 +422,11 @@ def make_logo(matrix=None,
                np.arange(L, num_lines * max_positions_per_line)
         for r in rows:
             matrix.loc[r, :] = 0.0
+
+        # If there is a background matrix, pad it with ones:
+        if bg_mat is not None:
+            for r in rows:
+                bg_mat.loc[r, :] = 1./bg_mat.shape[1]
 
         # If there is a highlight sequence, pad it too
         if highlight_sequence is not None:
@@ -384,11 +457,15 @@ def make_logo(matrix=None,
         for n in range(num_lines):
 
             # Section matrix
-            start = n * max_positions_per_line
-            stop = (n+1) * max_positions_per_line
+            start = int(n * max_positions_per_line)
+            stop = int((n+1) * max_positions_per_line)
             n_matrix = matrix.iloc[start:stop, :]
 
-            # If there is a highlight sequence, section it too
+            # If there is a background matrix, section it
+            if bg_mat is not None:
+                n_bgmat = bg_mat.iloc[start:stop, :]
+
+            # If there is a highlight sequence, section it
             if highlight_sequence is not None:
                 n_highlight_sequence = highlight_sequence[start:stop]
             else:
@@ -396,14 +473,29 @@ def make_logo(matrix=None,
 
             # Adjust kwargs
             n_kwargs = kwargs.copy()
+
+            # Use only matrix and background as input, not files or iupac
+            # To do this, first set all input variables to None
+            for var_name in exclusive_list:
+                n_kwargs[var_name] = None
+
+            # Then pass sectioned matrices to matrics and background.
             n_kwargs['matrix'] = n_matrix
+            n_kwargs['background'] = n_bgmat
+
+            # Preserve matrix and logo type
             n_kwargs['matrix_type'] = logo_type
             n_kwargs['logo_type'] = logo_type
+
+            # Pass sectioned highlight_sequence
+            n_kwargs['highlight_sequence'] = n_highlight_sequence
+
+            # Pass shifted shift_first_position_to
+            n_kwargs['shift_first_position_to'] = matrix.index[0] + start
+
+            # Don't draw each individual logo. Wait until all are returned.
             n_kwargs['figsize'] = None
             n_kwargs['draw_now'] = False
-            n_kwargs['background'] = None
-            n_kwargs['highlight_sequence'] = n_highlight_sequence
-            n_kwargs['shift_first_position_to'] = matrix.index[0]+start
             n_kwargs['ylim'] = ylim
 
             # Adjust annotation

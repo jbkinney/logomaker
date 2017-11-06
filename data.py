@@ -4,6 +4,7 @@ import pandas as pd
 import re
 import pdb
 from Bio import SeqIO
+import warnings
 
 # Set constants
 SMALL = 1E-6
@@ -60,11 +61,6 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
         probability_mat = \
             counts_mat_to_probability_mat(matrix, pseudocount=pseudocount)
 
-    elif from_type == 'enrichment':
-        probability_mat = \
-            enrichment_mat_to_probability_mat(matrix, bg_mat,
-                                              base=enrichment_logbase)
-
     else:
         assert False, 'Error! from_type %s is invalid.'%from_type
 
@@ -106,25 +102,6 @@ def counts_mat_to_probability_mat(count_mat, pseudocount=1):
     freq_mat = count_mat.copy()
     vals = count_mat.values + pseudocount
     freq_mat.loc[:,:] = vals / vals.sum(axis=1)[:,np.newaxis]
-    freq_mat = normalize_probability_matrix(freq_mat)
-
-    # Validate and return
-    freq_mat = validate_probability_mat(freq_mat)
-    return freq_mat
-
-
-def enrichment_mat_to_probability_mat(weight_mat, bg_mat, base=2):
-    '''
-    Converts a weight_mat to a freq_mat
-    '''
-    # Validate mat before use
-    weight_mat = validate_mat(weight_mat)
-
-    # Compute freq_mat
-    vals = weight_mat.values
-    vals -= vals.mean(axis=1)[:, np.newaxis]
-    weights = np.pow(base, vals) * bg_mat.values
-    freq_mat.loc[:, :] = weights / weights.sum(axis=1)[:, np.newaxis]
     freq_mat = normalize_probability_matrix(freq_mat)
 
     # Validate and return
@@ -236,11 +213,10 @@ def set_bg_mat(background, matrix):
         new_bg_mat = background.copy()
 
     else:
-        pdb.set_trace()
         assert False, 'Error: bg_mat and df are incompatible'
 
     # Match indices of new_bg_mat to matrix
-    new_bg_mat['pos'] = matrix.index
+    new_bg_mat['pos'] = matrix.index.astype(int)
     new_bg_mat.set_index('pos', inplace=True, drop=True)
 
     # Normalize new_bg_mat as probability matrix
@@ -249,6 +225,10 @@ def set_bg_mat(background, matrix):
 
 
 def load_alignment(fasta_file=None,
+                   csv_file=None,
+                   seq_col=None,
+                   ct_col=None,
+                   csv_kwargs={},
                    sequences=None,
                    sequence_counts=None,
                    sequence_type=None,
@@ -264,27 +244,59 @@ def load_alignment(fasta_file=None,
         sequences = [str(record.seq) for record in \
                      SeqIO.parse(fasta_file, "fasta")]
 
-        # Assign each sequence a count of 1
-        sequence_counts = np.ones(len(sequences))
+    # If loading from a CSV file
+    elif csv_file is not None:
 
+        # Make sure that seq_col is specified
+        assert seq_col is not None, \
+            'Error: seq_col is None. If csv_file is specified, seq_col must' \
+            + ' also be specified'
+
+        # Load csv file as a dataframe
+        df = pd.read_csv(csv_file, **csv_kwargs)
+
+        # Make sure that seq_col is in df
+        assert seq_col in df.columns, \
+            ('Error: seq_col %s is not in the columns %s read from '
+            + 'csv_file %s') % (seq_col, df.columns, csv_file)
+
+        # Get sequences
+        sequences = df[seq_col].values
+
+        # Optionally set sequence_counts
+        if ct_col is not None:
+
+            # Make sure that seq_col is in df
+            assert seq_col in df.columns, \
+                ('Error: ct_col %s is not None, but neither is it in the '
+                 + 'columns %s loaded from csv_file'
+                 + ' file %s') % (ct_col, df.columns, csv_file)
+
+            # Load sequences counts
+            sequence_counts = df[ct_col].values
+
+    # Make sure that, whatever was passed, sequences is set
     assert sequences is not None, \
         'Error: either fasta_file or sequences must not be None.'
 
     # Get seq length
     L = len(sequences[0])
-    assert all([len(seq) == L for seq in sequences]), 'Error: not all sequences have length %d.' % L
+    assert all([len(seq) == L for seq in sequences]), \
+        'Error: not all sequences have length %d.' % L
 
     # Get counts list
     if sequence_counts is None:
         assert len(sequences) > 0, 'Error: sequences is empty'
         counts_array = np.ones(len(sequences))
     else:
-        assert len(sequence_counts) == len(sequences), 'Error: sequence_counts is not the same length as sequences'
+        assert len(sequence_counts) == len(sequences), \
+            'Error: sequence_counts is not the same length as sequences'
         counts_array = np.array(sequence_counts)
 
     # If positions is not specified by user, make it
     if positions is not None:
-        assert len(positions) == L, 'Error: positions, if passed, must be same length as sequences.'
+        assert len(positions) == L, 'Error: positions, if passed, must be '+\
+                                    'same length as sequences.'
     else:
         positions = range(L)
 

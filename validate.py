@@ -293,11 +293,25 @@ params_that_specify_ticklabels = {
 params_that_specify_filenames = {
     'fasta_file',
     'meme_file',
+    'csv_file',
+    'background_csvfile'
+}
+
+# Parameters that specify dictionaries
+params_that_specify_dicts = {
+    'rcparams',
+    'csv_kwargs',
+    'background_csvkwargs'
 }
 
 # Names of parameters to leave for later validatation
 params_for_later_validation = {
-    'meme_motifnum'
+    'meme_motifnum',
+    'background',
+    'ct_col',
+    'background_ctcol',
+    'seq_col',
+    'background_seqcol'
 }
 
 #
@@ -394,6 +408,10 @@ def validate_parameter(name, user, default):
     elif name in params_that_specify_filenames:
         value = _validate_filename(name, user, default)
 
+    # If value specifies a dicitionary
+    elif name in params_that_specify_dicts:
+        value = _validate_dict(name, user, default)
+
     # Special case: iupac_string
     elif name == 'iupac_string':
         value = _validate_iupac(name, user, default)
@@ -413,16 +431,6 @@ def validate_parameter(name, user, default):
     # Special case: fixedchar_dict
     elif name == 'fixedchar_dict':
         value = _validate_fixedchar_dict(name, user, default)
-
-    # Special case: rcparams
-    elif name == 'rcparams':
-        if type(user) == dict:
-            value = user
-        else:
-            message = "rcparams = %s is not a dictionary. Using %s instead." \
-            % (repr(user), repr(default))
-            warnings.warn(message, UserWarning)
-            value = default
 
     # Parameters left for validation later on
     elif name in params_for_later_validation:
@@ -830,6 +838,21 @@ def _validate_linestyle(name, user, default):
     return value
 
 
+def _validate_dict(name, user, default):
+    """ Validates any parameter that specifies a dictionary. """
+
+    if type(user) == dict:
+        value = user
+    else:
+        message = "%s = %s is not a dictionary. Using %s instead." \
+                  % (name, repr(user), repr(default))
+        warnings.warn(message, UserWarning)
+        value = default
+
+    # Return valid value to user
+    return value
+
+
 def _validate_ticklabels(name, user, default):
     """ Validates parameters passed as tick labels. """
 
@@ -909,6 +932,7 @@ def validate_mat(matrix):
 
     # If there is a pos column, make that the index
     if 'pos' in cols:
+        matrix['pos'] = matrix['pos'].astype(int)
         matrix.set_index('pos', drop=True, inplace=True)
 
     # Remove name from index column
