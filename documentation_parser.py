@@ -73,7 +73,7 @@ def document_function(func, doc_file):
     doc_dict = parse_documentation_file(doc_file)
 
     # Add default value to each parameter
-    docstr = ""
+    docstr = func.__doc__
     names, vargs, kwargs, default_values = inspect.getargspec(func)
     for i, name in enumerate(names):
         if name in doc_dict:
@@ -84,11 +84,16 @@ def document_function(func, doc_file):
             # Set default value in entry
             entry.set_default(default_values[i])
 
+            # Get string version with additional whitespace on each line
+            entry_str = repr(entry)
+            entry_str = '\n' + '\n'.join([' '*8 + line
+                                        for line in entry_str.split('\n')])
+
             # Recor string version of entry
-            docstr += '\n%s' % repr(entry)
+            docstr += entry_str
         else:
             warnings.warn('Parameter %s not documented.' % name)
-            docstr += '\n%s: NOT DOCUMENTED.\n' % name
+            docstr += '\n' + ' '*8 + '%s: NOT DOCUMENTED.\n' % name
 
     # Set docstring
     func.__doc__ = docstr
