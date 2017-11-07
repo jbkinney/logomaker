@@ -15,8 +15,8 @@ class Logo:
                  character_style,
                  highlight_sequence,
                  highlight_style,
-                 fixedchar_dict,
-                 fixedchar_style,
+                 fullheight,
+                 fullheight_style,
                  placement_style,
                  axes_style):
 
@@ -39,7 +39,7 @@ class Logo:
         self.character_style = character_style.copy()
         self.highlight_style = highlight_style.copy()
         self.placement_style = placement_style.copy()
-        self.fixedchar_style = fixedchar_style.copy()
+        self.fullheight_style = fullheight_style.copy()
 
         # Set axes style
         self.axes_style = axes_style.copy()
@@ -55,14 +55,12 @@ class Logo:
         else:
             self.use_highlight = False
 
-        # Set fixedchar_dict
-        self.fixedchar_dict = fixedchar_dict
-        if self.fixedchar_dict is not None:
-            assert isinstance(self.fixedchar_dict, dict), \
-                'Error: fixedchar_dict is not a dictionary.'
-            self.use_fixedchar = True
+        # Set fullheight
+        self.fullheight = fullheight
+        if self.fullheight is not None:
+            self.use_fullheight = True
         else:
-            self.use_fixedchar = False
+            self.use_fullheight = False
 
         # Compute characters and box
         self.compute_characters()
@@ -78,13 +76,13 @@ class Logo:
             except:
                 pdb.set_trace()
 
-        # Get final yspan of everything
-        ymax = self.df.values.max()
-        ymin = min(0, self.df.values.min())
+        # Compute ymin and ymax of logo.
+        values = self.df.values.astype(float)
+        pos_mask = (values > 0).astype(float)
+        neg_mask = (values < 0).astype(float)
+        ymax = (values * pos_mask).sum(axis=1).max()
+        ymin = (values * neg_mask).sum(axis=1).min()
         yspan = ymax-ymin
-
-        # Set ysep
-        ysep = yspan * self.placement_style['vsep']
 
         # Compute hstretch values for all characters
         width = self.placement_style['width']
@@ -97,6 +95,10 @@ class Logo:
                                     font_properties=self.font_properties,
                                     hpad=0,
                                     vpad=0)
+
+        xmin = min(self.poss) - width / 2.0
+        xmax = max(self.poss) + width / 2.0
+
         # Set max_hstretch
         uniform_stretch = self.placement_style['uniform_stretch']
         max_stretched_character = \
@@ -112,7 +114,10 @@ class Logo:
         for i, pos in enumerate(self.poss):
 
             vals = self.df.iloc[i, :].values
-            ymin = vals[vals < 0].sum()
+            col_ymin = vals[vals < 0].sum()
+
+            # Set ysep
+            ysep = yspan * self.placement_style['vsep']
 
             # Reorder columns
             stack_order = self.placement_style['stack_order']
@@ -124,8 +129,10 @@ class Logo:
                 neg_tmp_indices = tmp_indices[vals[tmp_indices] < 0]
                 indices = np.array(list(neg_tmp_indices[::-1]) +
                                    list(pos_tmp_indices[::-1]))
-            elif stack_order == 'fixed':
+            elif stack_order == 'fixed_going_up':
                 indices = range(len(vals))
+            elif stack_order == 'fixed_going_down':
+                indices = range(len(vals))[::-1]
             else:
                 assert False, 'Error: unrecognized stack_order value %s.'%\
                               stack_order
@@ -136,7 +143,7 @@ class Logo:
             w = width
 
             # Initialize y
-            y = ymin
+            y = col_ymin
 
             for n, char in enumerate(ordered_chars):
 
@@ -160,6 +167,7 @@ class Logo:
                         .copy()
                     edgewidth = self.highlight_style['edgewidth']
                     boxedgewidth = self.highlight_style['boxedgewidth']
+                    zorder = self.highlight_style['zorder']
                 else:
                     facecolor = self.character_style['facecolors'][char].copy()
                     edgecolor = self.character_style['edgecolors'][char].copy()
@@ -168,6 +176,7 @@ class Logo:
                         .copy()
                     edgewidth = self.character_style['edgewidth']
                     boxedgewidth = self.character_style['boxedgewidth']
+                    zorder = self.character_style['zorder']
 
                 # Get flip and shade character accordingly
                 if val <= 0.0:
@@ -193,7 +202,7 @@ class Logo:
                 char_obj = character.Character(
                     c=char,
                     xmin=x,
-                    ymin=y+ysep/2,
+                    ymin=y+ysep/2.0,
                     width=w,
                     height=h-ysep,
                     flip=flip,
@@ -206,7 +215,8 @@ class Logo:
                     boxedgewidth=boxedgewidth,
                     hpad=hpad,
                     vpad=vpad,
-                    max_hstretch=max_hstretch)
+                    max_hstretch=max_hstretch,
+                    zorder=zorder)
 
                 # Store Character object
                 char_list.append(char_obj)
@@ -214,37 +224,41 @@ class Logo:
                 # Increment y
                 y += h
 
-        # Get ybox
-        ymin = min([c.bbox.ymin for c in char_list])
-        ymax = max([c.bbox.ymax for c in char_list])
-
         # Process fixed characters
-        if self.use_fixedchar:
-            for pos, char in self.fixedchar_dict.items():
+        if self.use_fullheight:
+            for pos, char in self.fullheight.items():
+
+                # Set patch style
+                facecolor = self.fullheight_style['facecolors'][char].copy()
+                edgecolor = self.fullheight_style['edgecolors'][char].copy()
+                boxcolor = self.fullheight_style['boxcolors'][char].copy()
+                boxedgecolor = self.fullheight_style['boxedgecolors'][char] \
+                    .copy()
+                edgewidth = self.fullheight_style['edgewidth']
+                boxedgewidth = self.fullheight_style['boxedgewidth']
+                zorder = self.fullheight_style['zorder']
+
+                # Set ysep
+                ysep = yspan * self.fullheight_style['vsep']
+                width = self.fullheight_style['width']
 
                 # This is the same for every character
-                y = ymin
-                h = ymax-ymin
+                y = ymin + ysep/2.0
+                h = yspan - ysep
+                if h < SMALL:
+                    continue
+
                 x = pos - width/2.0
                 w = width
 
-                # Set patch style
-                facecolor = self.fixedchar_style['facecolors'][char].copy()
-                edgecolor = self.fixedchar_style['edgecolors'][char].copy()
-                boxcolor = self.fixedchar_style['boxcolors'][char].copy()
-                boxedgecolor = self.fixedchar_style['boxedgecolors'][char] \
-                    .copy()
-                edgewidth = self.fixedchar_style['edgewidth']
-                boxedgewidth = self.fixedchar_style['boxedgewidth']
-
-
                 # Create Character object
+
                 char_obj = character.Character(
                     c=char,
                     xmin=x,
-                    ymin=y+ysep/2,
+                    ymin=y,
                     width=w,
-                    height=h - ysep,
+                    height=h,
                     flip=False,
                     font_properties=self.font_properties,
                     facecolor=facecolor,
@@ -256,14 +270,10 @@ class Logo:
                     hpad=hpad,
                     vpad=vpad,
                     max_hstretch=max_hstretch,
-                    zorder=20)
+                    zorder=zorder)
 
                 # Store Character object
                 char_list.append(char_obj)
-
-        # Get xbox
-        xmin = min([c.bbox.xmin for c in char_list])
-        xmax = max([c.bbox.xmax for c in char_list])
 
         bbox = Bbox([[xmin, ymin], [xmax, ymax]])
 
@@ -288,14 +298,14 @@ class Logo:
 
         # Draw baseline
         if self.axes_style['show_baseline']:
-            ax.axhline(0, zorder=10, **self.axes_style['baseline_dict'])
+            ax.axhline(0, **self.axes_style['baseline_dict'])
 
         # Style gridlines
         ax.grid(**self.axes_style['gridline_dict'])
 
         # Draw vlines
         for x in self.axes_style['vline_positions']:
-            ax.axvline(x, zorder=30, **self.axes_style['vline_dict'])
+            ax.axvline(x, **self.axes_style['vline_dict'])
 
         # Draw x-axis annotation
         if self.axes_style['xticks'] is not None:
@@ -340,13 +350,17 @@ class Logo:
         plt.draw()
 
         # Set xticklabels
+        xticks = np.array(ax.get_xticks()).astype(int)
+        if not self.axes_style['show_position_zero']:
+            indices = xticks >= 0
+            xticks[indices] = xticks[indices] + 1
+
         if self.axes_style['xticklabels'] is not None:
             xticklabels = self.axes_style['xticklabels']
         elif self.axes_style['xtick_format'] is not None:
-            xticklabels = [self.axes_style['xtick_format'] % x
-                           for x in ax.get_xticks()]
+            xticklabels = [self.axes_style['xtick_format'] % x for x in xticks]
         else:
-            xticklabels = ax.get_xticks()
+            xticklabels = xticks
         ax.set_xticklabels(xticklabels,
                            rotation=self.axes_style['xtick_rotation'],
                            font_properties=

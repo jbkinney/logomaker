@@ -21,7 +21,7 @@ meme_file (str, None): MEME file from which to load a motif and (optionally)
 meme_motifname (str, None): The name of the motif to be loaded from the MEME
     file used when meme_file is specified. Ignored if None is passed.
 
-meme_motifnum (int >= 1, None): The number of the motif to be loaded from the
+meme_motifnum (int > 0, None): The number of the motif to be loaded from the
     MEME file used when meme_file is specified. The first motif is
     specified by a value of 1. Ignored if None is passed.
 
@@ -145,7 +145,7 @@ save_to_file (str, None): If string, specifies the name of file that
 dpi (int): The resolution at which to save the logo image if writing
     to a non-vector format.
 
-max_positions_per_line (int): The maximum number of positions per line. If
+max_positions_per_line (int > 0): The maximum number of positions per line. If
     the number of positions within a matrix exceeds this number, the
     logo will be split over multiple lines. If figsize is None, a
     figure whose height is proportional to the number of lines will
@@ -154,11 +154,17 @@ max_positions_per_line (int): The maximum number of positions per line. If
 #######################################################################
 ### Position choice
 
-position_range ([float >= 0, float >= 0], None): Rows of matrix to use when
+position_range ([int >= 0, int >= 0], None): Rows of matrix to use when
     drawing logo. If None, all rows are used.
 
 shift_first_position_to (float): Position value to be assigned to the
     first row of matrix that is actually used.
+
+show_position_zero (bool): If False, no xticklabel 0 will be shown. Instead,
+    xticklabels for positions >= 0 are all increased by 1; the x-axis will
+    thus be labeled using ...-3, -2, -1, 1, 2, 3,... . This is because some
+    biological numbering convensions avoid the use of zero. This option only
+    affects xticklabels, not the positions listed in the matrix dataframe.
 
 #######################################################################
 ### Position choice
@@ -181,7 +187,7 @@ ignore_characters (str, None): Specifies the set of characters to not
 #######################################################################
 ### Logo character styling
 
-colors (color scheme):  Face color of logo characters. Default 'gray'.
+character_colors (color scheme):  Face color of logo characters. Default 'gray'.
     Here and in what follows a variable of type 'color' can
     take a variety of value types.
     - (str) A LogoMaker color scheme in which the color is determined
@@ -201,28 +207,34 @@ colors (color scheme):  Face color of logo characters. Default 'gray'.
          'G': 'y',
          'T': [ 1.,  0.,  0.,  0.5]}
 
-alpha (float in [0,1]): Opacity of logo character face color. Here and
-    in what follows, if the corresponding color is specified by an
+character_alpha (float in [0,1]): Opacity of logo character face color. Here
+    and in what follows, if the corresponding color is specified by an
     RGBA array, this alpha value will be multiplied by the 'A' value
     that array to yield the final alpha value.
 
-edgecolors (color scheme): Edge color of the logo characters.
+character_edgecolors (color scheme): Edge color of the logo characters.
 
-edgealpha (float in [0,1]): Opacity of character edge color.
+character_edgealpha (float in [0,1]): Opacity of character edge color.
 
-edgewidth (float >= 0): Width of character edges.
+character_edgewidth (float >= 0): Width of character edges.
 
-boxcolors (color scheme): Face color of the box containing each logo
+character_boxcolors (color scheme): Face color of the box containing each logo
     character.
 
-boxalpha (float in [0,1]): Opacity box face color.
+character_boxalpha (float in [0,1]): Opacity box face color.
 
-boxedgecolors (color scheme): Edge color of the box containing each
+character_boxedgecolors (color scheme): Edge color of the box containing each
     logo character.
 
-boxedgealpha (float in [0,1]): Opacity of box edge color.
+character_boxedgealpha (float in [0,1]): Opacity of box edge color.
 
-boxedgewidth (float >= 0): Width of box edges.
+character_boxedgewidth (float >= 0): Width of box edges.
+
+character_zorder (float >= 0): Determines whether characters and their bounding
+    boxes appear in front of or behind other features of the logo, such as
+    gridlines. The higher zorder is, the more in-front these characters
+    will be. Characters are always drawn immediately in front of their
+    bounding boxes.
 
 #######################################################################
 ### Highlighted logo character styling
@@ -258,38 +270,48 @@ highlight_boxedgealpha (float in [0,1], None): see boxedgealpha.
 
 highlight_boxedgewidth (float >= 0, None): See boxedgewidth.
 
+highlight_zorder (float): See zorder.
+
 #######################################################################
 ### Fixed character styling
 
-fixedchar_dict (dict, None): A dictitonary listing positions at which a
-    specific character always appears. For instance, {3:'G', 4:'U'} can
-    be used to specify that 'GU' always appears at positions 3 and 4 in
-    a 9nt splice site. Characters specified in this way will be drawn
-    the full height of the y-axis regardless of logo_type. In what follows,
-    each fixedchar_* parameter behaves behaves as the * parameter listed
-    above. Unlike highlight_* parameters described immediately above,
-    however, fixedchar_* parameters do not default to the values of the
+fullheight (dict, list, None): Either a dictionary or a list. If a dictionary
+    listing positions as keys and characters as values, such as {3:'G', 4:'U'}
+    those characters& bounding box will be drawn at those positions using the
+    full height of the y-axis. If a list specifying just positions is passed,
+    only a box the full height of the y-axis will be drawn at those positions.
+    In what follows, each fullheight_* parameter behaves behaves as the *
+    parameter listed above. Unlike highlight_* parameters described immediately
+    above, however, fullheight_* parameters do not default to the values of the
     corresponding * parameter if None is passed.
 
-fixedchar_colors (color scheme): See colors.
+fullheight_colors (color scheme): See colors.
 
-fixedchar_alpha (float in [0,1]): See alpha.
+fullheight_alpha (float in [0,1]): See alpha.
 
-fixedchar_edgecolors (color scheme): See edgecolors.
+fullheight_edgecolors (color scheme): See edgecolors.
 
-fixedchar_edgealpha (float in [0,1]): See edgealpha.
+fullheight_edgealpha (float in [0,1]): See edgealpha.
 
-fixedchar_edgewidth (float >= 0): See edge_width.
+fullheight_edgewidth (float >= 0): See edge_width.
 
-fixedchar_boxcolors (color scheme): See boxcolors.
+fullheight_boxcolors (color scheme): See boxcolors.
 
-fixedchar_boxalpha (float in [0,1]): See boxalpha.
+fullheight_boxalpha (float in [0,1]): See boxalpha.
 
-fixedchar_boxedgecolors (color scheme): See boxedgecolors.
+fullheight_boxedgecolors (color scheme): See boxedgecolors.
 
-fixedchar_boxedgealpha (float in [0,1]): see boxedgealpha.
+fullheight_boxedgealpha (float in [0,1]): see boxedgealpha.
 
-fixedchar_boxedgewidth (float >= 0): See boxedgewidth.
+fullheight_boxedgewidth (float >= 0): See boxedgewidth.
+
+fullheight_zorder (float): See zorder.
+
+fullheight_vsep (float >= 0): Overrides vsep when applied to fullheight
+    positions.
+
+fullheight_width (float >= 0): Overrides width when applied to fullheight
+    positions
 
 #######################################################################
 ### Logo character font
@@ -332,7 +354,8 @@ font_style (str, None): The logo character font style. Specifically,
 ### Character placement
 
 stack_order (str in set): Order in which to stack characters at the
-    same position. Either 'big_on_top', 'small_on_top', or 'fixed'.
+    same position. Can be 'big_on_top', 'small_on_top',
+    'fixed_going_up', 'fixed_going_down'.
 
 use_transparency (boolean): Option to render characters with an opacity
     proportional to character height.
@@ -458,6 +481,10 @@ baseline_style (str, list, None): If not None, specifies baseline line
     style. Is passed as the 'linestyle' argument to ax.axhline() if not
     None.
 
+baseline_zorder (float, None): Specifies how in-front baseline is drawn
+    relative to logo characters and other plotted objects. Larger values
+    correspond to more in-frontness.
+
 #######################################################################
 ### vlines formatting
 
@@ -481,6 +508,10 @@ vline_alpha (float in [0,1], None): If not None, specifies the
 vline_style (str, list, None): If not None, specifies vline line
     style. Is passed as the 'linestyle' argument to ax.axhline() if not
     None.
+
+vline_zorder (float, None): Specifies how in-front vlines are drawn relative
+    to logo characters and other plotted objects. Larger values correspond
+    to more in-frontness.
 
 #######################################################################
 ### x-axis formatting

@@ -75,10 +75,14 @@ LOGOMAKER_TYPES = {'counts', 'probability', 'enrichment', 'information'}
 
 # Names of parameters that can take on any float value
 params_with_float_values = {
-    'shift_first_position_to',
     'xtick_anchor',
     'xtick_rotation',
     'ytick_rotation',
+    'character_zorder',
+    'highlight_zorder',
+    'fullheight_zorder',
+    'baseline_zorder',
+    'vline_zorder'
 }
 
 # Names of numerical parameters that must be > 0
@@ -92,12 +96,12 @@ params_greater_than_0 = {
 params_greater_or_equal_to_0 = {
     'pseudocount',
     'counts_threshold',
-    'edgewidth',
-    'boxedgewidth',
+    'character_edgewidth',
+    'character_boxedgewidth',
     'highlight_edgewidth',
     'highlight_boxedgewidth',
-    'fixedchar_edgewidth',
-    'fixedchar_boxedgewidth',
+    'fullheight_edgewidth',
+    'fullheight_boxedgewidth',
     'max_alpha_val',
     'hpad',
     'vpad',
@@ -110,22 +114,24 @@ params_greater_or_equal_to_0 = {
 
 # Names of numerical parameters in the interval [0,1]
 params_between_0_and_1 = {
-    'alpha',
-    'edgealpha',
-    'boxalpha',
-    'boxedgealpha',
+    'character_alpha',
+    'character_edgealpha',
+    'character_boxalpha',
+    'character_boxedgealpha',
     'highlight_alpha',
     'highlight_edgealpha',
     'highlight_boxalpha',
     'highlight_boxedgealpha',
-    'fixedchar_alpha',
-    'fixedchar_edgealpha',
-    'fixedchar_boxalpha',
-    'fixedchar_boxedgealpha',
+    'fullheight_alpha',
+    'fullheight_edgealpha',
+    'fullheight_boxalpha',
+    'fullheight_boxedgealpha',
     'below_shade',
     'below_alpha',
     'width',
+    'fullheight_width',
     'vsep',
+    'fullheight_vsep',
     'gridline_alpha',
     'baseline_alpha',
 }
@@ -137,7 +143,8 @@ params_with_values_in_dict = {
     'enrichment_logbase': [2, np.e, 10],
     'information_units': ['bits', 'nats'],
     'sequence_type': ['dna', 'DNA', 'rna', 'RNA', 'protein', 'PROTEIN'],
-    'stack_order': ['big_on_top', 'small_on_top', 'fixed'],
+    'stack_order': ['big_on_top', 'small_on_top', 'fixed_going_up',
+                    'fixed_going_down'],
     'axes_type': ['classic', 'naked', 'everything', 'rails', 'vlines'],
     'gridline_axis': ['x', 'y', 'both'],
 }
@@ -157,6 +164,7 @@ params_with_boolean_values = {
     'top_spine',
     'bottom_spine',
     'use_tightlayout',
+    'show_position_zero',
 }
 
 # Names of parameters whose values are strings
@@ -190,18 +198,18 @@ params_that_are_ordered_arrays = {
 
 # Names of parameters that specify color schemes
 params_that_specify_colorschemes = {
-    'colors',
-    'edgecolors',
-    'boxcolors',
-    'boxedgecolors',
+    'character_colors',
+    'character_edgecolors',
+    'character_boxcolors',
+    'character_boxedgecolors',
     'highlight_colors',
     'highlight_edgecolors',
     'highlight_boxcolors',
     'highlight_boxedgecolors',
-    'fixedchar_colors',
-    'fixedchar_edgecolors',
-    'fixedchar_boxcolors',
-    'fixedchar_boxedgecolors',
+    'fullheight_colors',
+    'fullheight_edgecolors',
+    'fullheight_boxcolors',
+    'fullheight_boxedgecolors',
 }
 
 # Names of parameters that specify colors:
@@ -281,6 +289,7 @@ params_that_cant_be_none = {
     'rcparams',
     'xtick_anchor',
     'use_tightlayout',
+    'show_position_zero',
 }
 
 # Parameters that specify tick labels
@@ -306,13 +315,13 @@ params_that_specify_dicts = {
 
 # Names of parameters to leave for later validatation
 params_for_later_validation = {
-    'meme_motifnum',
     'background',
     'ct_col',
     'background_ctcol',
     'seq_col',
     'background_seqcol'
 }
+
 
 #
 # Primary validation function
@@ -356,23 +365,23 @@ def validate_parameter(name, user, default):
 
     # If value is float
     elif name in params_with_float_values:
-        value = _validate_float(name, user, default)
+        value = _validate_number(name, user, default)
 
     # If value is float > 0
     elif name in params_greater_than_0:
-        value = _validate_float(name, user, default,
-                                greater_than=0.0)
+        value = _validate_number(name, user, default,
+                                 greater_than=0.0)
 
     # If value is float >= 0
     elif name in params_greater_or_equal_to_0:
-        value = _validate_float(name, user, default,
-                                greater_than_or_equal_to=0.0)
+        value = _validate_number(name, user, default,
+                                 greater_than_or_equal_to=0.0)
 
     # If value is float in [0,1]
     elif name in params_between_0_and_1:
-        value = _validate_float(name, user, default,
-                                greater_than_or_equal_to=0.0,
-                                less_than_or_equal_to=1.0)
+        value = _validate_number(name, user, default,
+                                 greater_than_or_equal_to=0.0,
+                                 less_than_or_equal_to=1.0)
 
     # If value is an interval
     elif name in params_that_specify_intervals:
@@ -412,6 +421,15 @@ def validate_parameter(name, user, default):
     elif name in params_that_specify_dicts:
         value = _validate_dict(name, user, default)
 
+    # Special case: shift_first_position_to
+    elif name == 'shift_first_position_to':
+        value = _validate_number(name, user, default, is_int=True)
+
+    # Special case: max_positions_per_line
+    elif name in {'max_positions_per_line', 'meme_motifnum'}:
+        value = _validate_number(name, user, default, is_int=True,
+                                 greater_than=0)
+
     # Special case: iupac_string
     elif name == 'iupac_string':
         value = _validate_iupac(name, user, default)
@@ -428,9 +446,11 @@ def validate_parameter(name, user, default):
     elif name == 'vline_positions':
         value = _validate_array(name, user, default)
 
-    # Special case: fixedchar_dict
-    elif name == 'fixedchar_dict':
-        value = _validate_fixedchar_dict(name, user, default)
+    # Special case: fullheight
+    elif name == 'fullheight':
+
+        # Verify is a dictionary
+        value = _validate_fullheight(name, user, default)
 
     # Parameters left for validation later on
     elif name in params_for_later_validation:
@@ -448,23 +468,30 @@ def validate_parameter(name, user, default):
 #
 
 
-def _validate_float(name,
-                    user,
-                    default,
-                    greater_than=-np.Inf,
-                    greater_than_or_equal_to=-np.Inf,
-                    less_than=np.Inf,
-                    less_than_or_equal_to=np.Inf,
-                    in_set=None):
+def _validate_number(name,
+                     user,
+                     default,
+                     is_int=False,
+                     greater_than=-np.Inf,
+                     greater_than_or_equal_to=-np.Inf,
+                     less_than=np.Inf,
+                     less_than_or_equal_to=np.Inf,
+                     in_set=None):
     """ Validates a floating point parameter. """
 
     # Test whether parameter can be interpreted as a float
     try:
-        value = float(user)
+        # If converting to int
+        if is_int:
+            value = int(user)
+
+        # Otherwise, if converting to float
+        else:
+            value = float(user)
 
     except (ValueError, TypeError):
         value = default
-        message = "Cannot interpret value %s for parameter '%s' as float. " +\
+        message = "Cannot interpret value %s for parameter '%s' as number. " +\
                   "Using default value %s instead."
         message = message % (repr(user), name, repr(default))
         warnings.warn(message, UserWarning)
@@ -674,21 +701,28 @@ def _validate_filename(name, user, default):
     return value
 
 
-def _validate_fixedchar_dict(name, user, default):
-    """ Validates a string parameter. """
+def _validate_fullheight(name, user, default):
+    """ Validates a fullheight specificaiton, which can be either
+     a dictionary or an array/list. """
 
-    # Test whether parameter can be interpreted as a string
     try:
+
+        # Test whether parameter can be interpreted as a string
         if isinstance(user, basestring):
             user = ast.literal_eval(user)
 
-        assert isinstance(user, dict)
-        for key, val in user.items():
-            assert isinstance(key, numbers.Number)
-            assert np.isfinite(key)
-            assert isinstance(val, basestring)
-            assert len(val)==1
-        value = user
+        # If dictionary
+        if isinstance(user, dict):
+            for key, val in user.items():
+                user[key] = int(val)
+            value = user
+
+        # If list
+        elif isinstance(user, (list, np.array)):
+            value = np.array(user).astype(int)
+
+        else:
+            value = default
 
     # If user value is not valid, set to default and issue warning
     except (AssertionError, ValueError):

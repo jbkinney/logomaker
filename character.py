@@ -135,17 +135,13 @@ def put_char_in_box(ax,
         .translate(tx=bbox.xmin+char_shift, ty=bbox.ymin)
     char_path = transformation.transform_path(tmp_path)
 
-    # Compute z-orders
-    box_zorder = -3 if zorder is None else zorder
-    char_zorder = 3 if zorder is None else zorder
-
     # Compute patch for box containing character
     box_patch = Rectangle((bbox.xmin, bbox.ymin),
                           bbox.width, bbox.height,
                           facecolor=boxcolor,
                           edgecolor=boxedgecolor,
                           linewidth=boxedgewidth,
-                          zorder=box_zorder)
+                          zorder=zorder)
     ax.add_patch(box_patch)
 
     # Compute character patch
@@ -153,7 +149,7 @@ def put_char_in_box(ax,
                            facecolor=facecolor,
                            edgecolor=edgecolor,
                            linewidth=linewidth,
-                           zorder=char_zorder)
+                           zorder=zorder)
     ax.add_patch(char_patch)
 
     # Return patches to user

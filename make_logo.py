@@ -66,6 +66,7 @@ def make_logo(matrix=None,
               # Position choice
               position_range=None,
               shift_first_position_to=None,
+              show_position_zero=True,
 
               # Character choice
               sequence_type=None,
@@ -73,16 +74,17 @@ def make_logo(matrix=None,
               ignore_characters='.-',
 
               # Character formatting
-              colors='dodgerblue',
-              alpha=1,
-              edgecolors='black',
-              edgealpha=1,
-              edgewidth=0,
-              boxcolors='white',
-              boxedgecolors='black',
-              boxedgewidth=0,
-              boxalpha=0,
-              boxedgealpha=0,
+              character_colors='dodgerblue',
+              character_alpha=1,
+              character_edgecolors='black',
+              character_edgealpha=1,
+              character_edgewidth=0,
+              character_boxcolors='white',
+              character_boxedgecolors='black',
+              character_boxedgewidth=0,
+              character_boxalpha=0,
+              character_boxedgealpha=0,
+              character_zorder=3,
 
               # Highlighted character formatting
               highlight_sequence=None,
@@ -96,19 +98,23 @@ def make_logo(matrix=None,
               highlight_boxedgecolors=None,
               highlight_boxedgewidth=None,
               highlight_boxedgealpha=None,
+              highlight_zorder=None,
 
-              # Fixed character formatting
-              fixedchar_dict={},
-              fixedchar_colors='silver',
-              fixedchar_alpha=1,
-              fixedchar_edgecolors='black',
-              fixedchar_edgewidth=0,
-              fixedchar_edgealpha=1,
-              fixedchar_boxcolors='white',
-              fixedchar_boxalpha=0,
-              fixedchar_boxedgecolors='black',
-              fixedchar_boxedgewidth=0,
-              fixedchar_boxedgealpha=1,
+              # Full height formatting
+              fullheight=None,
+              fullheight_colors=None,
+              fullheight_alpha=None,
+              fullheight_edgecolors=None,
+              fullheight_edgewidth=None,
+              fullheight_edgealpha=None,
+              fullheight_boxcolors=None,
+              fullheight_boxalpha=None,
+              fullheight_boxedgecolors=None,
+              fullheight_boxedgewidth=None,
+              fullheight_boxedgealpha=None,
+              fullheight_zorder=None,
+              fullheight_vsep=None,
+              fullheight_width=None,
 
               # Character font
               font_properties=None,
@@ -150,6 +156,7 @@ def make_logo(matrix=None,
               baseline_color=None,
               baseline_alpha=None,
               baseline_style=None,
+              baseline_zorder=None,
 
               # vlines formatting
               vline_positions=(),
@@ -157,6 +164,7 @@ def make_logo(matrix=None,
               vline_color=None,
               vline_alpha=None,
               vline_style=None,
+              vline_zorder=None,
 
               # x-axis formatting
               xlim=None,
@@ -537,20 +545,22 @@ def make_logo(matrix=None,
     # character_style
 
     character_style = {
-        'facecolors': color.get_color_dict(color_scheme=colors,
+        'facecolors': color.get_color_dict(color_scheme=character_colors,
                                            chars=characters,
-                                           alpha=alpha),
-        'edgecolors': color.get_color_dict(color_scheme=edgecolors,
+                                           alpha=character_alpha),
+        'edgecolors': color.get_color_dict(color_scheme=character_edgecolors,
                                            chars=characters,
-                                           alpha=edgealpha),
-        'boxcolors': color.get_color_dict(color_scheme=boxcolors,
+                                           alpha=character_edgealpha),
+        'boxcolors': color.get_color_dict(color_scheme=character_boxcolors,
                                           chars=characters,
-                                          alpha=boxalpha),
-        'boxedgecolors': color.get_color_dict(color_scheme=boxedgecolors,
-                                              chars=characters,
-                                              alpha=boxedgealpha),
-        'edgewidth': edgewidth,
-        'boxedgewidth': boxedgewidth,
+                                          alpha=character_boxalpha),
+        'boxedgecolors': color.get_color_dict(
+                                        color_scheme=character_boxedgecolors,
+                                        chars=characters,
+                                        alpha=character_boxedgealpha),
+        'edgewidth': character_edgewidth,
+        'boxedgewidth': character_boxedgewidth,
+        'zorder': character_zorder,
     }
 
     ######################################################################
@@ -559,34 +569,37 @@ def make_logo(matrix=None,
     # Set higlighted character format
     highlight_colors = highlight_colors \
         if highlight_colors is not None \
-        else colors
+        else character_colors
     highlight_alpha = float(highlight_alpha) \
         if highlight_alpha is not None \
-        else alpha
+        else character_alpha
     highlight_edgecolors = highlight_edgecolors \
         if highlight_edgecolors is not None \
-        else edgecolors
+        else character_edgecolors
     highlight_edgewidth = highlight_edgewidth \
         if highlight_edgewidth is not None \
-        else edgewidth
+        else character_edgewidth
     highlight_edgealpha = float(highlight_edgealpha) \
         if highlight_edgealpha is not None \
-        else edgealpha
+        else character_edgealpha
     highlight_boxcolors = highlight_boxcolors \
         if highlight_boxcolors is not None \
-        else boxcolors
+        else character_boxcolors
     highlight_boxalpha = float(highlight_boxalpha) \
         if highlight_boxalpha is not None \
-        else boxalpha
+        else character_boxalpha
     highlight_boxedgecolors = highlight_boxedgecolors \
         if highlight_boxedgecolors is not None \
-        else boxedgecolors
+        else character_boxedgecolors
     highlight_boxedgewidth = highlight_boxedgewidth \
         if highlight_boxedgewidth is not None \
-        else boxedgewidth
+        else character_boxedgewidth
     highlight_boxedgealpha = highlight_boxedgealpha \
         if highlight_boxedgealpha is not None \
-        else boxedgealpha
+        else character_boxedgealpha
+    highlight_zorder = highlight_zorder \
+        if highlight_zorder is not None \
+        else character_zorder
 
     highlight_style = {
         'facecolors': color.get_color_dict(color_scheme=highlight_colors,
@@ -604,28 +617,94 @@ def make_logo(matrix=None,
                                           alpha=highlight_boxedgealpha),
         'edgewidth': highlight_edgewidth,
         'boxedgewidth': highlight_boxedgewidth,
+        'zorder': highlight_zorder,
     }
 
     ######################################################################
-    # fixedchar_style
+    # fullheight_style
 
-    fixed_characters = set(fixedchar_dict.values())
-    fixedchar_style = {
-        'facecolors': color.get_color_dict(color_scheme=fixedchar_colors,
-                                           chars=fixed_characters,
-                                           alpha=fixedchar_alpha),
-        'edgecolors': color.get_color_dict(color_scheme=fixedchar_edgecolors,
-                                           chars=fixed_characters,
-                                           alpha=fixedchar_edgealpha),
-        'boxcolors': color.get_color_dict(color_scheme=fixedchar_boxcolors,
-                                          chars=fixed_characters,
-                                          alpha=fixedchar_boxalpha),
+    # If a list is passed, make characters transparent
+    if isinstance(fullheight, np.ndarray):
+        # Force characters to be transparent, since these are dummy
+        # characters anyway
+        fullheight_alpha = 0
+
+        # Have box transparency default to 1, since that is all there
+        # is to see
+        if fullheight_boxalpha is None:
+            fullheight_boxalpha = 1
+
+        # Create dictionary with dummy characters
+        keys = list(fullheight)
+        vals = ['A']*len(fullheight)
+        fullheight = dict(zip(keys, vals))
+
+    # If None, default to empty dictionary
+    elif fullheight is None:
+        fullheight = {}
+
+    fullheight_characters = set(fullheight.values())
+
+    # Set fullheight character format
+    fullheight_colors = fullheight_colors \
+        if fullheight_colors is not None \
+        else character_colors
+    fullheight_alpha = float(fullheight_alpha) \
+        if fullheight_alpha is not None \
+        else character_alpha
+    fullheight_edgecolors = fullheight_edgecolors \
+        if fullheight_edgecolors is not None \
+        else character_edgecolors
+    fullheight_edgewidth = fullheight_edgewidth \
+        if fullheight_edgewidth is not None \
+        else character_edgewidth
+    fullheight_edgealpha = float(fullheight_edgealpha) \
+        if fullheight_edgealpha is not None \
+        else character_edgealpha
+    fullheight_boxcolors = fullheight_boxcolors \
+        if fullheight_boxcolors is not None \
+        else character_boxcolors
+    fullheight_boxalpha = float(fullheight_boxalpha) \
+        if fullheight_boxalpha is not None \
+        else character_boxalpha
+    fullheight_boxedgecolors = fullheight_boxedgecolors \
+        if fullheight_boxedgecolors is not None \
+        else character_boxedgecolors
+    fullheight_boxedgewidth = fullheight_boxedgewidth \
+        if fullheight_boxedgewidth is not None \
+        else character_boxedgewidth
+    fullheight_boxedgealpha = fullheight_boxedgealpha \
+        if fullheight_boxedgealpha is not None \
+        else character_boxedgealpha
+    fullheight_zorder = fullheight_zorder \
+        if fullheight_zorder is not None \
+        else character_zorder
+    fullheight_vsep = fullheight_vsep \
+        if fullheight_vsep is not None \
+        else vsep
+    fullheight_width = fullheight_width \
+        if fullheight_width is not None \
+        else width
+
+    fullheight_style = {
+        'facecolors': color.get_color_dict(color_scheme=fullheight_colors,
+                                           chars=fullheight_characters,
+                                           alpha=fullheight_alpha),
+        'edgecolors': color.get_color_dict(color_scheme=fullheight_edgecolors,
+                                           chars=fullheight_characters,
+                                           alpha=fullheight_edgealpha),
+        'boxcolors': color.get_color_dict(color_scheme=fullheight_boxcolors,
+                                          chars=fullheight_characters,
+                                          alpha=fullheight_boxalpha),
         'boxedgecolors': color.get_color_dict(
-                                          color_scheme=fixedchar_boxedgecolors,
-                                          chars=fixed_characters,
-                                          alpha=fixedchar_boxedgealpha),
-        'edgewidth': fixedchar_edgewidth,
-        'boxedgewidth': fixedchar_boxedgewidth,
+                                        color_scheme=fullheight_boxedgecolors,
+                                        chars=fullheight_characters,
+                                        alpha=fullheight_boxedgealpha),
+        'edgewidth': fullheight_edgewidth,
+        'boxedgewidth': fullheight_boxedgewidth,
+        'zorder': fullheight_zorder,
+        'vsep': fullheight_vsep,
+        'width': fullheight_width
     }
 
     ######################################################################
@@ -894,6 +973,8 @@ def make_logo(matrix=None,
         baseline_width = mpl.rcParams['axes.linewidth']
     if baseline_style is None:
         baseline_style = '-'
+    if baseline_zorder is None:
+        baseline_zorder = 10
 
     # Baseline styling
     baseline_dict = {
@@ -901,6 +982,7 @@ def make_logo(matrix=None,
         'alpha': baseline_alpha,
         'linewidth': baseline_width,
         'linestyle': baseline_style,
+        'zorder': baseline_zorder
     }
 
     # Set vlines defaults
@@ -912,6 +994,8 @@ def make_logo(matrix=None,
         vline_width = mpl.rcParams['axes.linewidth']
     if vline_style is None:
         vline_style = '-'
+    if vline_zorder is None:
+        vline_zorder = 30
 
     # vlines styling
     vline_dict = {
@@ -919,10 +1003,12 @@ def make_logo(matrix=None,
         'alpha': vline_alpha,
         'linewidth': vline_width,
         'linestyle': vline_style,
+        'zorder': vline_zorder
     }
 
     # Set axes_style dictionary
     axes_style = {
+        'show_position_zero': show_position_zero,
         'show_binary_yaxis': show_binary_yaxis,
         'show_baseline': show_baseline,
         'baseline_dict': baseline_dict,
@@ -960,11 +1046,11 @@ def make_logo(matrix=None,
     # Create Logo instance
     logo = Logo(matrix=matrix,
                 highlight_sequence=highlight_sequence,
-                fixedchar_dict=fixedchar_dict,
+                fullheight=fullheight,
                 font_properties=font_properties,
                 character_style=character_style,
                 highlight_style=highlight_style,
-                fixedchar_style=fixedchar_style,
+                fullheight_style=fullheight_style,
                 placement_style=placement_style,
                 axes_style=axes_style)
 
