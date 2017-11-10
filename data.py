@@ -224,6 +224,16 @@ def set_bg_mat(background, matrix):
     return new_bg_mat
 
 
+def load_matrix(csv_file, csv_kwargs={}):
+    """ Loads a matrix from a csv file """
+
+    # Make sure that a file name is specified
+    assert csv_file is not None, 'Error: csv_file is not specified.'
+    matrix = pd.read_csv(csv_file, **csv_kwargs)
+    matrix = validate_mat(matrix)
+    return matrix
+
+
 def load_alignment(fasta_file=None,
                    csv_file=None,
                    seq_col=None,
@@ -254,6 +264,7 @@ def load_alignment(fasta_file=None,
 
         # Load csv file as a dataframe
         df = pd.read_csv(csv_file, **csv_kwargs)
+        df = df.fillna(csv_fillna)
 
         # Make sure that seq_col is in df
         assert seq_col in df.columns, \
@@ -361,16 +372,22 @@ def filter_columns(matrix,
         warnings.warn(message, UserWarning)
         translation_dict = {}
 
-    # Remove any characters to ignore
-    new_matrix = matrix.copy()
+    # Copy matrix as a precaution
+    # The resulting copy will undergo a number of modifications
+    matrix = matrix.copy()
+
+    # Get current list of columns
+    cols = list(matrix.columns)
+
+    # Remove any columns to ignore
     for char in ignore_characters:
-        if char in new_matrix.columns:
-            del new_matrix[char]
+        if char in cols:
+            del matrix[char]
 
     # If manually restricting to specific characters, do it:
     if characters is not None:
         new_columns = [c for c in characters if c in matrix.columns]
-        new_matrix = matrix.loc[:, new_columns]
+        matrix = matrix.loc[:, new_columns]
 
     # Otherwise performing translation, do it
     elif len(translation_dict) > 0:
@@ -378,32 +395,37 @@ def filter_columns(matrix,
         # Union of keys and values.
         allowed_chars = set(translation_dict.values()) | \
                         set(translation_dict.keys())
-        invalid_chars = set(new_matrix.columns) - allowed_chars
-        assert len(invalid_chars)==0, \
-            'Matrix contains invalid characters %s ' % \
-            repr(list(invalid_chars)) + \
-            ' for sequence_type %s ' % sequence_type
+        invalid_chars = list(set(matrix.columns) - allowed_chars)
+        invalid_chars.sort()
+
+        # assert len(invalid_chars)==0, \
+        #     'Matrix contains invalid characters %s ' % \
+        #     repr(list(invalid_chars)) + \
+        #     ' for sequence_type %s ' % sequence_type
+
+        # Remove invalid characters, giving a warning while doing so
+        matrix.drop(invalid_chars, axis=1, inplace=True)
+        message = ("Invalid matrix columns %s for sequence_type %s." +
+                   " These columns have been removed.") %\
+                  (repr(invalid_chars), sequence_type)
+        warnings.warn(message, UserWarning)
 
         # Rename columns
-        new_matrix = matrix.rename(columns=translation_dict)
+        matrix = matrix.rename(columns=translation_dict)
 
         # Collapse columns with same name
-        new_matrix = new_matrix.groupby(new_matrix.columns, axis=1).sum()
+        matrix = matrix.groupby(matrix.columns, axis=1).sum()
 
         # Order columns alphabetically
-        new_columns = list(new_matrix.columns)
+        new_columns = list(matrix.columns)
         new_columns.sort()
-        new_matrix = new_matrix.loc[:, new_columns]
-
-    # Otherwise, just copy matrix
-    else:
-        new_matrix = matrix.copy()
+        matrix = matrix.loc[:, new_columns]
 
 
     # Validate new matrix
-    new_matrix = validate_mat(new_matrix)
+    matrix = validate_mat(matrix)
 
-    return new_matrix
+    return matrix
 
 
 def iupac_to_probability_mat(iupac):

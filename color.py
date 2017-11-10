@@ -3,12 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgb
 import warnings
+import pdb
 
 # Create facecolor scheme dict
 three_zeros = np.zeros(3)
 three_ones = np.ones(3)
 color_scheme_dict = {
-
     'classic': {
         'G': [1, .65, 0],
         'TU': [1, 0, 0],
@@ -46,7 +46,16 @@ color_scheme_dict = {
         'KRH': [0, 0, 1],
         'DE': [1, 0, 0],
         'GSTYCQNAVLIPWFM': [.5, .5, .5]
-    }
+    },
+
+    'NajafabadiEtAl2017': {
+        'DEC': [.42, .16, .42],
+        'PG': [.47, .47, 0.0],
+        'MIWALFV': [.13, .35, .61],
+        'NTSQ': [.25, .73, .28],
+        'RK': [.74, .18, .12],
+        'HY': [.09, .47, .46],
+    },
 }
 
 def restrict_dict(in_dict, keys_to_keep):
@@ -98,8 +107,6 @@ def get_color_dict(color_scheme, chars, alpha, shuffle_colors=False):
     # If a predefined facecolor scheme
     elif type(color_scheme) == dict:
         color_dict = expand_color_dict(color_scheme)
-        for char in chars:
-            assert char in color_dict
 
     # If a string
     elif type(color_scheme) == str:

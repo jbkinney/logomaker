@@ -84,6 +84,25 @@ class Logo:
         ymin = (values * neg_mask).sum(axis=1).min()
         yspan = ymax-ymin
 
+        # Set ysep
+        ysep = yspan * self.placement_style['vsep']
+
+        # Recalibrate if not showing empty boxes
+        if self.placement_style['remove_flattened_characters']:
+            pos_mask = (values > ysep).astype(float)
+            neg_mask = (values < -ysep).astype(float)
+            ymax = (values * pos_mask).sum(axis=1).max()
+            ymin = (values * neg_mask).sum(axis=1).min()
+            yspan = ymax-ymin
+
+        # If ylim was manually specified, override all that
+        if self.axes_style['ylim'] is not None:
+            ylim = self.axes_style['ylim']
+            ymin = ylim[0]
+            ymax = ylim[1]
+            yspan = ymax-ymin
+            ysep = yspan * self.placement_style['vsep']
+
         # Compute hstretch values for all characters
         width = self.placement_style['width']
         hpad = self.placement_style['hpad']
@@ -114,10 +133,11 @@ class Logo:
         for i, pos in enumerate(self.poss):
 
             vals = self.df.iloc[i, :].values
-            col_ymin = vals[vals < 0].sum()
 
-            # Set ysep
-            ysep = yspan * self.placement_style['vsep']
+            if not self.placement_style['remove_flattened_characters']:
+                col_ymin = vals[vals < 0].sum()
+            else:
+                col_ymin = vals[vals < -ysep].sum()
 
             # Reorder columns
             stack_order = self.placement_style['stack_order']
@@ -155,7 +175,8 @@ class Logo:
 
                 # Make sure character has finite height
                 if h - ysep < SMALL:
-                    y += h
+                    if not self.placement_style['remove_flattened_characters']:
+                        y += h
                     continue
 
                 # Get facecolor, edgecolor, and edgewidth
@@ -223,6 +244,13 @@ class Logo:
 
                 # Increment y
                 y += h
+
+        # Set ylims for full-height characters
+        if self.axes_style['ylim'] is not None:
+            ylim = self.axes_style['ylim']
+            ymin = ylim[0]
+            ymax = ylim[1]
+            yspan = ymax-ymin
 
         # Process fixed characters
         if self.use_fullheight:

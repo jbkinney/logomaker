@@ -140,6 +140,7 @@ params_between_0_and_1 = {
 params_with_values_in_dict = {
     'matrix_type': LOGOMAKER_TYPES,
     'logo_type': LOGOMAKER_TYPES,
+    'background_mattype': ['counts', 'probability'],
     'enrichment_logbase': [2, np.e, 10],
     'information_units': ['bits', 'nats'],
     'sequence_type': ['dna', 'DNA', 'rna', 'RNA', 'protein', 'PROTEIN'],
@@ -165,6 +166,10 @@ params_with_boolean_values = {
     'bottom_spine',
     'use_tightlayout',
     'show_position_zero',
+    'remove_flattened_characters',
+    'csv_delim_whitespace',
+    'highlight_bgconsensus',
+    'negate_matrix',
 }
 
 # Names of parameters whose values are strings
@@ -181,6 +186,7 @@ params_with_string_values = {
     'ytick_format',
     'ylabel',
     'title',
+    'csv_delimiter',
 }
 
 # Names of parameters whose values specify a numerical interval
@@ -264,7 +270,6 @@ params_that_cant_be_none = {
     'enrichment_logbase',
     'enrichment_centering',
     'information_units',
-    'counts_threshold',
     'draw_now',
     'colors',
     'alpha',
@@ -290,6 +295,8 @@ params_that_cant_be_none = {
     'xtick_anchor',
     'use_tightlayout',
     'show_position_zero',
+    'highlight_bgconsensus',
+    'negate_matrix'
 }
 
 # Parameters that specify tick labels
@@ -302,8 +309,10 @@ params_that_specify_ticklabels = {
 params_that_specify_filenames = {
     'fasta_file',
     'meme_file',
-    'csv_file',
-    'background_csvfile'
+    'sequences_csvfile',
+    'background_seqcsvfile',
+    'matrix_csvfile',
+    'background_matcsvfile'
 }
 
 # Parameters that specify dictionaries
@@ -319,7 +328,10 @@ params_for_later_validation = {
     'ct_col',
     'background_ctcol',
     'seq_col',
-    'background_seqcol'
+    'background_seqcol',
+    'csv_index_col',
+    'csv_header',
+    'csv_usecols',
 }
 
 
@@ -775,7 +787,7 @@ def _validate_colorscheme(name, user, default):
         'color.color_scheme_dict[user]',
         'plt.get_cmap(user)',
         'to_rgb(user)',
-        'expand_color_dict(user)'
+        'color.expand_color_dict(user)'
     ]
 
     # Test lines of code
@@ -929,8 +941,15 @@ def validate_mat(matrix):
     # Copy and preserve logomaker_type
     matrix = matrix.copy()
 
+    # Replace NaN matrix values with zero.
+    if np.isnan(matrix.values).any():
+        message = \
+            "Some matrix values are NaN. These are being replaced by 0.0."
+        warnings.warn(message, UserWarning)
+        matrix.fillna(0.0, inplace=True)
+
     assert type(matrix) == pd.core.frame.DataFrame, 'Error: df is not a dataframe'
-    cols = matrix.columns
+
 
     # Make sure the matrix has a finite number of rows and columns
     assert matrix.shape[0] >= 1, 'Error: matrix has zero rows.'
@@ -940,9 +959,20 @@ def validate_mat(matrix):
     assert np.isfinite(matrix.values).all(), \
         'Error: not all matrix elements are well-defined, finite numbers.'
 
+    # Remove columns whose names aren't strings exactly 1 character long.
+    # Warn user when doing so
+    cols = matrix.columns
+    for col in cols:
+        if not isinstance(col, basestring) or (len(col) != 1):
+            del matrix[col]
+            message = ('Matrix has invalid column name "%s". This column ' +
+                       'has been removed.') % col
+            warnings.warn(message, UserWarning)
+
+    cols = matrix.columns
     for i, col_name in enumerate(cols):
         # Ok to have a 'pos' column
-        if col_name=='pos':
+        if col_name == 'pos':
             continue
 
         # Convert column name to simple string if possible

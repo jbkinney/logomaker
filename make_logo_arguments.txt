@@ -31,9 +31,9 @@ iupac_string (str, None): A string specifying a motif in IUPAC format. The
     with this parameter to transform the characters to 'dna', 'RNA',
     or 'rna.' Ignored if None is passed.
 
-csv_file (str, None): Name of file containing sequence and (optionally)
-    sequence counts in column-separated value format. Ignored if None
-    is passed.
+sequences_csvfile (str, None): Name of file containing sequence and
+    (optionally) sequence counts in column-separated value format. Ignored
+    if None is passed.
 
 seq_col (literal, None): If csv_file is specified, this specifies the name
     of the column that lists sequences. Must be passed if csv_file is
@@ -44,14 +44,35 @@ ct_col (literal, None): If csv_file is specified, this specifies the name
     csv_file is specified and this is not, a count of 1 will be assumed
     for each listed sequence. Ignored if None is passed.
 
+matrix_csvfile (str, None): Name of file containing matrix values in
+    CSV format. Ignored if None is passed.
+
+csv_index_col (literal, None): Name of column to user for matrix positions.
+    If None, the default value for pandas.read_csv(index_col=) is used.
+
+csv_delim_whitespace (bool, None): Whether to interpret whitespace as the
+    csv delimiter. If None, the default value for
+    pandas.read_csv(delim_whitespace=) is used.
+
+csv_delimiter (bool, None): The delimiter character to use when parsing
+    CSV files. If None, the default value for pandas.read_csv(delimneter=)
+    is used.
+
+csv_header (literal, None): Row to use as header when parsing CSV file.
+    If None, the default value for pandas.read_csv(header=) is used.
+
+csv_usecols (literal, None): Columns to use when parsing CSV file. If None,
+    the default value for pandas.read_csv(use_cols=) is used
+
 csv_kwargs (dict): If csv_file is specified, this dictionary contains the
     keyword arguments to be passed to pandas.read_csv. For example, if
     the csv file uses whitespace to separate columns, one might pass
     csv_kwargs={'delim_whitespace':True}.
 
-background_csvfile (str, None): Name of file containing background
+background_seqcsvfile (str, None): Name of file containing background
     sequences and (optionally) background sequence counts in
-    column-separated value format. Defaults to csv_file if None is passed.
+    column-separated value format. Defaults to sequences_csvfile if None
+    is passed.
 
 background_seqcol (literal, None): If csv_file or background_csvfile
     is specified, this specifies the name of the column that lists
@@ -66,6 +87,13 @@ background_csvkwargs (dict): If csv_file or background_csvfile is
     passed to pandas.read_csv. For example, if the csv file uses whitespace
     to separate columns, one might pass csv_kwargs={'delim_whitespace':True}.
     Defaults to csv_kwargs if None is passed.
+
+background_matcsvfile (str, None): Name of file containing background matrix
+    in CSV format. This matrix must be of type 'counts' or 'probability',
+    which is specified by the background_mattype parameter.
+
+background_mattype (str): Type of background matrix loaded from
+    background_matcsvfile. Must  be 'counts' or 'probability'.
 
 matrix_type (str in set, None): Type of data passed in matrix. If str,
     value must be in {'counts','probability', 'enrichment',
@@ -122,9 +150,14 @@ enrichment_centering (bool): If True, log enrichment values at each
 information_units (str in set): Units to use when computing information
     logos. Values must be in {'bits', 'nats'}.
 
-counts_threshold (float >= 0): The total number of sequences in an
+counts_threshold (float >= 0, None): The total number of sequences in an
     alignment that must have a non-deletion character for that position
     to be included in the resulting counts matrix and derived matrices.
+    If this is not None, positions with counts falling below this threshold
+    will be removed from the matrix. Regardless of whether any positions are
+    removed, matrix positions will be renumbered starting from zero.
+
+negate_matrix (bool): If true, all matrix values are multiplied by -1.
 
 #######################################################################
 ### Immediate drawing
@@ -249,6 +282,9 @@ highlight_sequence (str, None): Sequence to highlight within the logo.
     characters. Each parameter can also be None, and in fact is None
     by default. Each highlight_* parameter, when None is passed,
     defaults to the value provided in the corresponding * parameter.
+
+highlight_bgconsensus (bool): If True, the consensus sequence of the background
+    probability matrix is used as highlight_sequence.
 
 highlight_colors (color scheme, None): See colors.
 
@@ -410,6 +446,10 @@ max_stretched_character (str length 1, None): If a character is
     characters like 'W' and 'A' to be stretched to fill the avaliable
     width while preventing naturally narrow characters like 'I' from
     being stretched an absurdly large amount.
+
+remove_flattened_characters (bool): If vsep is set, some characters will be
+    shrunk to size zero. This parameter determines whether or not
+    these flattended characters will contribute to the height of a stack.
 
 #######################################################################
 ### Axes formatting

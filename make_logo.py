@@ -4,8 +4,9 @@ import inspect
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 import matplotlib as mpl
-from validate import validate_parameter, validate_mat
-from data import load_alignment, iupac_to_probability_mat, \
+from validate import validate_parameter, validate_mat, \
+    params_that_specify_colorschemes
+from data import load_alignment, load_matrix, iupac_to_probability_mat, \
     counts_mat_to_probability_mat
 from Logo import Logo
 import data
@@ -36,15 +37,27 @@ def make_logo(matrix=None,
               # IUPAC processing
               iupac_string=None,
 
-              # CSV file processing
-              csv_file=None,
+              # CSV sequences file processing
+              sequences_csvfile=None,
               seq_col=None,
               ct_col=None,
-              csv_kwargs={},
-              background_csvfile=None,
+              background_seqcsvfile=None,
               background_seqcol=None,
               background_ctcol=None,
               background_csvkwargs=None,
+
+              # CSV matrix file processing
+              matrix_csvfile=None,
+              background_matcsvfile=None,
+              background_mattype='probability',
+
+              # General CSV file processing
+              csv_index_col=None,
+              csv_delim_whitespace=None,
+              csv_delimiter=None,
+              csv_header=None,
+              csv_usecols=None,
+              csv_kwargs={},
 
               # Matrix transformation (make_logo only)
               matrix_type=None,
@@ -54,7 +67,8 @@ def make_logo(matrix=None,
               enrichment_logbase=2,
               enrichment_centering=True,
               information_units='bits',
-              counts_threshold=0,
+              counts_threshold=None,
+              negate_matrix=False,
 
               # Immediate drawing (make_logo only)
               figsize=None,
@@ -74,20 +88,21 @@ def make_logo(matrix=None,
               ignore_characters='.-',
 
               # Character formatting
-              character_colors='dodgerblue',
-              character_alpha=1,
-              character_edgecolors='black',
-              character_edgealpha=1,
-              character_edgewidth=0,
-              character_boxcolors='white',
-              character_boxedgecolors='black',
-              character_boxedgewidth=0,
-              character_boxalpha=0,
-              character_boxedgealpha=0,
+              character_colors='random',
+              character_alpha=None,
+              character_edgecolors=None,
+              character_edgealpha=None,
+              character_edgewidth=1,
+              character_boxcolors=None,
+              character_boxedgecolors=None,
+              character_boxedgewidth=1,
+              character_boxalpha=None,
+              character_boxedgealpha=None,
               character_zorder=3,
 
               # Highlighted character formatting
               highlight_sequence=None,
+              highlight_bgconsensus=False,
               highlight_colors=None,
               highlight_alpha=None,
               highlight_edgecolors=None,
@@ -135,7 +150,8 @@ def make_logo(matrix=None,
               width=1.,
               vsep=0.,
               uniform_stretch=False,
-              max_stretched_character=None,
+              max_stretched_character='A',
+              remove_flattened_characters=True,
 
               # Special axes formatting
               axes_type='classic',
@@ -261,6 +277,29 @@ def make_logo(matrix=None,
     ######################################################################
     # matrix
 
+    # Copy csv_kwargs if background_csvkwargs is None
+    if background_csvkwargs is None:
+        background_csvkwargs = csv_kwargs.copy()
+
+    # Add specified kwargs to csv_kwargs
+    # If not None, these override specifiations
+    # in both csv_kwargs and background_csvkwargs
+    if csv_delim_whitespace is not None:
+        csv_kwargs['delim_whitespace'] = csv_delim_whitespace
+        background_csvkwargs['delim_whitespace'] = csv_delim_whitespace
+    if csv_index_col is not None:
+        csv_kwargs['index_col'] = csv_index_col
+        background_csvkwargs['index_col'] = csv_index_col
+    if csv_delimiter is not None:
+        csv_kwargs['delimiter'] = csv_delimiter
+        background_csvkwargs['delimiter'] = csv_delimiter
+    if csv_header is not None:
+        csv_kwargs['header'] = csv_header
+        background_csvkwargs['header'] = csv_header
+    if csv_usecols is not None:
+        csv_kwargs['usecols'] = csv_usecols
+        background_csvkwargs['usecols'] = csv_usecols
+
     # Initialize background matrix to none
     bg_mat = None
 
@@ -269,7 +308,8 @@ def make_logo(matrix=None,
                       'fasta_file',
                       'meme_file',
                       'iupac_string',
-                      'csv_file']
+                      'sequences_csvfile',
+                      'matrix_csvfile']
     num_input_sources = sum([eval(x) is not None for x in exclusive_list])
     if num_input_sources != 1:
         assert False, \
@@ -311,21 +351,22 @@ def make_logo(matrix=None,
             title = iupac_string
 
     # Otherwise, if csv file is specified
-    elif csv_file is not None:
-        matrix = load_alignment(csv_file=csv_file,
+    elif sequences_csvfile is not None:
+        matrix = load_alignment(csv_file=sequences_csvfile,
                                 seq_col=seq_col,
                                 ct_col=ct_col,
-                                csv_kwargs=csv_kwargs)
+                                csv_kwargs=csv_kwargs,
+                                ignore_characters=ignore_characters)
         matrix_type = 'counts'
 
         # If either a background counts column or a
         # background csv file is specified
-        if (background_ctcol is not None) or (background_csvfile is not None):
+        if (background_ctcol is not None) or (background_seqcsvfile is not None):
 
             # Set background csv parameters, defaulting to foreground
             # CSV parameters
-            if background_csvfile is None:
-                background_csvfile = csv_file
+            if background_seqcsvfile is None:
+                background_seqcsvfile = sequences_csvfile
             if background_seqcol is None:
                 background_seqcol = seq_col
             if background_ctcol is None:
@@ -334,17 +375,33 @@ def make_logo(matrix=None,
                 background_csvkwargs = csv_kwargs
 
             # Load background counts from csv file
-            bg_countsmat = load_alignment(csv_file=background_csvfile,
+            bg_countsmat = load_alignment(csv_file=background_seqcsvfile,
                                           seq_col=background_seqcol,
                                           ct_col=background_ctcol,
-                                          csv_kwargs=background_csvkwargs)
+                                          csv_kwargs=background_csvkwargs,
+                                          ignore_characters=ignore_characters)
 
             # Transform background counts matrix to a probability matrix
             bg_mat = counts_mat_to_probability_mat(count_mat=bg_countsmat,
                                                    pseudocount=pseudocount)
 
+    # Otherwise, if csv matrix file is specified
+    elif matrix_csvfile is not None:
+        matrix = load_matrix(csv_file=matrix_csvfile,
+                             csv_kwargs=csv_kwargs)
+
     else:
         assert False, 'This should never happen.'
+
+    # Set background from background_matcsvfile if that is specified
+    if background_matcsvfile is not None:
+        bg_mat = load_matrix(csv_file=background_matcsvfile,
+                             csv_kwargs=background_csvkwargs)
+
+        # Transform bg_mat to probability matrix if passed as a counts matrix
+        if background_mattype == 'counts':
+            bg_mat = counts_mat_to_probability_mat(bg_mat,
+                                                   pseudocount=pseudocount)
 
     ######################################################################
     # matrix.columns
@@ -359,10 +416,14 @@ def make_logo(matrix=None,
     ######################################################################
     # matrix.index
 
-    # If matrix_type is counts, remove positions with too few counts
-    if matrix_type == 'counts':
+    # If matrix_type is counts, and counts_theshold is not None,
+    # remove positions with too few counts and renumber positions starting
+    # at zero
+    if matrix_type == 'counts' and counts_threshold is not None:
         position_counts = matrix.values.sum(axis=1)
         matrix = matrix.loc[position_counts >= counts_threshold, :]
+        matrix['pos'] = range(len(matrix))
+        matrix.set_index('pos', inplace=True, drop=True)
 
     # Restrict to specific position range if requested
     if position_range is not None:
@@ -391,8 +452,18 @@ def make_logo(matrix=None,
     matrix = validate_mat(matrix)
     positions = matrix.index
 
+    # Shift bg_mat positions too if bg_mat is specified
+    if bg_mat is not None:
+        bg_mat['pos'] = positions
+        bg_mat.set_index('pos', inplace=True, drop=True)
+        bg_mat = validate_mat(bg_mat)
+
     ######################################################################
     # matrix.values
+
+    # Negate matrix values if requested
+    if negate_matrix:
+        matrix *= -1.0
 
     # Set logo_type equal to matrix_type if is currently None
     if logo_type is None:
@@ -413,117 +484,13 @@ def make_logo(matrix=None,
                                 enrichment_centering=enrichment_centering,
                                 information_units=information_units)
 
-    ######################################################################
-    # multi-line logos
-    if L > max_positions_per_line:
-
-        # Compute the number of lines needed
-        num_lines = int(np.ceil(L / max_positions_per_line))
-
-        # Set figsize
-        fig_height = num_lines * default_fig_height_per_line
-        if figsize is None:
-            figsize = [default_fig_width, fig_height]
-
-        # Pad matrix with zeros
-        rows = matrix.index[0] + \
-               np.arange(L, num_lines * max_positions_per_line)
-        for r in rows:
-            matrix.loc[r, :] = 0.0
-
-        # If there is a background matrix, pad it with ones:
-        if bg_mat is not None:
-            for r in rows:
-                bg_mat.loc[r, :] = 1./bg_mat.shape[1]
-
-        # If there is a highlight sequence, pad it too
-        if highlight_sequence is not None:
-            highlight_sequence = highlight_sequence + \
-                                 ' '*(num_lines * max_positions_per_line - L)
-
-        # Get arguments passed by user
-        kwargs = dict(zip(names, user_values))
-
-        # Set ylim (will not be None)
-        if ylim is None:
-            ymax = (matrix.values * (matrix.values > 0)).sum(axis=1).max()
-            ymin = (matrix.values * (matrix.values < 0)).sum(axis=1).min()
-            ylim = [ymin, ymax]
-
-        # Set style sheet:
-        if style_sheet is not None:
-            if style_sheet == 'default':
-                mpl.rcdefaults()
-            else:
-                plt.style.use(style_sheet)
-
-        # Create figure
-        if draw_now:
-            fig, axs = plt.subplots(num_lines, 1, figsize=figsize)
-
-        logos = []
-        for n in range(num_lines):
-
-            # Section matrix
-            start = int(n * max_positions_per_line)
-            stop = int((n+1) * max_positions_per_line)
-            n_matrix = matrix.iloc[start:stop, :]
-
-            # If there is a background matrix, section it
-            if bg_mat is not None:
-                n_bgmat = bg_mat.iloc[start:stop, :]
-
-            # If there is a highlight sequence, section it
-            if highlight_sequence is not None:
-                n_highlight_sequence = highlight_sequence[start:stop]
-            else:
-                n_highlight_sequence = None
-
-            # Adjust kwargs
-            n_kwargs = kwargs.copy()
-
-            # Use only matrix and background as input, not files or iupac
-            # To do this, first set all input variables to None
-            for var_name in exclusive_list:
-                n_kwargs[var_name] = None
-
-            # Then pass sectioned matrices to matrics and background.
-            n_kwargs['matrix'] = n_matrix
-            n_kwargs['background'] = n_bgmat
-
-            # Preserve matrix and logo type
-            n_kwargs['matrix_type'] = logo_type
-            n_kwargs['logo_type'] = logo_type
-
-            # Pass sectioned highlight_sequence
-            n_kwargs['highlight_sequence'] = n_highlight_sequence
-
-            # Pass shifted shift_first_position_to
-            n_kwargs['shift_first_position_to'] = matrix.index[0] + start
-
-            # Don't draw each individual logo. Wait until all are returned.
-            n_kwargs['figsize'] = None
-            n_kwargs['draw_now'] = False
-            n_kwargs['ylim'] = ylim
-
-            # Adjust annotation
-            if n != 0:
-                n_kwargs['title'] = ''
-            if n != num_lines-1:
-                n_kwargs['xlabel'] = ''
-
-            # Create logo
-            logo = make_logo(**n_kwargs)
-            if draw_now:
-                logo.fig = fig
-                logo.ax = axs[n]
-                logo.draw(logo.ax)
-            else:
-                logo.fig = None
-                logo.ax = None
-            logos.append(logo)
-
-        return logos
+    # Set highlight sequence from background consensus if requested
+    # Overrides highlight_sequence
+    if highlight_bgconsensus and bg_mat is not None:
+        cols = bg_mat.columns
+        highlight_sequence = ''
+        for i, row in bg_mat.iterrows():
+            highlight_sequence += row.argmax()
 
     ######################################################################
     # font_properties
@@ -542,29 +509,7 @@ def make_logo(matrix=None,
                                          style=font_style)
 
     ######################################################################
-    # character_style
-
-    character_style = {
-        'facecolors': color.get_color_dict(color_scheme=character_colors,
-                                           chars=characters,
-                                           alpha=character_alpha),
-        'edgecolors': color.get_color_dict(color_scheme=character_edgecolors,
-                                           chars=characters,
-                                           alpha=character_edgealpha),
-        'boxcolors': color.get_color_dict(color_scheme=character_boxcolors,
-                                          chars=characters,
-                                          alpha=character_boxalpha),
-        'boxedgecolors': color.get_color_dict(
-                                        color_scheme=character_boxedgecolors,
-                                        chars=characters,
-                                        alpha=character_boxedgealpha),
-        'edgewidth': character_edgewidth,
-        'boxedgewidth': character_boxedgewidth,
-        'zorder': character_zorder,
-    }
-
-    ######################################################################
-    # highlight_style
+    # Set highlight style
 
     # Set higlighted character format
     highlight_colors = highlight_colors \
@@ -601,27 +546,8 @@ def make_logo(matrix=None,
         if highlight_zorder is not None \
         else character_zorder
 
-    highlight_style = {
-        'facecolors': color.get_color_dict(color_scheme=highlight_colors,
-                                           chars=characters,
-                                           alpha=highlight_alpha),
-        'edgecolors': color.get_color_dict(color_scheme=highlight_edgecolors,
-                                           chars=characters,
-                                           alpha=highlight_edgealpha),
-        'boxcolors': color.get_color_dict(color_scheme=highlight_boxcolors,
-                                          chars=characters,
-                                          alpha=highlight_boxalpha),
-        'boxedgecolors': color.get_color_dict(
-                                          color_scheme=highlight_boxedgecolors,
-                                          chars=characters,
-                                          alpha=highlight_boxedgealpha),
-        'edgewidth': highlight_edgewidth,
-        'boxedgewidth': highlight_boxedgewidth,
-        'zorder': highlight_zorder,
-    }
-
     ######################################################################
-    # fullheight_style
+    # Set fullheight style
 
     # If a list is passed, make characters transparent
     if isinstance(fullheight, np.ndarray):
@@ -686,6 +612,80 @@ def make_logo(matrix=None,
         if fullheight_width is not None \
         else width
 
+    ######################################################################
+    # Modify colors and alpha values if either are None
+
+    # If a color is not set, set alpha to 0
+    # If a color is set and alpha is not, set alpha to 1
+
+    colors_alpha_pairs = [
+        ('character_colors', 'character_alpha'),
+        ('character_edgecolors', 'character_edgealpha'),
+        ('character_boxcolors', 'character_boxalpha'),
+        ('character_boxedgecolors', 'character_boxedgealpha'),
+        ('highlight_colors', 'highlight_alpha'),
+        ('highlight_edgecolors', 'highlight_edgealpha'),
+        ('highlight_boxcolors', 'highlight_boxalpha'),
+        ('highlight_boxedgecolors', 'highlight_boxedgealpha'),
+        ('fullheight_colors', 'fullheight_alpha'),
+        ('fullheight_edgecolors', 'fullheight_edgealpha'),
+        ('fullheight_boxcolors', 'fullheight_boxalpha'),
+        ('fullheight_boxedgecolors', 'fullheight_boxedgealpha')
+    ]
+
+    for colors_varname, alpha_varname in colors_alpha_pairs:
+
+        colors = eval(colors_varname)
+        alpha = eval(alpha_varname)
+
+        if colors is None:
+            exec ('%s = "gray"' % colors_varname)
+            exec ('%s = 0.0' % alpha_varname)
+        elif alpha is None:
+            exec ('%s = 1.0' % alpha_varname)
+
+    ######################################################################
+    # Set style dicts
+
+    character_style = {
+        'facecolors': color.get_color_dict(color_scheme=character_colors,
+                                           chars=characters,
+                                           alpha=character_alpha),
+        'edgecolors': color.get_color_dict(color_scheme=character_edgecolors,
+                                           chars=characters,
+                                           alpha=character_edgealpha),
+        'boxcolors': color.get_color_dict(color_scheme=character_boxcolors,
+                                          chars=characters,
+                                          alpha=character_boxalpha),
+        'boxedgecolors': color.get_color_dict(
+                                        color_scheme=character_boxedgecolors,
+                                        chars=characters,
+                                        alpha=character_boxedgealpha),
+        'edgewidth': character_edgewidth,
+        'boxedgewidth': character_boxedgewidth,
+        'zorder': character_zorder,
+    }
+
+    highlight_style = {
+        'facecolors': color.get_color_dict(color_scheme=highlight_colors,
+                                           chars=characters,
+                                           alpha=highlight_alpha),
+        'edgecolors': color.get_color_dict(color_scheme=highlight_edgecolors,
+                                           chars=characters,
+                                           alpha=highlight_edgealpha),
+        'boxcolors': color.get_color_dict(color_scheme=highlight_boxcolors,
+                                          chars=characters,
+                                          alpha=highlight_boxalpha),
+        'boxedgecolors': color.get_color_dict(
+                                          color_scheme=highlight_boxedgecolors,
+                                          chars=characters,
+                                          alpha=highlight_boxedgealpha),
+        'edgewidth': highlight_edgewidth,
+        'boxedgewidth': highlight_boxedgewidth,
+        'zorder': highlight_zorder,
+    }
+
+
     fullheight_style = {
         'facecolors': color.get_color_dict(color_scheme=fullheight_colors,
                                            chars=fullheight_characters,
@@ -708,6 +708,131 @@ def make_logo(matrix=None,
     }
 
     ######################################################################
+    # multi-line logos
+    if L > max_positions_per_line:
+
+        # Compute the number of lines needed
+        num_lines = int(np.ceil(L / max_positions_per_line))
+
+        # Set figsize
+        fig_height = num_lines * default_fig_height_per_line
+        if figsize is None:
+            figsize = [default_fig_width, fig_height]
+
+        # Pad matrix with zeros
+        rows = matrix.index[0] + \
+               np.arange(L, num_lines * max_positions_per_line)
+        for r in rows:
+            matrix.loc[r, :] = 0.0
+
+        # If there is a background matrix, pad it with ones:
+        if bg_mat is not None:
+            for r in rows:
+                bg_mat.loc[r, :] = 1. / bg_mat.shape[1]
+
+        # If there is a highlight sequence, pad it too
+        if highlight_sequence is not None:
+            highlight_sequence = highlight_sequence + \
+                                 ' ' * int(
+                                     num_lines * max_positions_per_line - L)
+
+        # Get arguments passed by user
+        kwargs = dict(zip(names, user_values))
+
+        # If 'random' was picked for any color, choose a specific color_dict
+        # and set this across all logo lines
+        for var_name in params_that_specify_colorschemes:
+            if eval('%s == "random"' % var_name):
+                these_chars = characters \
+                              if not 'fullheight' in var_name \
+                              else fullheight_characters
+                kwargs[var_name] = color.get_color_dict(
+                                        color_scheme='random',
+                                        chars=these_chars,
+                                        alpha=1)
+
+        # Set ylim (will not be None)
+        if ylim is None:
+            ymax = (matrix.values * (matrix.values > 0)).sum(axis=1).max()
+            ymin = (matrix.values * (matrix.values < 0)).sum(axis=1).min()
+            ylim = [ymin, ymax]
+
+        # Set style sheet:
+        if style_sheet is not None:
+            if style_sheet == 'default':
+                mpl.rcdefaults()
+            else:
+                plt.style.use(style_sheet)
+
+        # Create figure
+        if draw_now:
+            fig, axs = plt.subplots(num_lines, 1, figsize=figsize)
+
+        logos = []
+        for n in range(num_lines):
+
+            # Section matrix
+            start = int(n * max_positions_per_line)
+            stop = int((n + 1) * max_positions_per_line)
+            n_matrix = matrix.iloc[start:stop, :]
+
+            # If there is a background matrix, section it
+            if bg_mat is not None:
+                n_bgmat = bg_mat.iloc[start:stop, :]
+
+            # If there is a highlight sequence, section it
+            if highlight_sequence is not None:
+                n_highlight_sequence = highlight_sequence[start:stop]
+            else:
+                n_highlight_sequence = None
+
+            # Adjust kwargs
+            n_kwargs = kwargs.copy()
+
+            # Use only matrix and background as input, not files or iupac
+            # To do this, first set all input variables to None
+            for var_name in exclusive_list:
+                n_kwargs[var_name] = None
+
+            # Then pass sectioned matrices to matrics and background.
+            n_kwargs['matrix'] = n_matrix
+            n_kwargs['background'] = n_bgmat
+
+            # Preserve matrix and logo type
+            n_kwargs['matrix_type'] = logo_type
+            n_kwargs['logo_type'] = logo_type
+
+            # Pass sectioned highlight_sequence
+            n_kwargs['highlight_sequence'] = n_highlight_sequence
+
+            # Pass shifted shift_first_position_to
+            n_kwargs['shift_first_position_to'] = matrix.index[0] + start
+
+            # Don't draw each individual logo. Wait until all are returned.
+            n_kwargs['figsize'] = None
+            n_kwargs['draw_now'] = False
+            n_kwargs['ylim'] = ylim
+
+            # Adjust annotation
+            if n != 0:
+                n_kwargs['title'] = ''
+            if n != num_lines - 1:
+                n_kwargs['xlabel'] = ''
+
+            # Create logo
+            logo = make_logo(**n_kwargs)
+            if draw_now:
+                logo.fig = fig
+                logo.ax = axs[n]
+                logo.draw(logo.ax)
+            else:
+                logo.fig = None
+                logo.ax = None
+            logos.append(logo)
+
+        return logos
+
+    ######################################################################
     # placement_style
 
     placement_style = {
@@ -722,7 +847,8 @@ def make_logo(matrix=None,
         'vsep': vsep,
         'width': width,
         'uniform_stretch': uniform_stretch,
-        'max_stretched_character': max_stretched_character
+        'max_stretched_character': max_stretched_character,
+        'remove_flattened_characters': remove_flattened_characters,
     }
 
     ######################################################################
