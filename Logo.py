@@ -65,7 +65,6 @@ class Logo:
         # Compute characters and box
         self.compute_characters()
 
-
     def compute_characters(self):
 
         # Get largest value for computing transparency
@@ -77,7 +76,8 @@ class Logo:
                 pdb.set_trace()
 
         # Compute ymin and ymax of logo.
-        values = self.df.values.astype(float)
+        # Set NaN values to zero when doing so
+        values = self.df.fillna(0).values.astype(float)
         pos_mask = (values > 0).astype(float)
         neg_mask = (values < 0).astype(float)
         ymax = (values * pos_mask).sum(axis=1).max()
@@ -134,6 +134,11 @@ class Logo:
 
             vals = self.df.iloc[i, :].values
 
+            # Remove non-finite values and characters
+            finite_indices = np.isfinite(vals)
+            chars = self.chars[finite_indices]
+            vals = vals[finite_indices]
+
             if not self.placement_style['remove_flattened_characters']:
                 col_ymin = vals[vals < 0].sum()
             else:
@@ -142,21 +147,24 @@ class Logo:
             # Reorder columns
             stack_order = self.placement_style['stack_order']
             if stack_order == 'big_on_top':
-                indices = np.argsort(vals)
+                ordered_indices = np.argsort(vals)
             elif stack_order == 'small_on_top':
                 tmp_indices = np.argsort(vals)
                 pos_tmp_indices = tmp_indices[vals[tmp_indices] >= 0]
                 neg_tmp_indices = tmp_indices[vals[tmp_indices] < 0]
-                indices = np.array(list(neg_tmp_indices[::-1]) +
+                ordered_indices = np.array(list(neg_tmp_indices[::-1]) +
                                    list(pos_tmp_indices[::-1]))
             elif stack_order == 'fixed_going_up':
-                indices = range(len(vals))
+                ordered_indices = range(len(vals))
             elif stack_order == 'fixed_going_down':
-                indices = range(len(vals))[::-1]
+                ordered_indices = range(len(vals))[::-1]
             else:
                 assert False, 'Error: unrecognized stack_order value %s.'%\
                               stack_order
-            ordered_chars = self.chars[indices]
+
+            # Reorder characters and values as appropriate
+            ordered_chars = chars[ordered_indices]
+            vals = vals[ordered_indices]
 
             # This is the same for every character
             x = pos - width/2.0
@@ -168,7 +176,7 @@ class Logo:
             for n, char in enumerate(ordered_chars):
 
                 # Get value
-                val = self.df.loc[pos, char]
+                val = vals[n]
 
                 # Get height
                 h = abs(val)

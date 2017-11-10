@@ -152,7 +152,7 @@ params_with_values_in_dict = {
 
 # Names of parameters whose values are True or False
 params_with_boolean_values = {
-    'enrichment_centering',
+    'center_columns',
     'draw_now',
     'use_transparency',
     'below_flip',
@@ -268,7 +268,7 @@ params_that_specify_linestyles = {
 params_that_cant_be_none = {
     'pseudocount',
     'enrichment_logbase',
-    'enrichment_centering',
+    'center_columns',
     'information_units',
     'draw_now',
     'colors',
@@ -448,7 +448,7 @@ def validate_parameter(name, user, default):
 
     # Special case: matrix
     elif name == 'matrix':
-        value = validate_mat(user)
+        value = validate_mat(user, allow_nan=True)
 
     # Special case: figsize
     elif name == 'figsize':
@@ -717,27 +717,27 @@ def _validate_fullheight(name, user, default):
     """ Validates a fullheight specificaiton, which can be either
      a dictionary or an array/list. """
 
-    try:
+    # Test whether parameter can be interpreted as a string
+    if isinstance(user, basestring):
+        user = ast.literal_eval(user)
 
-        # Test whether parameter can be interpreted as a string
-        if isinstance(user, basestring):
-            user = ast.literal_eval(user)
+    # If dictionary
+    if isinstance(user, dict):
 
-        # If dictionary
-        if isinstance(user, dict):
-            for key, val in user.items():
-                user[key] = int(val)
-            value = user
+        # Make sure keys are ints and vals are length 1 strings
+        keys = [int(k) for k in user.keys()]
+        vals = [str(v) for v in user.values()]
 
-        # If list
-        elif isinstance(user, (list, np.array)):
-            value = np.array(user).astype(int)
+        assert all([len(v) == 1 for v in vals]), \
+         'Error: multiple characters passed to single position in fullheight'
 
-        else:
-            value = default
+        value = dict(zip(keys, vals))
 
-    # If user value is not valid, set to default and issue warning
-    except (AssertionError, ValueError):
+    # If list
+    elif isinstance(user, (list, np.array)):
+        value = np.array(user).astype(int)
+
+    else:
         value = default
         message = "Invalid value %s for parameter %s. " +\
                   "Using default %s instead."
@@ -932,7 +932,7 @@ def _validate_ticklabels(name, user, default):
     return value
 
 
-def validate_mat(matrix):
+def validate_mat(matrix, allow_nan=True):
     '''
     Runs assert statements to verify that df is indeed a motif dataframe.
     Returns a cleaned-up version of df if possible
@@ -941,23 +941,17 @@ def validate_mat(matrix):
     # Copy and preserve logomaker_type
     matrix = matrix.copy()
 
-    # Replace NaN matrix values with zero.
-    if np.isnan(matrix.values).any():
-        message = \
-            "Some matrix values are NaN. These are being replaced by 0.0."
-        warnings.warn(message, UserWarning)
-        matrix.fillna(0.0, inplace=True)
-
     assert type(matrix) == pd.core.frame.DataFrame, 'Error: df is not a dataframe'
 
+    if not allow_nan:
+        # Make sure all entries are finite numbers
+        assert np.isfinite(matrix.values).all(), \
+            'Error: some matrix elements are not finite.' +\
+            'Set allow_nan=True to allow.'
 
     # Make sure the matrix has a finite number of rows and columns
     assert matrix.shape[0] >= 1, 'Error: matrix has zero rows.'
     assert matrix.shape[1] >= 1, 'Error: matrix has zero columns.'
-
-    # Make sure all entries are finite numbers
-    assert np.isfinite(matrix.values).all(), \
-        'Error: not all matrix elements are well-defined, finite numbers.'
 
     # Remove columns whose names aren't strings exactly 1 character long.
     # Warn user when doing so

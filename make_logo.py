@@ -13,6 +13,7 @@ import data
 import color
 from load_meme import load_meme
 from documentation_parser import document_function
+import os
 
 import pdb
 
@@ -65,7 +66,7 @@ def make_logo(matrix=None,
               background=None,
               pseudocount=1.0,
               enrichment_logbase=2,
-              enrichment_centering=True,
+              center_columns=False,
               information_units='bits',
               counts_threshold=None,
               negate_matrix=False,
@@ -481,7 +482,7 @@ def make_logo(matrix=None,
                                 pseudocount=pseudocount,
                                 background=bg_mat,
                                 enrichment_logbase=enrichment_logbase,
-                                enrichment_centering=enrichment_centering,
+                                center_columns=center_columns,
                                 information_units=information_units)
 
     # Set highlight sequence from background consensus if requested
@@ -753,8 +754,9 @@ def make_logo(matrix=None,
 
         # Set ylim (will not be None)
         if ylim is None:
-            ymax = (matrix.values * (matrix.values > 0)).sum(axis=1).max()
-            ymin = (matrix.values * (matrix.values < 0)).sum(axis=1).min()
+            values = matrix.fillna(0).values
+            ymax = (values * (values > 0)).sum(axis=1).max()
+            ymin = (values * (values < 0)).sum(axis=1).min()
             ylim = [ymin, ymax]
 
         # Set style sheet:
@@ -893,8 +895,9 @@ def make_logo(matrix=None,
 
     # Set ylim (will not be None)
     if ylim is None:
-        ymax = (matrix.values * (matrix.values > 0)).sum(axis=1).max()
-        ymin = (matrix.values * (matrix.values < 0)).sum(axis=1).min()
+        values = matrix.fillna(0).values
+        ymax = (values * (values > 0)).sum(axis=1).max()
+        ymin = (values * (values < 0)).sum(axis=1).min()
         ylim = [ymin, ymax]
 
     # Set xlim (will not be None)
@@ -1224,4 +1227,5 @@ def make_logo(matrix=None,
 
 
 # Document make_logo
-document_function(make_logo, 'make_logo_arguments.txt')
+path = os.path.dirname(__file__)
+document_function(make_logo, '%s/make_logo_arguments.txt'%path)

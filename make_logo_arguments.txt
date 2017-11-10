@@ -144,8 +144,8 @@ pseudocount (float >= 0): For converting a counts matrix to a
 enrichment_logbase (float in set): Logarithm to use when computing
     enrichment. Value must be in {2, 10, np.e}.
 
-enrichment_centering (bool): If True, log enrichment values at each
-    position are shifted so that their mean value is 0. Default True.
+center_columns (bool): If True, values at each position are shifted
+    so that their mean value is 0.
 
 information_units (str in set): Units to use when computing information
     logos. Values must be in {'bits', 'nats'}.

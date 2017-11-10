@@ -31,7 +31,7 @@ from validate import validate_mat, validate_probability_mat, iupac_dict
 
 def transform_mat(matrix, to_type, from_type=None, background=None,
                   pseudocount=1, enrichment_logbase=2,
-                  enrichment_centering=True, information_units='bits'):
+                  center_columns=True, information_units='bits'):
     '''
     transform_mat(): transforms a matrix of one type into another.
     :param matrix: input matrix, in data frame format
@@ -44,7 +44,22 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
     '''
 
     # Check that matrix is valid
-    matrix = validate_mat(matrix)
+    if (from_type is None) and (to_type is None):
+
+        # Center values if requested
+        matrix = validate_mat(matrix, allow_nan=True)
+        if center_columns:
+            means = matrix.mean(axis=1, skipna=True).values
+            means[np.isnan(means)] = 0.0
+            out_mat = matrix.copy()
+            out_mat.iloc[:, :] = matrix.values - means[:, np.newaxis]
+        else:
+            out_mat = matrix.copy()
+
+        return out_mat
+
+    else:
+        matrix = validate_mat(matrix, allow_nan=False)
 
     # If not changing types, just return matrix
     if from_type == to_type:
@@ -60,7 +75,6 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
     elif from_type == 'counts':
         probability_mat = \
             counts_mat_to_probability_mat(matrix, pseudocount=pseudocount)
-
     else:
         assert False, 'Error! from_type %s is invalid.'%from_type
 
@@ -79,7 +93,7 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
         out_mat = \
             probability_mat_to_enrichment_mat(probability_mat, bg_mat,
                                               base=enrichment_logbase,
-                                              centering=enrichment_centering)
+                                              centering=center_columns)
 
     elif to_type == 'information':
         out_mat = probability_mat_to_information_mat(probability_mat, bg_mat,

@@ -188,6 +188,4 @@ def load_meme(file_name,
             print('Warning: Returning only the first of %d motifs.' %
                   len(matrix_list))
         return matrix_list[0]
-
-
-load_meme('data/meme_example.txt', get_dict=True)
+        
