@@ -474,9 +474,41 @@ rcparams (dict): Default parameter values to used for matplotlib
     plots, not just the current logo.
 
 #######################################################################
+### Scalebar formatting
+
+show_scalebar (bool, None): If not None, specifies wheterh to show a scalebar.
+
+scalebar_length (float, None): If not None, specifies the  length of the
+    scalebar in y-axis units.
+
+scalebar_linewidth (float, None): If not None, specifies the width of the
+    scalebar in points.
+
+scalebar_color (float, None): If not None, specifies the color of the
+    scalebar itself (not the text).
+
+scalebar_text (str, None): If not None, specifies the text displayed next
+    to the scalebar.
+
+scalebar_x (float, None): If not None, specifies the x-position of the
+    scalebar (which is vertical).
+
+scalebar_ymin (float, None): If not None, specifies the y-cooridnate of the
+    bottom of the scalebar.
+
+scalebar_texthalignment (str, None): If not None, specifies the horizonotal
+    alignment of the scalebar. See mpl.text.Text() documentation for options.
+
+scalebar_textvalignment (str, None): If not None, specifies the vertical
+    alignment of the scalebar. See mpl.text.Text() documentation for options.
+
+scalebar_textrotation (float, None): If not None, specifies the rotation
+    angle of the scalebar label text.
+
+#######################################################################
 ### Gridline formatting
 
-show_gridlines (bool): Whether to show gridlines. Note: gridlines are
+show_gridlines (bool, None): Whether to show gridlines. Note: gridlines are
     plotted below logo characters but above logo bounding boxes.
 
 gridline_axis (str in set, None): If str, specifies axes on which to

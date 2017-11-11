@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
 import character
+from matplotlib.text import Text
+from matplotlib.lines import Line2D
 import pdb
 
 SMALL = 1E-6
@@ -18,7 +20,8 @@ class Logo:
                  fullheight,
                  fullheight_style,
                  placement_style,
-                 axes_style):
+                 axes_style,
+                 scalebar_style):
 
         # Set font properties
         self.font_properties = font_properties
@@ -40,6 +43,7 @@ class Logo:
         self.highlight_style = highlight_style.copy()
         self.placement_style = placement_style.copy()
         self.fullheight_style = fullheight_style.copy()
+        self.scalebar_style = scalebar_style.copy()
 
         # Set axes style
         self.axes_style = axes_style.copy()
@@ -414,6 +418,19 @@ class Logo:
                            rotation=self.axes_style['ytick_rotation'],
                            font_properties=
                                 self.axes_style['tick_fontproperties'])
+
+        # Draw scalebar
+        if self.scalebar_style['visible']:
+
+            # Draw scalebar line
+            line_kwargs = self.scalebar_style['line_kwargs']
+            line = Line2D(**line_kwargs)
+            ax.add_artist(line)
+
+            # Draw scalebar text
+            text_kwargs = self.scalebar_style['text_kwargs']
+            text = Text(**text_kwargs)
+            ax.add_artist(text)
 
         # Do final drawing
         if self.axes_style['use_tightlayout']:

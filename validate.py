@@ -82,7 +82,10 @@ params_with_float_values = {
     'highlight_zorder',
     'fullheight_zorder',
     'baseline_zorder',
-    'vline_zorder'
+    'vline_zorder',
+    'scalebar_x',
+    'scalebar_ymin',
+    'scalebar_textrotation',
 }
 
 # Names of numerical parameters that must be > 0
@@ -110,6 +113,8 @@ params_greater_or_equal_to_0 = {
     'vline_width',
     'xtick_length',
     'ytick_length',
+    'scalebar_length',
+    'scalebar_linewidth',
 }
 
 # Names of numerical parameters in the interval [0,1]
@@ -143,10 +148,19 @@ params_with_values_in_dict = {
     'background_mattype': ['counts', 'probability'],
     'enrichment_logbase': [2, np.e, 10],
     'information_units': ['bits', 'nats'],
-    'sequence_type': ['dna', 'DNA', 'rna', 'RNA', 'protein', 'PROTEIN'],
-    'stack_order': ['big_on_top', 'small_on_top', 'fixed_going_up',
+    'sequence_type': ['dna', 'DNA',
+                      'rna', 'RNA',
+                      'protein', 'PROTEIN'],
+    'stack_order': ['big_on_top',
+                    'small_on_top',
+                    'fixed_going_up',
                     'fixed_going_down'],
-    'axes_type': ['classic', 'naked', 'everything', 'rails', 'vlines'],
+    'axes_type': ['classic',
+                  'naked',
+                  'everything',
+                  'rails',
+                  'vlines',
+                  'scalebar'],
     'gridline_axis': ['x', 'y', 'both'],
 }
 
@@ -170,6 +184,7 @@ params_with_boolean_values = {
     'csv_delim_whitespace',
     'highlight_bgconsensus',
     'negate_matrix',
+    'show_scalebar',
 }
 
 # Names of parameters whose values are strings
@@ -187,6 +202,9 @@ params_with_string_values = {
     'ylabel',
     'title',
     'csv_delimiter',
+    'scalebar_text',
+    'scalebar_texthalignment',
+    'scalebar_textvalignment'
 }
 
 # Names of parameters whose values specify a numerical interval

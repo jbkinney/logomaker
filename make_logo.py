@@ -159,6 +159,18 @@ def make_logo(matrix=None,
               style_sheet=None,
               rcparams={},
 
+              # Scalebar styling
+              show_scalebar=None,
+              scalebar_length=None,
+              scalebar_linewidth=None,
+              scalebar_color=None,
+              scalebar_text=None,
+              scalebar_x=None,
+              scalebar_ymin=None,
+              scalebar_texthalignment=None,
+              scalebar_textvalignment=None,
+              scalebar_textrotation=None,
+
               # Grid line formatting
               show_gridlines=None,
               gridline_axis=None,
@@ -1016,6 +1028,30 @@ def make_logo(matrix=None,
         if show_baseline is None:
             show_baseline = True
 
+    if axes_type == 'scalebar':
+        if xtick_length is None:
+            xtick_length = 0
+        if xtick_rotation is None:
+            xtick_rotation = 90
+        if xlabel is None:
+            xlabel = 'position'
+        if left_spine is None:
+            left_spine = False
+        if right_spine is None:
+            right_spine = False
+        if top_spine is None:
+            top_spine = False
+        if bottom_spine is None:
+            bottom_spine = True
+        if show_baseline is None:
+            show_baseline = True
+        if show_gridlines is None:
+            show_gridlines = False
+        if show_scalebar is None:
+            show_scalebar = True
+        if yticks is None:
+            yticks = []
+
     # If showing binary yaxis, symmetrize ylim and set yticks to +/-
     if show_binary_yaxis:
 
@@ -1081,6 +1117,53 @@ def make_logo(matrix=None,
     title_fontdict = remove_none_from_dict(title_fontdict)
     title_fontdict = dict(axes_fontdict, **title_fontdict)
     title_fontproperties = FontProperties(**title_fontdict)
+
+    # Set scalebar defaults
+    if show_scalebar is None:
+        show_scalebar = False
+    if scalebar_text is None:
+        scalebar_text = '1 unit'
+    if scalebar_color is None:
+        scalebar_color = mpl.rcParams['axes.edgecolor']
+    if scalebar_linewidth is None:
+        scalebar_linewidth = 2
+    if scalebar_x is None:
+        scalebar_x = xlim[0]+.5
+    if scalebar_length is None:
+        scalebar_length = 1
+    if scalebar_ymin is None:
+        scalebar_ymin = ylim[1] - scalebar_length
+    if scalebar_texthalignment is None:
+        scalebar_texthalignment = 'right'
+    if scalebar_textvalignment is None:
+        scalebar_textvalignment = 'center'
+    if scalebar_textrotation is None:
+        scalebar_textrotation = 90
+
+    # Scalebar styling
+    scalebar_linestyle = {
+        'linewidth': scalebar_linewidth,
+        'color': scalebar_color,
+        'xdata': (scalebar_x, scalebar_x),
+        'ydata': (scalebar_ymin, scalebar_ymin+scalebar_length),
+    }
+    scalebar_linestyle = remove_none_from_dict(scalebar_linestyle)
+
+    scalebar_textstyle = {
+        'x': scalebar_x,
+        'y': scalebar_ymin + scalebar_length/2,
+        'text': scalebar_text,
+        'horizontalalignment': scalebar_texthalignment,
+        'verticalalignment': scalebar_textvalignment,
+        'rotation': scalebar_textrotation,
+    }
+    scalebar_textstyle = remove_none_from_dict(scalebar_textstyle)
+
+    # This is what gets passed to Logo()
+    scalebar_style = {
+        'line_kwargs': scalebar_linestyle,
+        'text_kwargs': scalebar_textstyle,
+        'visible': show_scalebar}
 
     # Gridline styling
     gridline_dict = {
@@ -1181,7 +1264,8 @@ def make_logo(matrix=None,
                 highlight_style=highlight_style,
                 fullheight_style=fullheight_style,
                 placement_style=placement_style,
-                axes_style=axes_style)
+                axes_style=axes_style,
+                scalebar_style=scalebar_style)
 
     # Decorate logo
     logo.logo_type = logo_type
