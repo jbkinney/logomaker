@@ -4,11 +4,10 @@
     <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Logo.py" afterPath="$PROJECT_DIR$/Logo.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/documentation_parser.py" afterPath="$PROJECT_DIR$/documentation_parser.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/make_logo.py" afterPath="$PROJECT_DIR$/make_logo.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/make_logo_arguments.txt" afterPath="$PROJECT_DIR$/make_logo_arguments.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/splicesite_test.ipynb" afterPath="$PROJECT_DIR$/splicesite_test.ipynb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_crpbindingsites.ipynb" afterPath="$PROJECT_DIR$/test_crpbindingsites.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/validate.py" afterPath="$PROJECT_DIR$/validate.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -24,8 +23,8 @@
           <file leaf-file-name="Logo.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/Logo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="5043">
-                  <caret line="430" column="52" lean-forward="false" selection-start-line="430" selection-start-column="52" selection-end-line="430" selection-end-column="52" />
+                <state relative-caret-position="582">
+                  <caret line="421" column="64" lean-forward="false" selection-start-line="421" selection-start-column="64" selection-end-line="421" selection-end-column="64" />
                   <folding>
                     <element signature="e#0#31#0" expanded="true" />
                   </folding>
@@ -36,9 +35,18 @@
           <file leaf-file-name="make_logo_arguments.txt" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/make_logo_arguments.txt">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="907">
-                  <caret line="498" column="20" lean-forward="true" selection-start-line="498" selection-start-column="20" selection-end-line="498" selection-end-column="20" />
+                <state relative-caret-position="627">
+                  <caret line="716" column="33" lean-forward="false" selection-start-line="716" selection-start-column="30" selection-end-line="716" selection-end-column="33" />
                   <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="examples.ipynb" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/examples.ipynb">
+              <provider selected="true" editor-type-id="ipnb-editor">
+                <state>
+                  <selected id="0" />
                 </state>
               </provider>
             </entry>
@@ -58,8 +66,8 @@
           <file leaf-file-name="documentation_parser.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/documentation_parser.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="0">
-                  <caret line="73" column="0" lean-forward="false" selection-start-line="73" selection-start-column="0" selection-end-line="73" selection-end-column="0" />
+                <state relative-caret-position="347">
+                  <caret line="86" column="16" lean-forward="false" selection-start-line="86" selection-start-column="16" selection-end-line="92" selection-end-column="77" />
                   <folding>
                     <element signature="e#0#9#0" expanded="true" />
                   </folding>
@@ -108,7 +116,7 @@
           <file leaf-file-name="validate.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/validate.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="352">
+                <state relative-caret-position="-16145">
                   <caret line="130" column="27" lean-forward="true" selection-start-line="130" selection-start-column="27" selection-end-line="130" selection-end-column="27" />
                   <folding>
                     <element signature="e#0#47#0" expanded="true" />
@@ -120,8 +128,8 @@
           <file leaf-file-name="make_logo.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/make_logo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2553">
-                  <caret line="1123" column="29" lean-forward="true" selection-start-line="1123" selection-start-column="29" selection-end-line="1123" selection-end-column="29" />
+                <state relative-caret-position="-2302">
+                  <caret line="1130" column="27" lean-forward="true" selection-start-line="1130" selection-start-column="27" selection-end-line="1130" selection-end-column="27" />
                   <folding>
                     <element signature="e#0#31#0" expanded="true" />
                   </folding>
@@ -142,9 +150,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>background_csvkwargs</find>
-      <find>_alpha</find>
-      <find>'character_</find>
       <find>background_csvkwrgs</find>
       <find>pdb</find>
       <find>csv_use_col</find>
@@ -163,7 +168,6 @@
       <find>center_values</find>
       <find>center_valu</find>
       <find>center_</find>
-      <find>ylim</find>
       <find>assert</find>
       <find>enrichment_center</find>
       <find>center_column</find>
@@ -172,6 +176,10 @@
       <find>show_gridlines</find>
       <find>xlim</find>
       <find>show_scalebar</find>
+      <find>tick_length</find>
+      <find>scalebar_</find>
+      <find>ylim</find>
+      <find>#</find>
     </findStrings>
     <replaceStrings>
       <replace>df</replace>
@@ -230,14 +238,14 @@
         <option value="$PROJECT_DIR$/load_meme.py" />
         <option value="$PROJECT_DIR$/logomaker" />
         <option value="$PROJECT_DIR$/data/.gitignore" />
-        <option value="$PROJECT_DIR$/documentation_parser.py" />
         <option value="$PROJECT_DIR$/character.py" />
         <option value="$PROJECT_DIR$/color.py" />
         <option value="$PROJECT_DIR$/data.py" />
-        <option value="$PROJECT_DIR$/Logo.py" />
-        <option value="$PROJECT_DIR$/make_logo_arguments.txt" />
         <option value="$PROJECT_DIR$/validate.py" />
         <option value="$PROJECT_DIR$/make_logo.py" />
+        <option value="$PROJECT_DIR$/Logo.py" />
+        <option value="$PROJECT_DIR$/documentation_parser.py" />
+        <option value="$PROJECT_DIR$/make_logo_arguments.txt" />
       </list>
     </option>
   </component>
@@ -265,7 +273,7 @@
     </entry>
   </component>
   <component name="ProjectView">
-    <navigator proportions="" version="1">
+    <navigator currentView="ProjectPane" proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -278,7 +286,21 @@
       <manualOrder />
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="Scratches" />
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="logomaker" type="b2602c69:ProjectViewProjectNode" />
+              <item name="logomaker" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -430,13 +452,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1507225961489</updated>
-    </task>
-    <task id="LOCAL-00009" summary="Divided padding by 2, so that value is now equal to total whitespace">
-      <created>1508329416051</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1508329416051</updated>
     </task>
     <task id="LOCAL-00010" summary="Implemented character transformations">
       <created>1508331692553</created>
@@ -774,7 +789,14 @@
       <option name="project" value="LOCAL" />
       <updated>1510329675091</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <task id="LOCAL-00058" summary="Implemented scalebar functionality in make_logo()">
+      <created>1510443213982</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1510443213983</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="TodoView">
@@ -789,7 +811,7 @@
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="2560" height="1440" extended-state="0" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29321486" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19817315" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32954547" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.328125" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -839,7 +861,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Split code into files Logo.py, make_logo.py, make_styled_logo.py, and worked on the make_logo docstring." />
     <MESSAGE value="Finished initial documentation for make_styled_logo, except the description of the 'background' parameter." />
     <MESSAGE value="Made baseline specification more flexible." />
     <MESSAGE value="Removed trailing commas from style file paring." />
@@ -864,7 +885,8 @@
     <MESSAGE value="Refactored fixedchar -&gt; fullheight, added related functionality and fixed bugs, including a major bug in Logo.compute_characters()" />
     <MESSAGE value="Bunches of changes. Implemented replacing NaN with zero. Also, implemented more forgiving parsing of matrix." />
     <MESSAGE value="Fixed paths issue with make_logo_arguments.txt being referenced from make_logo. Also fixed bug in the specification of fullheight using a dictionary." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed paths issue with make_logo_arguments.txt being referenced from make_logo. Also fixed bug in the specification of fullheight using a dictionary." />
+    <MESSAGE value="Implemented scalebar functionality in make_logo()" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented scalebar functionality in make_logo()" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -873,13 +895,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4788">
-          <caret line="342" column="64" lean-forward="false" selection-start-line="342" selection-start-column="64" selection-end-line="342" selection-end-column="64" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5138">
@@ -1094,16 +1109,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/documentation_parser.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="73" column="0" lean-forward="false" selection-start-line="73" selection-start-column="0" selection-end-line="73" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1126,25 +1131,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Logo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5043">
-          <caret line="430" column="52" lean-forward="false" selection-start-line="430" selection-start-column="52" selection-end-line="430" selection-end-column="52" />
+        <state relative-caret-position="582">
+          <caret line="421" column="64" lean-forward="false" selection-start-line="421" selection-start-column="64" selection-end-line="421" selection-end-column="64" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/make_logo_arguments.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="907">
-          <caret line="498" column="20" lean-forward="true" selection-start-line="498" selection-start-column="20" selection-end-line="498" selection-end-column="20" />
-          <folding />
+    <entry file="file://$PROJECT_DIR$/examples.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/validate.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
+        <state relative-caret-position="-16145">
           <caret line="130" column="27" lean-forward="true" selection-start-line="130" selection-start-column="27" selection-end-line="130" selection-end-column="27" />
           <folding>
             <element signature="e#0#47#0" expanded="true" />
@@ -1154,11 +1158,29 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/make_logo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2553">
-          <caret line="1123" column="29" lean-forward="true" selection-start-line="1123" selection-start-column="29" selection-end-line="1123" selection-end-column="29" />
+        <state relative-caret-position="-2302">
+          <caret line="1130" column="27" lean-forward="true" selection-start-line="1130" selection-start-column="27" selection-end-line="1130" selection-end-column="27" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/documentation_parser.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="347">
+          <caret line="86" column="16" lean-forward="false" selection-start-line="86" selection-start-column="16" selection-end-line="92" selection-end-column="77" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/make_logo_arguments.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="627">
+          <caret line="716" column="33" lean-forward="false" selection-start-line="716" selection-start-column="30" selection-end-line="716" selection-end-column="33" />
+          <folding />
         </state>
       </provider>
     </entry>

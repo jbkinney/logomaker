@@ -743,3 +743,4 @@ title_fontstyle (str, None): Overrides axes_fontstyle for title
 title_fontsize (str, float, None): Overrides axes_fontsize for title
     styling if value is not None.
 
+#######################################################################

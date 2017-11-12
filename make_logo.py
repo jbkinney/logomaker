@@ -1036,7 +1036,7 @@ def make_logo(matrix=None,
         if xlabel is None:
             xlabel = 'position'
         if left_spine is None:
-            left_spine = False
+            left_spine = True
         if right_spine is None:
             right_spine = False
         if top_spine is None:
@@ -1049,8 +1049,6 @@ def make_logo(matrix=None,
             show_gridlines = False
         if show_scalebar is None:
             show_scalebar = True
-        if yticks is None:
-            yticks = []
 
     # If showing binary yaxis, symmetrize ylim and set yticks to +/-
     if show_binary_yaxis:
@@ -1128,11 +1126,11 @@ def make_logo(matrix=None,
     if scalebar_linewidth is None:
         scalebar_linewidth = 2
     if scalebar_x is None:
-        scalebar_x = xlim[0]+.5
+        scalebar_x = xlim[0]-.5
     if scalebar_length is None:
         scalebar_length = 1
     if scalebar_ymin is None:
-        scalebar_ymin = ylim[1] - scalebar_length
+        scalebar_ymin = 0.5*(ylim[0] + ylim[1]) - .5
     if scalebar_texthalignment is None:
         scalebar_texthalignment = 'right'
     if scalebar_textvalignment is None:
@@ -1144,13 +1142,13 @@ def make_logo(matrix=None,
     scalebar_linestyle = {
         'linewidth': scalebar_linewidth,
         'color': scalebar_color,
-        'xdata': (scalebar_x, scalebar_x),
-        'ydata': (scalebar_ymin, scalebar_ymin+scalebar_length),
+        'xloc': scalebar_x,
+        'ymin': scalebar_ymin,
+        'ymax': scalebar_ymin+scalebar_length,
     }
     scalebar_linestyle = remove_none_from_dict(scalebar_linestyle)
 
     scalebar_textstyle = {
-        'x': scalebar_x,
         'y': scalebar_ymin + scalebar_length/2,
         'text': scalebar_text,
         'horizontalalignment': scalebar_texthalignment,

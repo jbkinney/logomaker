@@ -419,18 +419,35 @@ class Logo:
                            font_properties=
                                 self.axes_style['tick_fontproperties'])
 
-        # Draw scalebar
+        # Draw scalebar and remove left and right spines, yticks
         if self.scalebar_style['visible']:
+            linestyle = self.scalebar_style['line_kwargs']
+            textstyle = self.scalebar_style['text_kwargs']
 
-            # Draw scalebar line
-            line_kwargs = self.scalebar_style['line_kwargs']
-            line = Line2D(**line_kwargs)
-            ax.add_artist(line)
+            # Shrink spine to the desired length
+            spine = ax.spines['left']
+            spine.set_bounds(linestyle['ymin'],
+                             linestyle['ymax'])
 
-            # Draw scalebar text
-            text_kwargs = self.scalebar_style['text_kwargs']
-            text = Text(**text_kwargs)
-            ax.add_artist(text)
+            # Shift spine out
+            spine.set_position(('data', linestyle['xloc']))
+
+            # Make spine think and set styling
+            spine.set_linewidth(2)
+            spine.set_color(linestyle['color'])
+
+            # Label spine
+            ax.set_yticks([textstyle['y']])
+            fontdict = {
+                'verticalalignment': textstyle['verticalalignment'],
+                'horizontalalignment': textstyle['horizontalalignment']
+            }
+            ax.set_yticklabels([textstyle['text']],
+                               rotation=textstyle['rotation'],
+                               fontdict=fontdict)
+            ax.yaxis.set_tick_params(length=0)
+            ax.grid('off')
+            ax.spines['right'].set_visible(False)
 
         # Do final drawing
         if self.axes_style['use_tightlayout']:

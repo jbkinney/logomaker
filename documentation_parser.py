@@ -4,7 +4,9 @@ import validate
 import warnings
 
 class ParameterDoc:
-    def __init__(self, entry):
+    def __init__(self, entry, sec_name, num_in_sec):
+        self.section = sec_name
+        self.num_in_section = num_in_sec
         pattern = re.compile(
             "(?P<name>\w+)[ ]+\((?P<in_type>[\S \n]+)\)[ ]*:(?P<description>(?:[ ]*\S+[\S ]*\n)+)")
 
@@ -50,19 +52,45 @@ def parse_documentation_file(file_name):
     # Replace tabs with spaces
     doc_contents = re.sub('\t', '    ', doc_contents)
 
-    # Parse entries
-    pattern = re.compile("\n[ ]*(?P<entry>\w+(?:[ ]*\S+[\S ]*\n)+)")
-    matches = re.finditer(pattern, doc_contents)
-
-    # Create dictionary of ParameterDoc objects
+    # Create list to hold contents of documentation
     doc_dict = {}
-    for i, m in enumerate(matches):
-        entry = m.group('entry')
-        doc = ParameterDoc(entry)
-        if doc.name is not None:
-            doc_dict[doc.name] = doc
-        else:
-            warnings.warn('Could not parse documentation entry %s' % entry)
+
+    # Parse doc_contents into sections
+    sec_pattern = re.compile(
+        '(?<=###)(?P<heading>[^#\n]+)\n(?P<section>[\S \n]+?)(?=###)')
+    sec_matches = re.finditer(sec_pattern, doc_contents)
+    for i, sec_match in enumerate(sec_matches):
+        sec_name = sec_match.group('heading').strip()
+        sec_contents = sec_match.group('section')
+
+        # Parse parameter entries
+        param_pattern = re.compile(
+            "\n[ ]*(?P<entry>\w+(?:[ ]*\S+[\S ]*\n)+)")
+
+        param_matches = re.finditer(param_pattern, sec_contents)
+        for j, param_match in enumerate(param_matches):
+            entry = param_match.group('entry')
+            doc = ParameterDoc(entry=entry,
+                               sec_name=sec_name,
+                               num_in_sec=j)
+            if doc.name is not None:
+                doc_dict[doc.name] = doc
+            else:
+                warnings.warn('Could not parse documentation entry %s' % entry)
+
+    # # Parse entries
+    # pattern = re.compile("\n[ ]*(?P<entry>\w+(?:[ ]*\S+[\S ]*\n)+)")
+    # matches = re.finditer(pattern, doc_contents)
+    #
+    # # Create ordered list of ParameterDoc objects
+    # doc_list = []
+    # for i, m in enumerate(matches):
+    #     entry = m.group('entry')
+    #     doc = ParameterDoc(entry)
+    #     if doc.name is not None:
+    #         doc_list.append(doc)
+    #     else:
+    #         warnings.warn('Could not parse documentation entry %s' % entry)
 
     # Return dictionary to user
     return doc_dict
