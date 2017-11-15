@@ -4,9 +4,10 @@ import validate
 import warnings
 
 class ParameterDoc:
-    def __init__(self, entry, sec_name, num_in_sec):
+    def __init__(self, entry, sec_name, num_in_sec, param_num):
         self.section = sec_name
         self.num_in_section = num_in_sec
+        self.param_num = param_num
         pattern = re.compile(
             "(?P<name>\w+)[ ]+\((?P<in_type>[\S \n]+)\)[ ]*:(?P<description>(?:[ ]*\S+[\S ]*\n)+)")
 
@@ -59,6 +60,7 @@ def parse_documentation_file(file_name):
     sec_pattern = re.compile(
         '(?<=###)(?P<heading>[^#\n]+)\n(?P<section>[\S \n]+?)(?=###)')
     sec_matches = re.finditer(sec_pattern, doc_contents)
+    param_num = 0
     for i, sec_match in enumerate(sec_matches):
         sec_name = sec_match.group('heading').strip()
         sec_contents = sec_match.group('section')
@@ -72,11 +74,14 @@ def parse_documentation_file(file_name):
             entry = param_match.group('entry')
             doc = ParameterDoc(entry=entry,
                                sec_name=sec_name,
-                               num_in_sec=j)
+                               num_in_sec=j,
+                               param_num=param_num)
             if doc.name is not None:
                 doc_dict[doc.name] = doc
             else:
                 warnings.warn('Could not parse documentation entry %s' % entry)
+            doc.param_num += 1
+            param_num += 1
 
     # # Parse entries
     # pattern = re.compile("\n[ ]*(?P<entry>\w+(?:[ ]*\S+[\S ]*\n)+)")

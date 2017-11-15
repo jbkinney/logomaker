@@ -241,6 +241,7 @@ params_that_specify_colors = {
     'gridline_color',
     'baseline_color',
     'vline_color',
+    'scalebar_color',
 }
 
 
