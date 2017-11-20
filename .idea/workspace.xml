@@ -3,9 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="687be509-29a5-4b9b-9be7-6d502a3d284c" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/documentation_parser.py" afterPath="$PROJECT_DIR$/documentation_parser.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_crpbindingsites.ipynb" afterPath="$PROJECT_DIR$/test_crpbindingsites.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/validate.py" afterPath="$PROJECT_DIR$/validate.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -127,7 +124,7 @@
           <file leaf-file-name="make_logo.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/make_logo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-2302">
+                <state relative-caret-position="19279">
                   <caret line="1130" column="27" lean-forward="true" selection-start-line="1130" selection-start-column="27" selection-end-line="1130" selection-end-column="27" />
                   <folding>
                     <element signature="e#0#31#0" expanded="true" />
@@ -451,13 +448,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1507225961489</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Moved patch computation to character constructor, out of draw() function">
-      <created>1508335030076</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1508335030076</updated>
     </task>
     <task id="LOCAL-00012" summary="Included ability to read parameters_file into make_logo, but I think this was a bad idea.">
       <created>1508413568200</created>
@@ -795,7 +785,14 @@
       <option name="project" value="LOCAL" />
       <updated>1510529933137</updated>
     </task>
-    <option name="localTasksCounter" value="60" />
+    <task id="LOCAL-00060" summary="Added parameter number to documentation.">
+      <created>1510783642661</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1510783642661</updated>
+    </task>
+    <option name="localTasksCounter" value="61" />
     <servers />
   </component>
   <component name="TodoView">
@@ -860,7 +857,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Made baseline specification more flexible." />
     <MESSAGE value="Removed trailing commas from style file paring." />
     <MESSAGE value="Have made a number of changes. Added validation, including for FontProperties parameters, and removed font_name parameters from make_logo in favor of just using font_family parameters." />
     <MESSAGE value="Wrote examples.ipynb, which creates example logos illustrating different parameter values." />
@@ -885,7 +881,8 @@
     <MESSAGE value="Fixed paths issue with make_logo_arguments.txt being referenced from make_logo. Also fixed bug in the specification of fullheight using a dictionary." />
     <MESSAGE value="Implemented scalebar functionality in make_logo()" />
     <MESSAGE value="Changed scalebar to use left axes spine. Also modified parse_documentation_file to record the section and location within section for each parameter" />
-    <option name="LAST_COMMIT_MESSAGE" value="Changed scalebar to use left axes spine. Also modified parse_documentation_file to record the section and location within section for each parameter" />
+    <MESSAGE value="Added parameter number to documentation." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added parameter number to documentation." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1157,7 +1154,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/make_logo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2302">
+        <state relative-caret-position="19279">
           <caret line="1130" column="27" lean-forward="true" selection-start-line="1130" selection-start-column="27" selection-end-line="1130" selection-end-column="27" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
