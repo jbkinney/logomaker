@@ -59,21 +59,6 @@ def make_logo(dataframe=None,
               # Full height formatting
               fullheight_style_dict = None,
 
-              fullheight=None,
-              fullheight_colors=None,
-              fullheight_alpha=None,
-              fullheight_edgecolors=None,
-              fullheight_edgewidth=None,
-              fullheight_edgealpha=None,
-              fullheight_boxcolors=None,
-              fullheight_boxalpha=None,
-              fullheight_boxedgecolors=None,
-              fullheight_boxedgewidth=None,
-              fullheight_boxedgealpha=None,
-              fullheight_zorder=None,
-              fullheight_vsep=None,
-              fullheight_width=None,
-
               # Character font
               font_properties=None,
               font_file=None,
@@ -1240,66 +1225,67 @@ def make_logo(dataframe=None,
     # Set fullheight style
 
     # If a list is passed, make characters transparent
-    if isinstance(fullheight, np.ndarray):
+
+    if isinstance(fullheight_style_dict['fullheight'], np.ndarray):
         # Force characters to be transparent, since these are dummy
         # characters anyway
-        fullheight_alpha = 0
+        fullheight_style_dict['fullheight_alpha'] = 0
 
         # Have box transparency default to 1, since that is all there
         # is to see
-        if fullheight_boxalpha is None:
-            fullheight_boxalpha = 1
+        if fullheight_style_dict['fullheight_boxalpha'] is None:
+            fullheight_style_dict['fullheight_boxalpha'] = 1
 
         # Create dictionary with dummy characters
-        keys = list(fullheight)
-        vals = ['A']*len(fullheight)
-        fullheight = dict(zip(keys, vals))
+        keys = list(fullheight_style_dict['fullheight'])
+        vals = ['A']*len(fullheight_style_dict['fullheight'])
+        fullheight_style_dict['fullheight'] = dict(zip(keys, vals))
 
     # If None, default to empty dictionary
-    elif fullheight is None:
-        fullheight = {}
+    elif fullheight_style_dict['fullheight'] is None:
+        fullheight_style_dict['fullheight'] = {}
 
-    fullheight_characters = set(fullheight.values())
+    fullheight_characters = set(fullheight_style_dict['fullheight'].values())
 
     # Set fullheight character format
-    fullheight_colors = fullheight_colors \
-        if fullheight_colors is not None \
+    fullheight_style_dict['fullheight_colors'] = fullheight_style_dict['fullheight_colors'] \
+        if fullheight_style_dict['fullheight_colors'] is not None \
         else character_style_dict['character_colors']
-    fullheight_alpha = float(fullheight_alpha) \
-        if fullheight_alpha is not None \
+    fullheight_style_dict['fullheight_alpha'] = float(fullheight_style_dict['fullheight_alpha']) \
+        if fullheight_style_dict['fullheight_alpha'] is not None \
         else character_style_dict['character_alpha']
-    fullheight_edgecolors = fullheight_edgecolors \
-        if fullheight_edgecolors is not None \
+    fullheight_style_dict['fullheight_edgecolors'] = fullheight_style_dict['fullheight_edgecolors'] \
+        if fullheight_style_dict['fullheight_edgecolors'] is not None \
         else character_style_dict['character_edgecolors']
-    fullheight_edgewidth = fullheight_edgewidth \
-        if fullheight_edgewidth is not None \
+    fullheight_style_dict['fullheight_edgewidth'] = fullheight_style_dict['fullheight_edgewidth'] \
+        if fullheight_style_dict['fullheight_edgewidth'] is not None \
         else character_style_dict['character_edgewidth']
-    fullheight_edgealpha = float(fullheight_edgealpha) \
-        if fullheight_edgealpha is not None \
+    fullheight_style_dict['fullheight_edgealpha'] = float(fullheight_style_dict['fullheight_edgealpha']) \
+        if fullheight_style_dict['fullheight_edgealpha'] is not None \
         else character_style_dict['character_edgealpha']
-    fullheight_boxcolors = fullheight_boxcolors \
-        if fullheight_boxcolors is not None \
+    fullheight_style_dict['fullheight_boxcolors'] = fullheight_style_dict['fullheight_boxcolors'] \
+        if fullheight_style_dict['fullheight_boxcolors'] is not None \
         else character_style_dict['character_boxcolors']
-    fullheight_boxalpha = float(fullheight_boxalpha) \
-        if fullheight_boxalpha is not None \
+    fullheight_style_dict['fullheight_boxalpha'] = float(fullheight_style_dict['fullheight_boxalpha']) \
+        if fullheight_style_dict['fullheight_boxalpha'] is not None \
         else character_style_dict['character_boxalpha']
-    fullheight_boxedgecolors = fullheight_boxedgecolors \
-        if fullheight_boxedgecolors is not None \
+    fullheight_style_dict['fullheight_boxedgecolors'] = fullheight_style_dict['fullheight_boxedgecolors'] \
+        if fullheight_style_dict['fullheight_boxedgecolors'] is not None \
         else character_style_dict['character_boxedgecolors']
-    fullheight_boxedgewidth = fullheight_boxedgewidth \
-        if fullheight_boxedgewidth is not None \
+    fullheight_style_dict['fullheight_boxedgewidth'] = fullheight_style_dict['fullheight_boxedgewidth'] \
+        if fullheight_style_dict['fullheight_boxedgewidth'] is not None \
         else character_style_dict['character_boxedgewidth']
-    fullheight_boxedgealpha = fullheight_boxedgealpha \
-        if fullheight_boxedgealpha is not None \
+    fullheight_style_dict['fullheight_boxedgealpha'] = fullheight_style_dict['fullheight_boxedgealpha'] \
+        if fullheight_style_dict['fullheight_boxedgealpha'] is not None \
         else character_style_dict['character_boxedgealpha']
-    fullheight_zorder = fullheight_zorder \
-        if fullheight_zorder is not None \
+    fullheight_style_dict['fullheight_zorder'] = fullheight_style_dict['fullheight_zorder'] \
+        if fullheight_style_dict['fullheight_zorder'] is not None \
         else character_style_dict['character_zorder']
-    fullheight_vsep = fullheight_vsep \
-        if fullheight_vsep is not None \
+    fullheight_style_dict['fullheight_vsep'] = fullheight_style_dict['fullheight_vsep'] \
+        if fullheight_style_dict['fullheight_vsep'] is not None \
         else vsep
-    fullheight_width = fullheight_width \
-        if fullheight_width is not None \
+    fullheight_style_dict['fullheight_width'] = fullheight_style_dict['fullheight_width'] \
+        if fullheight_style_dict['fullheight_width'] is not None \
         else width
 
     ######################################################################
@@ -1317,10 +1303,10 @@ def make_logo(dataframe=None,
         ('highlight_style_dict["highlight_edgecolors"]', 'highlight_style_dict["highlight_edgealpha"]'),
         ('highlight_style_dict["highlight_boxcolors"]', 'highlight_style_dict["highlight_boxalpha"]'),
         ('highlight_style_dict["highlight_boxedgecolors"]', 'highlight_style_dict["highlight_boxedgealpha"]'),
-        ('fullheight_colors', 'fullheight_alpha'),
-        ('fullheight_edgecolors', 'fullheight_edgealpha'),
-        ('fullheight_boxcolors', 'fullheight_boxalpha'),
-        ('fullheight_boxedgecolors', 'fullheight_boxedgealpha')
+        ('fullheight_style_dict["fullheight_colors"]', 'fullheight_style_dict["fullheight_alpha"]'),
+        ('fullheight_style_dict["fullheight_edgecolors"]', 'fullheight_style_dict["fullheight_edgealpha"]'),
+        ('fullheight_style_dict["fullheight_boxcolors"]', 'fullheight_style_dict["fullheight_boxalpha"]'),
+        ('fullheight_style_dict["fullheight_boxedgecolors"]', 'fullheight_style_dict["fullheight_boxedgealpha"]')
     ]
 
     for colors_varname, alpha_varname in colors_alpha_pairs:
@@ -1377,24 +1363,24 @@ def make_logo(dataframe=None,
 
 
     fullheight_style = {
-        'facecolors': color.get_color_dict(color_scheme=fullheight_colors,
+        'facecolors': color.get_color_dict(color_scheme=fullheight_style_dict['fullheight_colors'],
                                            chars=fullheight_characters,
-                                           alpha=fullheight_alpha),
-        'edgecolors': color.get_color_dict(color_scheme=fullheight_edgecolors,
+                                           alpha=fullheight_style_dict['fullheight_alpha']),
+        'edgecolors': color.get_color_dict(color_scheme=fullheight_style_dict['fullheight_edgecolors'],
                                            chars=fullheight_characters,
-                                           alpha=fullheight_edgealpha),
-        'boxcolors': color.get_color_dict(color_scheme=fullheight_boxcolors,
+                                           alpha=fullheight_style_dict['fullheight_edgealpha']),
+        'boxcolors': color.get_color_dict(color_scheme=fullheight_style_dict['fullheight_boxcolors'],
                                           chars=fullheight_characters,
-                                          alpha=fullheight_boxalpha),
+                                          alpha=fullheight_style_dict['fullheight_boxalpha']),
         'boxedgecolors': color.get_color_dict(
-                                        color_scheme=fullheight_boxedgecolors,
+                                        color_scheme=fullheight_style_dict['fullheight_boxedgecolors'],
                                         chars=fullheight_characters,
-                                        alpha=fullheight_boxedgealpha),
-        'edgewidth': fullheight_edgewidth,
-        'boxedgewidth': fullheight_boxedgewidth,
-        'zorder': fullheight_zorder,
-        'vsep': fullheight_vsep,
-        'width': fullheight_width
+                                        alpha=fullheight_style_dict['fullheight_boxedgealpha']),
+        'edgewidth': fullheight_style_dict['fullheight_edgewidth'],
+        'boxedgewidth': fullheight_style_dict['fullheight_boxedgewidth'],
+        'zorder': fullheight_style_dict['fullheight_zorder'],
+        'vsep': fullheight_style_dict['fullheight_vsep'],
+        'width': fullheight_style_dict['fullheight_width']
     }
 
     '''
@@ -1937,7 +1923,7 @@ def make_logo(dataframe=None,
     logo = Logo(matrix=dataframe,
                 #highlight_sequence=highlight_sequence,
                 highlight_sequence=highlight_style_dict['highlight_sequence'],
-                fullheight=fullheight,
+                fullheight=fullheight_style_dict['fullheight'],
                 font_properties=font_properties,
                 character_style=character_style,
                 highlight_style=highlight_style,

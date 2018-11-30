@@ -338,6 +338,7 @@ params_that_specify_filenames = {
 params_that_specify_dicts = {
     'character_style_dict',
     'highlight_style_dict',
+    'fullheight_style_dict',
     'rcparams',
     'csv_kwargs',
     'background_csvkwargs'
