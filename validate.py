@@ -339,6 +339,8 @@ params_that_specify_dicts = {
     'character_style_dict',
     'highlight_style_dict',
     'fullheight_style_dict',
+    'font_style_dict',
+    'scalebar_dict',
     'rcparams',
     'csv_kwargs',
     'background_csvkwargs'
@@ -1068,6 +1070,8 @@ def validate_probability_mat(matrix):
     return matrix
 
 
+# Implementation note: this method should contain a list of the valid keys of any dictionary
+# that can be entered as a parameter for logomaker
 def _validate_user_set_dict(dict_name,dictionary_with_keys_vals):
 
     if(dict_name=='character_style_dict'):
@@ -1122,6 +1126,31 @@ def _validate_user_set_dict(dict_name,dictionary_with_keys_vals):
             'fullheight_width'
         ]
 
+    elif(dict_name=='font_style_dict'):
+
+        valid_dict_keys = [
+            'font_properties',
+            'font_file = None',
+            'font_family',
+            'font_weight',
+            'font_style',
+        ]
+
+    elif(dict_name=='scalebar_dict'):
+
+        valid_dict_keys = [
+            'show_scalebar',
+            'scalebar_length',
+            'scalebar_linewidth',
+            'scalebar_color',
+            'scalebar_text',
+            'scalebar_x',
+            'scalebar_ymin',
+            'scalebar_texthalignment',
+            'scalebar_textvalignment',
+            'scalebar_textrotation',
+        ]
+
     # need to fill condition for rcParams
 
     # if invalid key found, pop key.
@@ -1144,6 +1173,7 @@ def _validate_user_set_dict(dict_name,dictionary_with_keys_vals):
 
 # method that gets called if dictionaries aren't user supplied
 # so they may be populated with default values.
+# Implementation note: this needs to contain default dictionary key/values
 def _populate_default_dict_value(dict_name,dictionary_with_keys_vals,dict_set_by_user=False,keys_not_set_by_user=None):
 
     dict_to_be_populated = {}
@@ -1226,6 +1256,49 @@ def _populate_default_dict_value(dict_name,dictionary_with_keys_vals,dict_set_by
         else:
             for missing_key in keys_not_set_by_user:
                 dictionary_with_keys_vals[missing_key] = default_fullheight_style_values[missing_key]
+
+
+    elif (dict_name == 'font_style_dict'):
+
+        default_font_style_values = {
+            'font_properties':None,
+            'font_file':None,
+            'font_family':('Arial Rounded MT Bold', 'Arial', 'sans'),
+            'font_weight':'bold',
+            'font_style':None,
+        }
+
+        # if the user hasn't set the dictionary at all, set all keys to default values
+        if (dict_set_by_user == False):
+            dict_to_be_populated = default_font_style_values
+        else:
+            for missing_key in keys_not_set_by_user:
+                dictionary_with_keys_vals[missing_key] = default_font_style_values[missing_key]
+
+    elif(dict_name=='scalebar_dict'):
+
+        default_scalarbar_dict_values = {
+
+                'show_scalebar':None,
+                'scalebar_length':None,
+                'scalebar_linewidth':None,
+                'scalebar_color':None,
+                'scalebar_text':None,
+                'scalebar_x':None,
+                'scalebar_ymin':None,
+                'scalebar_texthalignment':None,
+                'scalebar_textvalignment':None,
+                'scalebar_textrotation':None,
+        }
+
+
+        # if the user hasn't set the dictionary at all, set all keys to default values
+        if (dict_set_by_user == False):
+            dict_to_be_populated = default_scalarbar_dict_values
+        else:
+            for missing_key in keys_not_set_by_user:
+                dictionary_with_keys_vals[missing_key] = default_scalarbar_dict_values[missing_key]
+
 
     elif (dict_name == 'rcparams'):
         dict_to_be_populated = {}

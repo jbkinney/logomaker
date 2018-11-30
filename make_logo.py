@@ -52,6 +52,8 @@ def make_logo(dataframe=None,
 
               # Dictionary containing styling options for characters
               character_style_dict = None,
+              # reason for not doing character_style_dict = {}, see below:
+              # https://stackoverflow.com/questions/26320899/why-is-the-empty-dictionary-a-dangerous-default-value-in-python
 
               # Highlighted character formatting
               highlight_style_dict = None,
@@ -60,11 +62,7 @@ def make_logo(dataframe=None,
               fullheight_style_dict = None,
 
               # Character font
-              font_properties=None,
-              font_file=None,
-              font_family=('Arial Rounded MT Bold', 'Arial', 'sans'),
-              font_weight='bold',
-              font_style=None,
+              font_style_dict = None,
 
               # Character placement
               stack_order='big_on_top',
@@ -84,20 +82,12 @@ def make_logo(dataframe=None,
               # Special axes formatting
               axes_type='classic',
               style_sheet=None,
+
               #rcparams={},
               rcparams=None,
 
-              # Scalebar styling
-              show_scalebar=None,
-              scalebar_length=None,
-              scalebar_linewidth=None,
-              scalebar_color=None,
-              scalebar_text=None,
-              scalebar_x=None,
-              scalebar_ymin=None,
-              scalebar_texthalignment=None,
-              scalebar_textvalignment=None,
-              scalebar_textrotation=None,
+              # Scalebar parameters
+              scalebar_dict = None,
 
               # Grid line formatting
               show_gridlines=None,
@@ -1171,17 +1161,17 @@ def make_logo(dataframe=None,
     # font_properties
 
     # If font_properties is set directly by user, validate it
-    if font_properties is not None:
-        assert isinstance(font_properties, FontProperties), \
+    if font_style_dict['font_properties'] is not None:
+        assert isinstance(font_style_dict['font_properties'], FontProperties), \
             'Error: font_properties is not an instance of FontProperties.'
     # Otherwise, create font_properties from other font information
     else:
 
         # Create properties
-        font_properties = FontProperties(family=font_family,
-                                         weight=font_weight,
-                                         fname=font_file,
-                                         style=font_style)
+        font_style_dict['font_properties'] = FontProperties(family=font_style_dict['font_family'],
+                                         weight=font_style_dict['font_weight'],
+                                         fname=font_style_dict['font_file'],
+                                         style=font_style_dict['font_style'])
 
     ######################################################################
     # Set highlight style
@@ -1713,8 +1703,8 @@ def make_logo(dataframe=None,
             show_baseline = True
         if show_gridlines is None:
             show_gridlines = False
-        if show_scalebar is None:
-            show_scalebar = True
+        if scalebar_dict['show_scalebar'] is None:
+            scalebar_dict['show_scalebar'] = True
 
     # If showing binary yaxis, symmetrize ylim and set yticks to +/-
     if show_binary_yaxis:
@@ -1783,43 +1773,43 @@ def make_logo(dataframe=None,
     title_fontproperties = FontProperties(**title_fontdict)
 
     # Set scalebar defaults
-    if show_scalebar is None:
-        show_scalebar = False
-    if scalebar_text is None:
-        scalebar_text = '1 unit'
-    if scalebar_color is None:
-        scalebar_color = mpl.rcParams['axes.edgecolor']
-    if scalebar_linewidth is None:
-        scalebar_linewidth = 2
-    if scalebar_x is None:
-        scalebar_x = xlim[0]-.5
-    if scalebar_length is None:
-        scalebar_length = 1
-    if scalebar_ymin is None:
-        scalebar_ymin = 0.5*(ylim[0] + ylim[1]) - .5
-    if scalebar_texthalignment is None:
-        scalebar_texthalignment = 'right'
-    if scalebar_textvalignment is None:
-        scalebar_textvalignment = 'center'
-    if scalebar_textrotation is None:
-        scalebar_textrotation = 90
+    if scalebar_dict['show_scalebar'] is None:
+        scalebar_dict['show_scalebar'] = False
+    if scalebar_dict['scalebar_text'] is None:
+        scalebar_dict['scalebar_text'] = '1 unit'
+    if scalebar_dict['scalebar_color'] is None:
+        scalebar_dict['scalebar_color'] = mpl.rcParams['axes.edgecolor']
+    if scalebar_dict['scalebar_linewidth'] is None:
+        scalebar_dict['scalebar_linewidth'] = 2
+    if scalebar_dict['scalebar_x'] is None:
+        scalebar_dict['scalebar_x'] = xlim[0]-.5
+    if scalebar_dict['scalebar_length'] is None:
+        scalebar_dict['scalebar_length'] = 1
+    if scalebar_dict['scalebar_ymin'] is None:
+        scalebar_dict['scalebar_ymin'] = 0.5*(ylim[0] + ylim[1]) - .5
+    if scalebar_dict['scalebar_texthalignment'] is None:
+        scalebar_dict['scalebar_texthalignment'] = 'right'
+    if scalebar_dict['scalebar_textvalignment'] is None:
+        scalebar_dict['scalebar_textvalignment'] = 'center'
+    if scalebar_dict['scalebar_textrotation'] is None:
+        scalebar_dict['scalebar_textrotation'] = 90
 
     # Scalebar styling
     scalebar_linestyle = {
-        'linewidth': scalebar_linewidth,
-        'color': scalebar_color,
-        'xloc': scalebar_x,
-        'ymin': scalebar_ymin,
-        'ymax': scalebar_ymin+scalebar_length,
+        'linewidth': scalebar_dict['scalebar_linewidth'],
+        'color': scalebar_dict['scalebar_color'],
+        'xloc': scalebar_dict['scalebar_x'],
+        'ymin': scalebar_dict['scalebar_ymin'],
+        'ymax': scalebar_dict['scalebar_ymin']+scalebar_dict['scalebar_length'],
     }
     scalebar_linestyle = remove_none_from_dict(scalebar_linestyle)
 
     scalebar_textstyle = {
-        'y': scalebar_ymin + scalebar_length/2,
-        'text': scalebar_text,
-        'horizontalalignment': scalebar_texthalignment,
-        'verticalalignment': scalebar_textvalignment,
-        'rotation': scalebar_textrotation,
+        'y': scalebar_dict['scalebar_ymin'] + scalebar_dict['scalebar_length']/2,
+        'text': scalebar_dict['scalebar_text'],
+        'horizontalalignment': scalebar_dict['scalebar_texthalignment'],
+        'verticalalignment': scalebar_dict['scalebar_textvalignment'],
+        'rotation': scalebar_dict['scalebar_textrotation'],
     }
     scalebar_textstyle = remove_none_from_dict(scalebar_textstyle)
 
@@ -1827,7 +1817,7 @@ def make_logo(dataframe=None,
     scalebar_style = {
         'line_kwargs': scalebar_linestyle,
         'text_kwargs': scalebar_textstyle,
-        'visible': show_scalebar}
+        'visible': scalebar_dict['show_scalebar']}
 
     # Gridline styling
     gridline_dict = {
@@ -1924,7 +1914,7 @@ def make_logo(dataframe=None,
                 #highlight_sequence=highlight_sequence,
                 highlight_sequence=highlight_style_dict['highlight_sequence'],
                 fullheight=fullheight_style_dict['fullheight'],
-                font_properties=font_properties,
+                font_properties=font_style_dict['font_properties'],
                 character_style=character_style,
                 highlight_style=highlight_style,
                 fullheight_style=fullheight_style,
