@@ -336,6 +336,8 @@ params_that_specify_filenames = {
 
 # Parameters that specify dictionaries
 params_that_specify_dicts = {
+    'character_style_dict',
+    'highlight_style_dict',
     'rcparams',
     'csv_kwargs',
     'background_csvkwargs'
@@ -368,8 +370,17 @@ def validate_parameter(name, user, default):
 
     # Skip if value is none
     if user is None:
-        if name in params_that_cant_be_none:
+        # the second condition is added to avoid mutable argument bugs for dictionaries
+        # simply: when dicts are not set by the user, the following will validate/populate with defaults
+
+        if name in params_that_cant_be_none and name not in params_that_specify_dicts:
             raise ValueError("Parameter '%s' cannot be None." % name)
+
+        # this implementation is here to avoid the buggy
+        # implementation earlier for mutable arguments in make_logo
+        elif name in params_that_specify_dicts:
+
+            value = _validate_dict(name, user, default)
         else:
             value = user
 
@@ -448,8 +459,10 @@ def validate_parameter(name, user, default):
     elif name in params_that_specify_filenames:
         value = _validate_filename(name, user, default)
 
-    # If value specifies a dicitionary
+    # If value specifies a dicitionary (and user is None)
+
     elif name in params_that_specify_dicts:
+        # checking params when user value for dict is not none
         value = _validate_dict(name, user, default)
 
     # Special case: shift_first_position_to
@@ -466,8 +479,8 @@ def validate_parameter(name, user, default):
         value = _validate_iupac(name, user, default)
 
     # Special case: matrix
-    elif name == 'matrix':
-        value = validate_mat(user, allow_nan=True)
+    elif name == 'dataframe':
+        value = validate_dataframe(user, allow_nan=True)
 
     # Special case: figsize
     elif name == 'figsize':
@@ -491,6 +504,7 @@ def validate_parameter(name, user, default):
     else:
         warnings.warn("'%s' parameter not validated." % name, UserWarning)
         value = user
+
 
     return value
 
@@ -906,13 +920,24 @@ def _validate_linestyle(name, user, default):
 def _validate_dict(name, user, default):
     """ Validates any parameter that specifies a dictionary. """
 
-    if type(user) == dict:
-        value = user
+    # if dict set by user
+    if(user is not None):
+
+        if type(user) == dict:
+            value = user
+            _validate_user_set_dict(name, user)
+
+        else:
+            message = "%s = %s is not a dictionary. Using %s instead." \
+                      % (name, repr(user), repr(default))
+            warnings.warn(message, UserWarning)
+            value = default
+
+    # if none, then return dict populated with default values
+    # i.e., if not set by user
     else:
-        message = "%s = %s is not a dictionary. Using %s instead." \
-                  % (name, repr(user), repr(default))
-        warnings.warn(message, UserWarning)
-        value = default
+
+        value = _populate_default_dict_value(name,user)
 
     # Return valid value to user
     return value
@@ -951,38 +976,38 @@ def _validate_ticklabels(name, user, default):
     return value
 
 
-def validate_mat(matrix, allow_nan=True):
+def validate_dataframe(dataframe, allow_nan=True):
     '''
     Runs assert statements to verify that df is indeed a motif dataframe.
     Returns a cleaned-up version of df if possible
     '''
 
     # Copy and preserve logomaker_type
-    matrix = matrix.copy()
+    dataframe = dataframe.copy()
 
-    assert type(matrix) == pd.core.frame.DataFrame, 'Error: df is not a dataframe'
+    assert type(dataframe) == pd.core.frame.DataFrame, 'Error: df is not a dataframe'
 
     if not allow_nan:
         # Make sure all entries are finite numbers
-        assert np.isfinite(matrix.values).all(), \
+        assert np.isfinite(dataframe.values).all(), \
             'Error: some matrix elements are not finite.' +\
             'Set allow_nan=True to allow.'
 
     # Make sure the matrix has a finite number of rows and columns
-    assert matrix.shape[0] >= 1, 'Error: matrix has zero rows.'
-    assert matrix.shape[1] >= 1, 'Error: matrix has zero columns.'
+    assert dataframe.shape[0] >= 1, 'Error: matrix has zero rows.'
+    assert dataframe.shape[1] >= 1, 'Error: matrix has zero columns.'
 
     # Remove columns whose names aren't strings exactly 1 character long.
     # Warn user when doing so
-    cols = matrix.columns
+    cols = dataframe.columns
     for col in cols:
         if not isinstance(col, basestring) or (len(col) != 1):
-            del matrix[col]
+            del dataframe[col]
             message = ('Matrix has invalid column name "%s". This column ' +
                        'has been removed.') % col
             warnings.warn(message, UserWarning)
 
-    cols = matrix.columns
+    cols = dataframe.columns
     for i, col_name in enumerate(cols):
         # Ok to have a 'pos' column
         if col_name == 'pos':
@@ -1005,23 +1030,23 @@ def validate_mat(matrix, allow_nan=True):
             'Error: column name "%s" is a whitespace charcter.'%repr(col_name)
 
         # Set revised column name
-        matrix.rename(columns={col_name:new_col_name}, inplace=True)
+        dataframe.rename(columns={col_name:new_col_name}, inplace=True)
 
     # If there is a pos column, make that the index
     if 'pos' in cols:
-        matrix['pos'] = matrix['pos'].astype(int)
-        matrix.set_index('pos', drop=True, inplace=True)
+        dataframe['pos'] = dataframe['pos'].astype(int)
+        dataframe.set_index('pos', drop=True, inplace=True)
 
     # Remove name from index column
-    matrix.index.names = [None]
+    dataframe.index.names = [None]
 
     # Alphabetize character columns
-    char_cols = list(matrix.columns)
+    char_cols = list(dataframe.columns)
     char_cols.sort()
-    matrix = matrix[char_cols]
+    dataframe = dataframe[char_cols]
 
     # Return cleaned-up df
-    return matrix
+    return dataframe
 
 def validate_probability_mat(matrix):
     '''
@@ -1030,7 +1055,7 @@ def validate_probability_mat(matrix):
     '''
 
     # Validate as motif
-    matrix = validate_mat(matrix)
+    matrix = validate_dataframe(matrix)
 
     # Validate df values as info values
     assert (all(matrix.values.ravel() >= 0)), \
@@ -1041,3 +1066,168 @@ def validate_probability_mat(matrix):
 
     return matrix
 
+
+def _validate_user_set_dict(dict_name,dictionary_with_keys_vals):
+
+    if(dict_name=='character_style_dict'):
+
+        valid_dict_keys = [
+            'character_colors',
+            'character_alpha',
+            'character_edgecolors',
+            'character_edgealpha',
+            'character_edgewidth',
+            'character_boxcolors',
+            'character_boxedgecolors',
+            'character_boxedgewidth',
+            'character_boxalpha',
+            'character_boxedgealpha',
+            'character_zorder'
+        ]
+    elif(dict_name=='highlight_style_dict'):
+
+        valid_dict_keys = [
+            'highlight_sequence',
+            'highlight_bgconsensus',
+            'highlight_colors',
+            'highlight_alpha',
+            'highlight_edgecolors',
+            'highlight_edgewidth',
+            'highlight_edgealpha',
+            'highlight_boxcolors',
+            'highlight_boxalpha',
+            'highlight_boxedgecolors',
+            'highlight_boxedgewidth',
+            'highlight_boxedgealpha',
+            'highlight_zorder'
+        ]
+
+    elif(dict_name=='fullheight_style_dict'):
+
+        valid_dict_keys = [
+            'fullheight',
+            'fullheight_colors',
+            'fullheight_alpha',
+            'fullheight_edgecolors',
+            'fullheight_edgewidth',
+            'fullheight_edgealpha',
+            'fullheight_boxcolors',
+            'fullheight_boxalpha',
+            'fullheight_boxedgecolors',
+            'fullheight_boxedgewidth',
+            'fullheight_boxedgealpha',
+            'fullheight_zorder',
+            'fullheight_vsep',
+            'fullheight_width'
+        ]
+
+    # need to fill condition for rcParams
+
+    # if invalid key found, pop key.
+    for k in dictionary_with_keys_vals.keys():
+        if (k not in valid_dict_keys):
+            warnings.warn(" Invalid key '%s' for %s, removing invalid key... " %(k,dict_name), UserWarning)
+            dictionary_with_keys_vals.pop(k)
+
+    # find keys that the user did not provide and set them to defaults
+    keys_not_set_by_user = list(set(dictionary_with_keys_vals).symmetric_difference(valid_dict_keys))
+
+    # populate the missing keys with default values
+    if (len(keys_not_set_by_user) > 0):
+        _populate_default_dict_value(dict_name, dictionary_with_keys_vals, dict_set_by_user=True,
+                                     keys_not_set_by_user=keys_not_set_by_user)
+
+    else:
+        return dictionary_with_keys_vals
+
+
+# method that gets called if dictionaries aren't user supplied
+# so they may be populated with default values.
+def _populate_default_dict_value(dict_name,dictionary_with_keys_vals,dict_set_by_user=False,keys_not_set_by_user=None):
+
+    dict_to_be_populated = {}
+
+    if(dict_name=='character_style_dict'):
+
+        default_character_style_values = {
+            'character_colors': 'classic',
+            'character_alpha': None,
+            'character_edgecolors': None,
+            'character_edgealpha': None,
+            'character_edgewidth': 1,
+            'character_boxcolors': None,
+            'character_boxedgecolors': None,
+            'character_boxedgewidth': 1,
+            'character_boxalpha': None,
+            'character_boxedgealpha': None,
+            'character_zorder': 3
+        }
+
+        # if the user hasn't set the dictionary at all, set all keys to default values
+        if(dict_set_by_user==False):
+            dict_to_be_populated = default_character_style_values
+
+        # if the user has partially set the dictionary
+        elif(dict_set_by_user==True):
+
+            # set the missing key values to defaults
+            for missing_key in keys_not_set_by_user:
+                dictionary_with_keys_vals[missing_key] = default_character_style_values[missing_key]
+
+    elif (dict_name == 'highlight_style_dict'):
+
+        default_highlight_style_values = {
+            'highlight_sequence':None,
+            'highlight_bgconsensus':False,
+            'highlight_colors':None,
+            'highlight_alpha':None,
+            'highlight_edgecolors':None,
+            'highlight_edgewidth':None,
+            'highlight_edgealpha':None,
+            'highlight_boxcolors':None,
+            'highlight_boxalpha':None,
+            'highlight_boxedgecolors':None,
+            'highlight_boxedgewidth':None,
+            'highlight_boxedgealpha':None,
+            'highlight_zorder':None
+        }
+
+        # if the user hasn't set the dictionary at all, set all keys to default values
+        if (dict_set_by_user == False):
+            dict_to_be_populated = default_highlight_style_values
+        else:
+            for missing_key in keys_not_set_by_user:
+                dictionary_with_keys_vals[missing_key] = default_highlight_style_values[missing_key]
+
+
+    elif (dict_name == 'fullheight_style_dict'):
+
+        default_fullheight_style_values = {
+            'fullheight':None,
+            'fullheight_colors':None,
+            'fullheight_alpha':None,
+            'fullheight_edgecolors':None,
+            'fullheight_edgewidth':None,
+            'fullheight_edgealpha':None,
+            'fullheight_boxcolors':None,
+            'fullheight_boxalpha':None,
+            'fullheight_boxedgecolors':None,
+            'fullheight_boxedgewidth':None,
+            'fullheight_boxedgealpha':None,
+            'fullheight_zorder':None,
+            'fullheight_vsep':None,
+            'fullheight_width':None
+        }
+
+        # if the user hasn't set the dictionary at all, set all keys to default values
+        if (dict_set_by_user == False):
+            dict_to_be_populated = default_fullheight_style_values
+        else:
+            for missing_key in keys_not_set_by_user:
+                dictionary_with_keys_vals[missing_key] = default_fullheight_style_values[missing_key]
+
+    elif (dict_name == 'rcparams'):
+        dict_to_be_populated = {}
+
+
+    return dict_to_be_populated
