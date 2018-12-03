@@ -338,9 +338,6 @@ params_that_specify_filenames = {
 params_that_specify_dicts = {
     'character_style_dict',
     'highlight_style_dict',
-    'fullheight_style_dict',
-    'font_style_dict',
-    'scalebar_dict',
     'rcparams',
     'csv_kwargs',
     'background_csvkwargs'
@@ -928,7 +925,16 @@ def _validate_dict(name, user, default):
 
         if type(user) == dict:
             value = user
-            _validate_user_set_dict(name, user)
+
+            if(name=='character_style_dict'):
+                _validate_character_style_dict_keys(name, user)
+            elif(name=='highlight_style_dict'):
+                print('ali tui')
+                sys.exit()
+
+            elif(name=='rcparmas'):
+                # need method to validate default values
+                value = {}
 
         else:
             message = "%s = %s is not a dictionary. Using %s instead." \
@@ -1070,110 +1076,44 @@ def validate_probability_mat(matrix):
     return matrix
 
 
-# Implementation note: this method should contain a list of the valid keys of any dictionary
-# that can be entered as a parameter for logomaker
-def _validate_user_set_dict(dict_name,dictionary_with_keys_vals):
+# validate character style dict
+def _validate_character_style_dict_keys(dict_name,character_style_dict):
 
-    if(dict_name=='character_style_dict'):
+    # this method will be run in _validate_dict()
 
-        valid_dict_keys = [
-            'character_colors',
-            'character_alpha',
-            'character_edgecolors',
-            'character_edgealpha',
-            'character_edgewidth',
-            'character_boxcolors',
-            'character_boxedgecolors',
-            'character_boxedgewidth',
-            'character_boxalpha',
-            'character_boxedgealpha',
-            'character_zorder'
-        ]
-    elif(dict_name=='highlight_style_dict'):
-
-        valid_dict_keys = [
-            'highlight_sequence',
-            'highlight_bgconsensus',
-            'highlight_colors',
-            'highlight_alpha',
-            'highlight_edgecolors',
-            'highlight_edgewidth',
-            'highlight_edgealpha',
-            'highlight_boxcolors',
-            'highlight_boxalpha',
-            'highlight_boxedgecolors',
-            'highlight_boxedgewidth',
-            'highlight_boxedgealpha',
-            'highlight_zorder'
-        ]
-
-    elif(dict_name=='fullheight_style_dict'):
-
-        valid_dict_keys = [
-            'fullheight',
-            'fullheight_colors',
-            'fullheight_alpha',
-            'fullheight_edgecolors',
-            'fullheight_edgewidth',
-            'fullheight_edgealpha',
-            'fullheight_boxcolors',
-            'fullheight_boxalpha',
-            'fullheight_boxedgecolors',
-            'fullheight_boxedgewidth',
-            'fullheight_boxedgealpha',
-            'fullheight_zorder',
-            'fullheight_vsep',
-            'fullheight_width'
-        ]
-
-    elif(dict_name=='font_style_dict'):
-
-        valid_dict_keys = [
-            'font_properties',
-            'font_file = None',
-            'font_family',
-            'font_weight',
-            'font_style',
-        ]
-
-    elif(dict_name=='scalebar_dict'):
-
-        valid_dict_keys = [
-            'show_scalebar',
-            'scalebar_length',
-            'scalebar_linewidth',
-            'scalebar_color',
-            'scalebar_text',
-            'scalebar_x',
-            'scalebar_ymin',
-            'scalebar_texthalignment',
-            'scalebar_textvalignment',
-            'scalebar_textrotation',
-        ]
-
-    # need to fill condition for rcParams
+    valid_character_dict_keys = [
+        'character_colors',
+        'character_alpha',
+        'character_edgecolors',
+        'character_edgealpha',
+        'character_edgewidth',
+        'character_boxcolors',
+        'character_boxedgecolors',
+        'character_boxedgewidth',
+        'character_boxalpha',
+        'character_boxedgealpha',
+        'character_zorder'
+    ]
 
     # if invalid key found, pop key.
-    for k in dictionary_with_keys_vals.keys():
-        if (k not in valid_dict_keys):
-            warnings.warn(" Invalid key '%s' for %s, removing invalid key... " %(k,dict_name), UserWarning)
-            dictionary_with_keys_vals.pop(k)
+    for k in character_style_dict.keys():
+        if(k not in valid_character_dict_keys):
+            warnings.warn(" Invalid key '%s' for character_style_dict, removing invalid key... " % k, UserWarning)
+            character_style_dict.pop(k)
 
     # find keys that the user did not provide and set them to defaults
-    keys_not_set_by_user = list(set(dictionary_with_keys_vals).symmetric_difference(valid_dict_keys))
+    keys_not_set_by_user = list(set(character_style_dict).symmetric_difference(valid_character_dict_keys))
 
     # populate the missing keys with default values
-    if (len(keys_not_set_by_user) > 0):
-        _populate_default_dict_value(dict_name, dictionary_with_keys_vals, dict_set_by_user=True,
-                                     keys_not_set_by_user=keys_not_set_by_user)
+    if(len(keys_not_set_by_user)>0):
+        _populate_default_dict_value(dict_name,character_style_dict,dict_set_by_user=True,keys_not_set_by_user=keys_not_set_by_user)
 
     else:
-        return dictionary_with_keys_vals
+        return character_style_dict
 
 
 # method that gets called if dictionaries aren't user supplied
 # so they may be populated with default values.
-# Implementation note: this needs to contain default dictionary key/values
 def _populate_default_dict_value(dict_name,dictionary_with_keys_vals,dict_set_by_user=False,keys_not_set_by_user=None):
 
     dict_to_be_populated = {}
@@ -1199,6 +1139,7 @@ def _populate_default_dict_value(dict_name,dictionary_with_keys_vals,dict_set_by
             dict_to_be_populated = default_character_style_values
 
         # if the user has partially set the dictionary
+
         elif(dict_set_by_user==True):
 
             # set the missing key values to defaults
@@ -1208,96 +1149,14 @@ def _populate_default_dict_value(dict_name,dictionary_with_keys_vals,dict_set_by
     elif (dict_name == 'highlight_style_dict'):
 
         default_highlight_style_values = {
-            'highlight_sequence':None,
-            'highlight_bgconsensus':False,
-            'highlight_colors':None,
-            'highlight_alpha':None,
-            'highlight_edgecolors':None,
-            'highlight_edgewidth':None,
-            'highlight_edgealpha':None,
-            'highlight_boxcolors':None,
-            'highlight_boxalpha':None,
-            'highlight_boxedgecolors':None,
-            'highlight_boxedgewidth':None,
-            'highlight_boxedgealpha':None,
-            'highlight_zorder':None
+            'highlight_sequence':None
         }
 
         # if the user hasn't set the dictionary at all, set all keys to default values
         if (dict_set_by_user == False):
             dict_to_be_populated = default_highlight_style_values
-        else:
-            for missing_key in keys_not_set_by_user:
-                dictionary_with_keys_vals[missing_key] = default_highlight_style_values[missing_key]
 
 
-    elif (dict_name == 'fullheight_style_dict'):
-
-        default_fullheight_style_values = {
-            'fullheight':None,
-            'fullheight_colors':None,
-            'fullheight_alpha':None,
-            'fullheight_edgecolors':None,
-            'fullheight_edgewidth':None,
-            'fullheight_edgealpha':None,
-            'fullheight_boxcolors':None,
-            'fullheight_boxalpha':None,
-            'fullheight_boxedgecolors':None,
-            'fullheight_boxedgewidth':None,
-            'fullheight_boxedgealpha':None,
-            'fullheight_zorder':None,
-            'fullheight_vsep':None,
-            'fullheight_width':None
-        }
-
-        # if the user hasn't set the dictionary at all, set all keys to default values
-        if (dict_set_by_user == False):
-            dict_to_be_populated = default_fullheight_style_values
-        else:
-            for missing_key in keys_not_set_by_user:
-                dictionary_with_keys_vals[missing_key] = default_fullheight_style_values[missing_key]
-
-
-    elif (dict_name == 'font_style_dict'):
-
-        default_font_style_values = {
-            'font_properties':None,
-            'font_file':None,
-            'font_family':('Arial Rounded MT Bold', 'Arial', 'sans'),
-            'font_weight':'bold',
-            'font_style':None,
-        }
-
-        # if the user hasn't set the dictionary at all, set all keys to default values
-        if (dict_set_by_user == False):
-            dict_to_be_populated = default_font_style_values
-        else:
-            for missing_key in keys_not_set_by_user:
-                dictionary_with_keys_vals[missing_key] = default_font_style_values[missing_key]
-
-    elif(dict_name=='scalebar_dict'):
-
-        default_scalarbar_dict_values = {
-
-                'show_scalebar':None,
-                'scalebar_length':None,
-                'scalebar_linewidth':None,
-                'scalebar_color':None,
-                'scalebar_text':None,
-                'scalebar_x':None,
-                'scalebar_ymin':None,
-                'scalebar_texthalignment':None,
-                'scalebar_textvalignment':None,
-                'scalebar_textrotation':None,
-        }
-
-
-        # if the user hasn't set the dictionary at all, set all keys to default values
-        if (dict_set_by_user == False):
-            dict_to_be_populated = default_scalarbar_dict_values
-        else:
-            for missing_key in keys_not_set_by_user:
-                dictionary_with_keys_vals[missing_key] = default_scalarbar_dict_values[missing_key]
 
 
     elif (dict_name == 'rcparams'):

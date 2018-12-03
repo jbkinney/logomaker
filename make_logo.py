@@ -52,17 +52,46 @@ def make_logo(dataframe=None,
 
               # Dictionary containing styling options for characters
               character_style_dict = None,
-              # reason for not doing character_style_dict = {}, see below:
-              # https://stackoverflow.com/questions/26320899/why-is-the-empty-dictionary-a-dangerous-default-value-in-python
 
               # Highlighted character formatting
               highlight_style_dict = None,
 
+              #highlight_sequence=None,
+              highlight_bgconsensus=False,
+              highlight_colors=None,
+              highlight_alpha=None,
+              highlight_edgecolors=None,
+              highlight_edgewidth=None,
+              highlight_edgealpha=None,
+              highlight_boxcolors=None,
+              highlight_boxalpha=None,
+              highlight_boxedgecolors=None,
+              highlight_boxedgewidth=None,
+              highlight_boxedgealpha=None,
+              highlight_zorder=None,
+
               # Full height formatting
-              fullheight_style_dict = None,
+              fullheight=None,
+              fullheight_colors=None,
+              fullheight_alpha=None,
+              fullheight_edgecolors=None,
+              fullheight_edgewidth=None,
+              fullheight_edgealpha=None,
+              fullheight_boxcolors=None,
+              fullheight_boxalpha=None,
+              fullheight_boxedgecolors=None,
+              fullheight_boxedgewidth=None,
+              fullheight_boxedgealpha=None,
+              fullheight_zorder=None,
+              fullheight_vsep=None,
+              fullheight_width=None,
 
               # Character font
-              font_style_dict = None,
+              font_properties=None,
+              font_file=None,
+              font_family=('Arial Rounded MT Bold', 'Arial', 'sans'),
+              font_weight='bold',
+              font_style=None,
 
               # Character placement
               stack_order='big_on_top',
@@ -82,12 +111,20 @@ def make_logo(dataframe=None,
               # Special axes formatting
               axes_type='classic',
               style_sheet=None,
-
               #rcparams={},
               rcparams=None,
 
-              # Scalebar parameters
-              scalebar_dict = None,
+              # Scalebar styling
+              show_scalebar=None,
+              scalebar_length=None,
+              scalebar_linewidth=None,
+              scalebar_color=None,
+              scalebar_text=None,
+              scalebar_x=None,
+              scalebar_ymin=None,
+              scalebar_texthalignment=None,
+              scalebar_textvalignment=None,
+              scalebar_textrotation=None,
 
               # Grid line formatting
               show_gridlines=None,
@@ -1151,7 +1188,7 @@ def make_logo(dataframe=None,
 
     # Set highlight sequence from background consensus if requested
     # Overrides highlight_sequence
-    if highlight_style_dict['highlight_bgconsensus'] and bg_mat is not None:
+    if highlight_bgconsensus and bg_mat is not None:
         cols = bg_mat.columns
         highlight_style_dict['highlight_sequence'] = ''
         for i, row in bg_mat.iterrows():
@@ -1161,121 +1198,120 @@ def make_logo(dataframe=None,
     # font_properties
 
     # If font_properties is set directly by user, validate it
-    if font_style_dict['font_properties'] is not None:
-        assert isinstance(font_style_dict['font_properties'], FontProperties), \
+    if font_properties is not None:
+        assert isinstance(font_properties, FontProperties), \
             'Error: font_properties is not an instance of FontProperties.'
     # Otherwise, create font_properties from other font information
     else:
 
         # Create properties
-        font_style_dict['font_properties'] = FontProperties(family=font_style_dict['font_family'],
-                                         weight=font_style_dict['font_weight'],
-                                         fname=font_style_dict['font_file'],
-                                         style=font_style_dict['font_style'])
+        font_properties = FontProperties(family=font_family,
+                                         weight=font_weight,
+                                         fname=font_file,
+                                         style=font_style)
 
     ######################################################################
     # Set highlight style
 
     # Set higlighted character format
-    highlight_style_dict['highlight_colors'] = highlight_style_dict['highlight_colors'] \
-        if highlight_style_dict['highlight_colors'] is not None \
+    highlight_colors = highlight_colors \
+        if highlight_colors is not None \
         else character_style_dict['character_colors']
-    highlight_style_dict['highlight_alpha'] = float(highlight_style_dict['highlight_alpha']) \
-        if highlight_style_dict['highlight_alpha'] is not None \
+    highlight_alpha = float(highlight_alpha) \
+        if highlight_alpha is not None \
         else character_style_dict['character_alpha']
-    highlight_style_dict['highlight_edgecolors'] = highlight_style_dict['highlight_edgecolors'] \
-        if highlight_style_dict['highlight_edgecolors'] is not None \
+    highlight_edgecolors = highlight_edgecolors \
+        if highlight_edgecolors is not None \
         else character_style_dict['character_edgecolors']
-    highlight_style_dict['highlight_edgewidth'] = highlight_style_dict['highlight_edgewidth'] \
-        if highlight_style_dict['highlight_edgewidth'] is not None \
+    highlight_edgewidth = highlight_edgewidth \
+        if highlight_edgewidth is not None \
         else character_style_dict['character_edgewidth']
-    highlight_style_dict['highlight_edgealpha'] = float(highlight_style_dict['highlight_edgealpha']) \
-        if highlight_style_dict['highlight_edgealpha'] is not None \
+    highlight_edgealpha = float(highlight_edgealpha) \
+        if highlight_edgealpha is not None \
         else character_style_dict['character_edgealpha']
-    highlight_style_dict['highlight_boxcolors'] = highlight_style_dict['highlight_boxcolors'] \
-        if highlight_style_dict['highlight_boxcolors'] is not None \
+    highlight_boxcolors = highlight_boxcolors \
+        if highlight_boxcolors is not None \
         else character_style_dict['character_boxcolors']
-    highlight_style_dict['highlight_boxalpha'] = float(highlight_style_dict['highlight_boxalpha']) \
-        if highlight_style_dict['highlight_boxalpha'] is not None \
+    highlight_boxalpha = float(highlight_boxalpha) \
+        if highlight_boxalpha is not None \
         else character_style_dict['character_boxalpha']
-    highlight_style_dict['highlight_boxedgecolors'] = highlight_style_dict['highlight_boxedgecolors'] \
-        if highlight_style_dict['highlight_boxedgecolors'] is not None \
+    highlight_boxedgecolors = highlight_boxedgecolors \
+        if highlight_boxedgecolors is not None \
         else character_style_dict['character_boxedgecolors']
-    highlight_style_dict['highlight_boxedgewidth'] = highlight_style_dict['highlight_boxedgewidth'] \
-        if highlight_style_dict['highlight_boxedgewidth'] is not None \
+    highlight_boxedgewidth = highlight_boxedgewidth \
+        if highlight_boxedgewidth is not None \
         else character_style_dict['character_boxedgewidth']
-    highlight_style_dict['highlight_boxedgealpha'] = highlight_style_dict['highlight_boxedgealpha'] \
-        if highlight_style_dict['highlight_boxedgealpha'] is not None \
+    highlight_boxedgealpha = highlight_boxedgealpha \
+        if highlight_boxedgealpha is not None \
         else character_style_dict['character_boxedgealpha']
-    highlight_style_dict['highlight_zorder'] = highlight_style_dict['highlight_zorder'] \
-        if highlight_style_dict['highlight_zorder'] is not None \
+    highlight_zorder = highlight_zorder \
+        if highlight_zorder is not None \
         else character_style_dict['character_zorder']
 
     ######################################################################
     # Set fullheight style
 
     # If a list is passed, make characters transparent
-
-    if isinstance(fullheight_style_dict['fullheight'], np.ndarray):
+    if isinstance(fullheight, np.ndarray):
         # Force characters to be transparent, since these are dummy
         # characters anyway
-        fullheight_style_dict['fullheight_alpha'] = 0
+        fullheight_alpha = 0
 
         # Have box transparency default to 1, since that is all there
         # is to see
-        if fullheight_style_dict['fullheight_boxalpha'] is None:
-            fullheight_style_dict['fullheight_boxalpha'] = 1
+        if fullheight_boxalpha is None:
+            fullheight_boxalpha = 1
 
         # Create dictionary with dummy characters
-        keys = list(fullheight_style_dict['fullheight'])
-        vals = ['A']*len(fullheight_style_dict['fullheight'])
-        fullheight_style_dict['fullheight'] = dict(zip(keys, vals))
+        keys = list(fullheight)
+        vals = ['A']*len(fullheight)
+        fullheight = dict(zip(keys, vals))
 
     # If None, default to empty dictionary
-    elif fullheight_style_dict['fullheight'] is None:
-        fullheight_style_dict['fullheight'] = {}
+    elif fullheight is None:
+        fullheight = {}
 
-    fullheight_characters = set(fullheight_style_dict['fullheight'].values())
+    fullheight_characters = set(fullheight.values())
 
     # Set fullheight character format
-    fullheight_style_dict['fullheight_colors'] = fullheight_style_dict['fullheight_colors'] \
-        if fullheight_style_dict['fullheight_colors'] is not None \
+    fullheight_colors = fullheight_colors \
+        if fullheight_colors is not None \
         else character_style_dict['character_colors']
-    fullheight_style_dict['fullheight_alpha'] = float(fullheight_style_dict['fullheight_alpha']) \
-        if fullheight_style_dict['fullheight_alpha'] is not None \
+    fullheight_alpha = float(fullheight_alpha) \
+        if fullheight_alpha is not None \
         else character_style_dict['character_alpha']
-    fullheight_style_dict['fullheight_edgecolors'] = fullheight_style_dict['fullheight_edgecolors'] \
-        if fullheight_style_dict['fullheight_edgecolors'] is not None \
+    fullheight_edgecolors = fullheight_edgecolors \
+        if fullheight_edgecolors is not None \
         else character_style_dict['character_edgecolors']
-    fullheight_style_dict['fullheight_edgewidth'] = fullheight_style_dict['fullheight_edgewidth'] \
-        if fullheight_style_dict['fullheight_edgewidth'] is not None \
+    fullheight_edgewidth = fullheight_edgewidth \
+        if fullheight_edgewidth is not None \
         else character_style_dict['character_edgewidth']
-    fullheight_style_dict['fullheight_edgealpha'] = float(fullheight_style_dict['fullheight_edgealpha']) \
-        if fullheight_style_dict['fullheight_edgealpha'] is not None \
+    fullheight_edgealpha = float(fullheight_edgealpha) \
+        if fullheight_edgealpha is not None \
         else character_style_dict['character_edgealpha']
-    fullheight_style_dict['fullheight_boxcolors'] = fullheight_style_dict['fullheight_boxcolors'] \
-        if fullheight_style_dict['fullheight_boxcolors'] is not None \
+    fullheight_boxcolors = fullheight_boxcolors \
+        if fullheight_boxcolors is not None \
         else character_style_dict['character_boxcolors']
-    fullheight_style_dict['fullheight_boxalpha'] = float(fullheight_style_dict['fullheight_boxalpha']) \
-        if fullheight_style_dict['fullheight_boxalpha'] is not None \
+    fullheight_boxalpha = float(fullheight_boxalpha) \
+        if fullheight_boxalpha is not None \
         else character_style_dict['character_boxalpha']
-    fullheight_style_dict['fullheight_boxedgecolors'] = fullheight_style_dict['fullheight_boxedgecolors'] \
-        if fullheight_style_dict['fullheight_boxedgecolors'] is not None \
+    fullheight_boxedgecolors = fullheight_boxedgecolors \
+        if fullheight_boxedgecolors is not None \
         else character_style_dict['character_boxedgecolors']
-    fullheight_style_dict['fullheight_boxedgewidth'] = fullheight_style_dict['fullheight_boxedgewidth'] \
-        if fullheight_style_dict['fullheight_boxedgewidth'] is not None \
+    fullheight_boxedgewidth = fullheight_boxedgewidth \
+        if fullheight_boxedgewidth is not None \
         else character_style_dict['character_boxedgewidth']
-    fullheight_style_dict['fullheight_boxedgealpha'] = fullheight_style_dict['fullheight_boxedgealpha'] \
-        if fullheight_style_dict['fullheight_boxedgealpha'] is not None \
+    fullheight_boxedgealpha = fullheight_boxedgealpha \
+        if fullheight_boxedgealpha is not None \
         else character_style_dict['character_boxedgealpha']
-    fullheight_style_dict['fullheight_zorder'] = fullheight_style_dict['fullheight_zorder'] \
-        if fullheight_style_dict['fullheight_zorder'] is not None \
+    fullheight_zorder = fullheight_zorder \
+        if fullheight_zorder is not None \
         else character_style_dict['character_zorder']
-    fullheight_style_dict['fullheight_vsep'] = fullheight_style_dict['fullheight_vsep'] \
-        if fullheight_style_dict['fullheight_vsep'] is not None \
+    fullheight_vsep = fullheight_vsep \
+        if fullheight_vsep is not None \
         else vsep
-    fullheight_style_dict['fullheight_width'] = fullheight_style_dict['fullheight_width'] \
-        if fullheight_style_dict['fullheight_width'] is not None \
+    fullheight_width = fullheight_width \
+        if fullheight_width is not None \
         else width
 
     ######################################################################
@@ -1289,14 +1325,14 @@ def make_logo(dataframe=None,
         ('character_style_dict["character_edgecolors"]', 'character_style_dict["character_edgealpha"]'),
         ('character_style_dict["character_boxcolors"]', 'character_style_dict["character_boxalpha"]'),
         ('character_style_dict["character_boxedgecolors"]', 'character_style_dict["character_boxedgealpha"]'),
-        ('highlight_style_dict["highlight_colors"]', 'highlight_style_dict["highlight_alpha"]'),
-        ('highlight_style_dict["highlight_edgecolors"]', 'highlight_style_dict["highlight_edgealpha"]'),
-        ('highlight_style_dict["highlight_boxcolors"]', 'highlight_style_dict["highlight_boxalpha"]'),
-        ('highlight_style_dict["highlight_boxedgecolors"]', 'highlight_style_dict["highlight_boxedgealpha"]'),
-        ('fullheight_style_dict["fullheight_colors"]', 'fullheight_style_dict["fullheight_alpha"]'),
-        ('fullheight_style_dict["fullheight_edgecolors"]', 'fullheight_style_dict["fullheight_edgealpha"]'),
-        ('fullheight_style_dict["fullheight_boxcolors"]', 'fullheight_style_dict["fullheight_boxalpha"]'),
-        ('fullheight_style_dict["fullheight_boxedgecolors"]', 'fullheight_style_dict["fullheight_boxedgealpha"]')
+        ('highlight_colors', 'highlight_alpha'),
+        ('highlight_edgecolors', 'highlight_edgealpha'),
+        ('highlight_boxcolors', 'highlight_boxalpha'),
+        ('highlight_boxedgecolors', 'highlight_boxedgealpha'),
+        ('fullheight_colors', 'fullheight_alpha'),
+        ('fullheight_edgecolors', 'fullheight_edgealpha'),
+        ('fullheight_boxcolors', 'fullheight_boxalpha'),
+        ('fullheight_boxedgecolors', 'fullheight_boxedgealpha')
     ]
 
     for colors_varname, alpha_varname in colors_alpha_pairs:
@@ -1333,44 +1369,44 @@ def make_logo(dataframe=None,
     }
 
     highlight_style = {
-        'facecolors': color.get_color_dict(color_scheme=highlight_style_dict['highlight_colors'],
+        'facecolors': color.get_color_dict(color_scheme=highlight_colors,
                                            chars=characters,
-                                           alpha=highlight_style_dict['highlight_alpha']),
-        'edgecolors': color.get_color_dict(color_scheme=highlight_style_dict['highlight_edgecolors'],
+                                           alpha=highlight_alpha),
+        'edgecolors': color.get_color_dict(color_scheme=highlight_edgecolors,
                                            chars=characters,
-                                           alpha=highlight_style_dict['highlight_edgealpha']),
-        'boxcolors': color.get_color_dict(color_scheme=highlight_style_dict['highlight_boxcolors'],
+                                           alpha=highlight_edgealpha),
+        'boxcolors': color.get_color_dict(color_scheme=highlight_boxcolors,
                                           chars=characters,
-                                          alpha=highlight_style_dict['highlight_boxalpha']),
+                                          alpha=highlight_boxalpha),
         'boxedgecolors': color.get_color_dict(
-                                          color_scheme=highlight_style_dict['highlight_boxedgecolors'],
+                                          color_scheme=highlight_boxedgecolors,
                                           chars=characters,
-                                          alpha=highlight_style_dict['highlight_boxedgealpha']),
-        'edgewidth': highlight_style_dict['highlight_edgewidth'],
-        'boxedgewidth': highlight_style_dict['highlight_boxedgewidth'],
-        'zorder': highlight_style_dict['highlight_zorder'],
+                                          alpha=highlight_boxedgealpha),
+        'edgewidth': highlight_edgewidth,
+        'boxedgewidth': highlight_boxedgewidth,
+        'zorder': highlight_zorder,
     }
 
 
     fullheight_style = {
-        'facecolors': color.get_color_dict(color_scheme=fullheight_style_dict['fullheight_colors'],
+        'facecolors': color.get_color_dict(color_scheme=fullheight_colors,
                                            chars=fullheight_characters,
-                                           alpha=fullheight_style_dict['fullheight_alpha']),
-        'edgecolors': color.get_color_dict(color_scheme=fullheight_style_dict['fullheight_edgecolors'],
+                                           alpha=fullheight_alpha),
+        'edgecolors': color.get_color_dict(color_scheme=fullheight_edgecolors,
                                            chars=fullheight_characters,
-                                           alpha=fullheight_style_dict['fullheight_edgealpha']),
-        'boxcolors': color.get_color_dict(color_scheme=fullheight_style_dict['fullheight_boxcolors'],
+                                           alpha=fullheight_edgealpha),
+        'boxcolors': color.get_color_dict(color_scheme=fullheight_boxcolors,
                                           chars=fullheight_characters,
-                                          alpha=fullheight_style_dict['fullheight_boxalpha']),
+                                          alpha=fullheight_boxalpha),
         'boxedgecolors': color.get_color_dict(
-                                        color_scheme=fullheight_style_dict['fullheight_boxedgecolors'],
+                                        color_scheme=fullheight_boxedgecolors,
                                         chars=fullheight_characters,
-                                        alpha=fullheight_style_dict['fullheight_boxedgealpha']),
-        'edgewidth': fullheight_style_dict['fullheight_edgewidth'],
-        'boxedgewidth': fullheight_style_dict['fullheight_boxedgewidth'],
-        'zorder': fullheight_style_dict['fullheight_zorder'],
-        'vsep': fullheight_style_dict['fullheight_vsep'],
-        'width': fullheight_style_dict['fullheight_width']
+                                        alpha=fullheight_boxedgealpha),
+        'edgewidth': fullheight_edgewidth,
+        'boxedgewidth': fullheight_boxedgewidth,
+        'zorder': fullheight_zorder,
+        'vsep': fullheight_vsep,
+        'width': fullheight_width
     }
 
     '''
@@ -1703,8 +1739,8 @@ def make_logo(dataframe=None,
             show_baseline = True
         if show_gridlines is None:
             show_gridlines = False
-        if scalebar_dict['show_scalebar'] is None:
-            scalebar_dict['show_scalebar'] = True
+        if show_scalebar is None:
+            show_scalebar = True
 
     # If showing binary yaxis, symmetrize ylim and set yticks to +/-
     if show_binary_yaxis:
@@ -1773,43 +1809,43 @@ def make_logo(dataframe=None,
     title_fontproperties = FontProperties(**title_fontdict)
 
     # Set scalebar defaults
-    if scalebar_dict['show_scalebar'] is None:
-        scalebar_dict['show_scalebar'] = False
-    if scalebar_dict['scalebar_text'] is None:
-        scalebar_dict['scalebar_text'] = '1 unit'
-    if scalebar_dict['scalebar_color'] is None:
-        scalebar_dict['scalebar_color'] = mpl.rcParams['axes.edgecolor']
-    if scalebar_dict['scalebar_linewidth'] is None:
-        scalebar_dict['scalebar_linewidth'] = 2
-    if scalebar_dict['scalebar_x'] is None:
-        scalebar_dict['scalebar_x'] = xlim[0]-.5
-    if scalebar_dict['scalebar_length'] is None:
-        scalebar_dict['scalebar_length'] = 1
-    if scalebar_dict['scalebar_ymin'] is None:
-        scalebar_dict['scalebar_ymin'] = 0.5*(ylim[0] + ylim[1]) - .5
-    if scalebar_dict['scalebar_texthalignment'] is None:
-        scalebar_dict['scalebar_texthalignment'] = 'right'
-    if scalebar_dict['scalebar_textvalignment'] is None:
-        scalebar_dict['scalebar_textvalignment'] = 'center'
-    if scalebar_dict['scalebar_textrotation'] is None:
-        scalebar_dict['scalebar_textrotation'] = 90
+    if show_scalebar is None:
+        show_scalebar = False
+    if scalebar_text is None:
+        scalebar_text = '1 unit'
+    if scalebar_color is None:
+        scalebar_color = mpl.rcParams['axes.edgecolor']
+    if scalebar_linewidth is None:
+        scalebar_linewidth = 2
+    if scalebar_x is None:
+        scalebar_x = xlim[0]-.5
+    if scalebar_length is None:
+        scalebar_length = 1
+    if scalebar_ymin is None:
+        scalebar_ymin = 0.5*(ylim[0] + ylim[1]) - .5
+    if scalebar_texthalignment is None:
+        scalebar_texthalignment = 'right'
+    if scalebar_textvalignment is None:
+        scalebar_textvalignment = 'center'
+    if scalebar_textrotation is None:
+        scalebar_textrotation = 90
 
     # Scalebar styling
     scalebar_linestyle = {
-        'linewidth': scalebar_dict['scalebar_linewidth'],
-        'color': scalebar_dict['scalebar_color'],
-        'xloc': scalebar_dict['scalebar_x'],
-        'ymin': scalebar_dict['scalebar_ymin'],
-        'ymax': scalebar_dict['scalebar_ymin']+scalebar_dict['scalebar_length'],
+        'linewidth': scalebar_linewidth,
+        'color': scalebar_color,
+        'xloc': scalebar_x,
+        'ymin': scalebar_ymin,
+        'ymax': scalebar_ymin+scalebar_length,
     }
     scalebar_linestyle = remove_none_from_dict(scalebar_linestyle)
 
     scalebar_textstyle = {
-        'y': scalebar_dict['scalebar_ymin'] + scalebar_dict['scalebar_length']/2,
-        'text': scalebar_dict['scalebar_text'],
-        'horizontalalignment': scalebar_dict['scalebar_texthalignment'],
-        'verticalalignment': scalebar_dict['scalebar_textvalignment'],
-        'rotation': scalebar_dict['scalebar_textrotation'],
+        'y': scalebar_ymin + scalebar_length/2,
+        'text': scalebar_text,
+        'horizontalalignment': scalebar_texthalignment,
+        'verticalalignment': scalebar_textvalignment,
+        'rotation': scalebar_textrotation,
     }
     scalebar_textstyle = remove_none_from_dict(scalebar_textstyle)
 
@@ -1817,7 +1853,7 @@ def make_logo(dataframe=None,
     scalebar_style = {
         'line_kwargs': scalebar_linestyle,
         'text_kwargs': scalebar_textstyle,
-        'visible': scalebar_dict['show_scalebar']}
+        'visible': show_scalebar}
 
     # Gridline styling
     gridline_dict = {
@@ -1913,8 +1949,8 @@ def make_logo(dataframe=None,
     logo = Logo(matrix=dataframe,
                 #highlight_sequence=highlight_sequence,
                 highlight_sequence=highlight_style_dict['highlight_sequence'],
-                fullheight=fullheight_style_dict['fullheight'],
-                font_properties=font_style_dict['font_properties'],
+                fullheight=fullheight,
+                font_properties=font_properties,
                 character_style=character_style,
                 highlight_style=highlight_style,
                 fullheight_style=fullheight_style,
