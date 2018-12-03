@@ -95,37 +95,21 @@ def make_logo(dataframe=None,
               # Baseline formatting
               baseline_param_dict = None,
 
-              # vlines formatting
-              vline_positions=(),
-              vline_width=None,
-              vline_color=None,
-              vline_alpha=None,
-              vline_style=None,
-              vline_zorder=None,
-
               # x-axis formatting
               xlim=None,
-              xticks=None,
-              xtick_spacing=None,
-              xtick_anchor=0,
-              xticklabels=None,
-              xtick_rotation=None,
-              xtick_length=None,
-              xtick_format=None,
-              xlabel=None,
 
               # y-axis formatting
               show_binary_yaxis=None,
               ylim=None,
-              yticks=None,
-              yticklabels=None,
-              ytick_rotation=None,
-              ytick_length=None,
+              #yticks=None,
+              #yticklabels=None,
+              #ytick_rotation=None,
+              #ytick_length=None,
               ytick_format=None,
-              ylabel=None,
+              #ylabel=None,
 
               # Other axis formatting
-              title=None,
+              #title=None,
               left_spine=None,
               right_spine=None,
               top_spine=None,
@@ -1523,20 +1507,20 @@ def make_logo(dataframe=None,
         ymax = dataframe.values.sum(axis=1).max()
         if ylim is None:
             ylim = [0, ymax]
-        if ylabel is None and axes_type != 'naked':
-            ylabel = 'counts'
+        #if ylabel is None and axes_type != 'naked':
+        #    ylabel = 'counts'
     elif logo_type == 'probability':
         if ylim is None:
             ylim = [0, 1]
-        if ylabel is None and axes_type != 'naked':
-            ylabel = 'probability'
+        #if ylabel is None and axes_type != 'naked':
+        #    ylabel = 'probability'
     elif logo_type == 'information':
         if ylim is None and (background is None):
             ylim = [0, np.log2(dataframe.shape[1])]
-        if ylabel is None and axes_type != 'naked':
-            ylabel = 'information\n(%s)' % information_units
+        #if ylabel is None and axes_type != 'naked':
+        #    ylabel = 'information\n(%s)' % information_units
     elif logo_type == 'enrichment':
-        if ylabel is None and axes_type != 'naked':
+        #if ylabel is None and axes_type != 'naked':
             ylabel = 'enrichment\n'
             if enrichment_logbase == 2:
                 ylabel += '($\log_2$)'
@@ -1547,9 +1531,9 @@ def make_logo(dataframe=None,
             else:
                 assert False, 'Error: invalid choice of enrichment_logbase=%f'\
                               % enrichment_logbase
-    else:
-        if ylabel is None:
-            ylabel = ''
+    #else:
+        #if ylabel is None:
+        #    ylabel = ''
 
     # Set ylim (will not be None)
     if ylim is None:
@@ -1565,20 +1549,20 @@ def make_logo(dataframe=None,
         xlim = [xmin, xmax]
 
     # Set xticks
-    if xtick_spacing is None and (axes_type in ['classic', 'everything']):
-        xtick_spacing = 1
+#    if xtick_spacing is None and (axes_type in ['classic', 'everything']):
+#        xtick_spacing = 1
     #if xticks is None and xtick_spacing is not None:
     #    xticks = [pos for pos in positions if
     #              (pos - xtick_anchor) % xtick_spacing == 0.0]
 
     # If axes_type is specified, make additional modifications
     if axes_type == 'classic':
-        if xtick_length is None:
-            xtick_length = 0
-        if xtick_rotation is None:
-            xtick_rotation = 90
-        if xlabel is None:
-            xlabel = 'position'
+#       if xtick_length is None:
+#           xtick_length = 0
+#       if xtick_rotation is None:
+#           xtick_rotation = 90
+#       if xlabel is None:
+#            xlabel = 'position'
         if left_spine is None:
             left_spine = True
         if right_spine is None:
@@ -1593,14 +1577,14 @@ def make_logo(dataframe=None,
             gridline_param_dict['show_gridlines'] = False
 
     elif axes_type == 'naked':
-        if xticks is None:
-            xticks = []
-        if xtick_length is None:
-            xtick_length = 0
-        if xlabel is None:
-            xlabel = ''
-        if yticks is None:
-            yticks = []
+#        if xticks is None:
+#            xticks = []
+#        if xtick_length is None:
+#            xtick_length = 0
+#        if xlabel is None:
+#            xlabel = ''
+#        if yticks is None:
+#            yticks = []
         if ylabel is None:
             ylabel = ''
         if left_spine is None:
@@ -1617,12 +1601,12 @@ def make_logo(dataframe=None,
             gridline_param_dict['show_gridlines'] = False
 
     elif axes_type == 'rails':
-        if xticks is None:
-            xticks = []
-        if xlabel is None:
-            xlabel = ''
-        if yticks is None and ylim is not None:
-            yticks = ylim
+#        if xticks is None:
+#            xticks = []
+#        if xlabel is None:
+#            xlabel = ''
+#        if yticks is None and ylim is not None:
+#            yticks = ylim
         if left_spine is None:
             left_spine = False
         if right_spine is None:
@@ -1637,8 +1621,8 @@ def make_logo(dataframe=None,
             gridline_param_dict['show_gridlines'] = False
 
     elif axes_type == 'everything':
-        if xlabel is None:
-            xlabel = 'position'
+#        if xlabel is None:
+#            xlabel = 'position'
         if left_spine is None:
             left_spine = True
         if right_spine is None:
@@ -1653,10 +1637,10 @@ def make_logo(dataframe=None,
             gridline_param_dict['show_gridlines'] = False
 
     elif axes_type == 'vlines':
-        if xtick_length is None:
-            xtick_length = 0
-        if xlabel is None:
-            xlabel = 'position'
+#        if xtick_length is None:
+#            xtick_length = 0
+#        if xlabel is None:
+#            xlabel = 'position'
         if left_spine is None:
             left_spine = False
         if right_spine is None:
@@ -1675,12 +1659,12 @@ def make_logo(dataframe=None,
             baseline_param_dict['show_baseline'] = True
 
     if axes_type == 'scalebar':
-        if xtick_length is None:
-            xtick_length = 0
-        if xtick_rotation is None:
-            xtick_rotation = 90
-        if xlabel is None:
-            xlabel = 'position'
+#        if xtick_length is None:
+#            xtick_length = 0
+#        if xtick_rotation is None:
+#            xtick_rotation = 90
+#        if xlabel is None:
+#            xlabel = 'position'
         if left_spine is None:
             left_spine = True
         if right_spine is None:
@@ -1704,17 +1688,17 @@ def make_logo(dataframe=None,
         ylim = [-y, y]
         yticks = [.5 * ylim[0], .5 * ylim[1]]
         yticklabels = ['$-$', '$+$']
-        if ytick_length is None:
-            ytick_length = 0
+#        if ytick_length is None:
+#            ytick_length = 0
 
     # Set label rotation
-    if xtick_rotation is None:
-        xtick_rotation = 0
-    if ytick_rotation is None:
-        ytick_rotation = 0
+#    if xtick_rotation is None:
+#        xtick_rotation = 0
+#    if ytick_rotation is None:
+#        ytick_rotation = 0
 
-    if title is None:
-        title = ''
+#    if title is None:
+#        title = ''
 
     # Default font for all axes elements
     axes_fontdict = {
@@ -1841,6 +1825,7 @@ def make_logo(dataframe=None,
         'zorder': baseline_param_dict['baseline_zorder']
     }
 
+    '''
     # Set vlines defaults
     if vline_color is None:
         vline_color = mpl.rcParams['axes.edgecolor']
@@ -1861,6 +1846,7 @@ def make_logo(dataframe=None,
         'linestyle': vline_style,
         'zorder': vline_zorder
     }
+    '''
 
     # Set axes_style dictionary
     axes_style = {
@@ -1868,26 +1854,26 @@ def make_logo(dataframe=None,
         'show_binary_yaxis': show_binary_yaxis,
         'show_baseline': baseline_param_dict['show_baseline'],
         'baseline_dict': baseline_dict,
-        'vline_positions': vline_positions,
-        'vline_dict': vline_dict,
-        'title': title,
+#        'vline_positions': vline_positions,
+#        'vline_dict': vline_dict,
+#        'title': title,
         'ylim': ylim,
-        'yticks': yticks,
-        'yticklabels': yticklabels,
-        'ylabel': ylabel,
+#        'yticks': yticks,
+#        'yticklabels': yticklabels,
+#        'ylabel': ylabel,
         'xlim': xlim,
-        'xticks': xticks,
-        'xticklabels': xticklabels,
-        'xlabel': xlabel,
+#        'xticks': xticks,
+#        'xticklabels': xticklabels,
+#        'xlabel': xlabel,
         'left_spine': left_spine,
         'right_spine': right_spine,
         'top_spine': top_spine,
         'bottom_spine': bottom_spine,
-        'xtick_length': xtick_length,
-        'xtick_rotation': xtick_rotation,
-        'xtick_format': xtick_format,
-        'ytick_length': ytick_length,
-        'ytick_rotation': ytick_rotation,
+#        'xtick_length': xtick_length,
+#        'xtick_rotation': xtick_rotation,
+#        'xtick_format': xtick_format,
+#        'ytick_length': ytick_length,
+#        'ytick_rotation': ytick_rotation,
         'ytick_format': ytick_format,
         'font_dict': axes_fontdict.copy(),
         'tick_fontproperties': tick_fontproperties,
