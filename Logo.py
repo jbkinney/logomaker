@@ -344,33 +344,33 @@ class Logo:
         ax.grid(**self.axes_style['gridline_dict'])
 
         # Draw vlines
-        for x in self.axes_style['vline_positions']:
-            ax.axvline(x, **self.axes_style['vline_dict'])
+#        for x in self.axes_style['vline_positions']:
+#            ax.axvline(x, **self.axes_style['vline_dict'])
 
         # Draw x-axis annotation
-        if self.axes_style['xticks'] is not None:
-            ax.set_xticks(self.axes_style['xticks'])
+#        if self.axes_style['xticks'] is not None:
+#            ax.set_xticks(self.axes_style['xticks'])
 
-        if self.axes_style['yticks'] is not None:
-            ax.set_yticks(self.axes_style['yticks'])
+#        if self.axes_style['yticks'] is not None:
+#            ax.set_yticks(self.axes_style['yticks'])
 
-        if self.axes_style['xlabel'] is not None:
-            ax.set_xlabel(self.axes_style['xlabel'],
-                    font_properties=self.axes_style['label_fontproperties'])
+#        if self.axes_style['xlabel'] is not None:
+#            ax.set_xlabel(self.axes_style['xlabel'],
+#                    font_properties=self.axes_style['label_fontproperties'])
 
-        if self.axes_style['ylabel'] is not None:
-            ax.set_ylabel(self.axes_style['ylabel'],
-                    font_properties=self.axes_style['label_fontproperties'])
+#        if self.axes_style['ylabel'] is not None:
+#            ax.set_ylabel(self.axes_style['ylabel'],
+#                    font_properties=self.axes_style['label_fontproperties'])
 
-        if self.axes_style['title'] is not None:
-            ax.set_title(self.axes_style['title'],
-                    font_properties=self.axes_style['title_fontproperties'])
+#        if self.axes_style['title'] is not None:
+#            ax.set_title(self.axes_style['title'],
+#                    font_properties=self.axes_style['title_fontproperties'])
 
-        if self.axes_style['xtick_length'] is not None:
-            ax.xaxis.set_tick_params(length=self.axes_style['xtick_length'])
+#        if self.axes_style['xtick_length'] is not None:
+#            ax.xaxis.set_tick_params(length=self.axes_style['xtick_length'])
 
-        if self.axes_style['ytick_length'] is not None:
-            ax.yaxis.set_tick_params(length=self.axes_style['ytick_length'])
+#        if self.axes_style['ytick_length'] is not None:
+#            ax.yaxis.set_tick_params(length=self.axes_style['ytick_length'])
 
         if self.axes_style['left_spine'] is not None:
             ax.spines['left'].set_visible(self.axes_style['left_spine'])
@@ -391,33 +391,33 @@ class Logo:
 
         # Set xticklabels
         xticks = np.array(ax.get_xticks()).astype(int)
-        if not self.axes_style['show_position_zero']:
-            indices = xticks >= 0
-            xticks[indices] = xticks[indices] + 1
+        #if not self.axes_style['show_position_zero']:
+        #    indices = xticks >= 0
+        #    xticks[indices] = xticks[indices] + 1
 
-        if self.axes_style['xticklabels'] is not None:
-            xticklabels = self.axes_style['xticklabels']
-        elif self.axes_style['xtick_format'] is not None:
-            xticklabels = [self.axes_style['xtick_format'] % x for x in xticks]
-        else:
-            xticklabels = xticks
-        ax.set_xticklabels(xticklabels,
-                           rotation=self.axes_style['xtick_rotation'],
-                           font_properties=
-                           self.axes_style['tick_fontproperties'])
+#        if self.axes_style['xticklabels'] is not None:
+#            xticklabels = self.axes_style['xticklabels']
+#        elif self.axes_style['xtick_format'] is not None:
+#            xticklabels = [self.axes_style['xtick_format'] % x for x in xticks]
+#        else:
+#            xticklabels = xticks
+#        ax.set_xticklabels(xticklabels,
+#                           rotation=self.axes_style['xtick_rotation'],
+#                           font_properties=
+#                           self.axes_style['tick_fontproperties'])
 
         # Set yticklabels
-        if self.axes_style['yticklabels'] is not None:
-            yticklabels = self.axes_style['yticklabels']
-        elif self.axes_style['ytick_format'] is not None:
-            yticklabels = [self.axes_style['ytick_format'] % y
-                           for y in ax.get_yticks()]
-        else:
-            yticklabels = ax.get_yticks()
-        ax.set_yticklabels(yticklabels,
-                           rotation=self.axes_style['ytick_rotation'],
-                           font_properties=
-                                self.axes_style['tick_fontproperties'])
+#        if self.axes_style['yticklabels'] is not None:
+#            yticklabels = self.axes_style['yticklabels']
+#        elif self.axes_style['ytick_format'] is not None:
+#            yticklabels = [self.axes_style['ytick_format'] % y
+#                           for y in ax.get_yticks()]
+#        else:
+#            yticklabels = ax.get_yticks()
+#        ax.set_yticklabels(yticklabels,
+#                           rotation=self.axes_style['ytick_rotation'],
+#                           font_properties=
+#                                self.axes_style['tick_fontproperties'])
 
         # Draw scalebar and remove left and right spines, yticks
         if self.scalebar_style['visible']:

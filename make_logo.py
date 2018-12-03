@@ -101,48 +101,14 @@ def make_logo(dataframe=None,
               # y-axis formatting
               show_binary_yaxis=None,
               ylim=None,
-              #yticks=None,
-              #yticklabels=None,
-              #ytick_rotation=None,
-              #ytick_length=None,
               ytick_format=None,
-              #ylabel=None,
 
               # Other axis formatting
-              #title=None,
               left_spine=None,
               right_spine=None,
               top_spine=None,
               bottom_spine=None,
               use_tightlayout=True,
-
-              # Default axes font
-              axes_fontfile=None,
-              axes_fontfamily='sans',
-              axes_fontweight=None,
-              axes_fontstyle=None,
-              axes_fontsize=10,
-
-              # tick font
-              tick_fontfile=None,
-              tick_fontfamily=None,
-              tick_fontweight=None,
-              tick_fontstyle=None,
-              tick_fontsize=None,
-
-              # label font
-              label_fontfile=None,
-              label_fontfamily=None,
-              label_fontweight=None,
-              label_fontstyle=None,
-              label_fontsize=None,
-
-              # title font
-              title_fontfile=None,
-              title_fontfamily=None,
-              title_fontweight=None,
-              title_fontstyle=None,
-              title_fontsize=None,
               ):
 
     """
@@ -1701,50 +1667,50 @@ def make_logo(dataframe=None,
 #        title = ''
 
     # Default font for all axes elements
-    axes_fontdict = {
-        'fname': axes_fontfile,
-        'family': axes_fontfamily,
-        'weight': axes_fontweight,
-        'style': axes_fontstyle,
-        'size': axes_fontsize,
-    }
-    axes_fontdict = remove_none_from_dict(axes_fontdict)
+#    axes_fontdict = {
+#        'fname': axes_fontfile,
+#        'family': axes_fontfamily,
+#        'weight': axes_fontweight,
+#        'style': axes_fontstyle,
+#        'size': axes_fontsize,
+#    }
+#    axes_fontdict = remove_none_from_dict(axes_fontdict)
 
     # Font for x and y axis tickmarks
-    tick_fontdict = {
-        'fname': tick_fontfile,
-        'family': tick_fontfamily,
-        'weight': tick_fontweight,
-        'style': tick_fontstyle,
-        'size': tick_fontsize,
-    }
-    tick_fontdict = remove_none_from_dict(tick_fontdict)
-    tick_fontdict = dict(axes_fontdict, **tick_fontdict)
-    tick_fontproperties = FontProperties(**tick_fontdict)
+#    tick_fontdict = {
+#        'fname': tick_fontfile,
+#        'family': tick_fontfamily,
+#        'weight': tick_fontweight,
+#        'style': tick_fontstyle,
+#        'size': tick_fontsize,
+#    }
+#    tick_fontdict = remove_none_from_dict(tick_fontdict)
+#    tick_fontdict = dict(axes_fontdict, **tick_fontdict)
+#    tick_fontproperties = FontProperties(**tick_fontdict)
 
     # Font for x and y axis labels
-    label_fontdict = {
-        'fname': label_fontfile,
-        'family': label_fontfamily,
-        'weight': label_fontweight,
-        'style': label_fontstyle,
-        'size': label_fontsize,
-    }
-    label_fontdict = remove_none_from_dict(label_fontdict)
-    label_fontdict = dict(axes_fontdict, **label_fontdict)
-    label_fontproperties = FontProperties(**label_fontdict)
+#    label_fontdict = {
+#        'fname': label_fontfile,
+#        'family': label_fontfamily,
+#        'weight': label_fontweight,
+#        'style': label_fontstyle,
+#        'size': label_fontsize,
+#    }
+#    label_fontdict = remove_none_from_dict(label_fontdict)
+#    label_fontdict = dict(axes_fontdict, **label_fontdict)
+#    label_fontproperties = FontProperties(**label_fontdict)
 
     # Font for title
-    title_fontdict = {
-        'fname': title_fontfile,
-        'family': title_fontfamily,
-        'weight': title_fontweight,
-        'style': title_fontstyle,
-        'size': title_fontsize,
-    }
-    title_fontdict = remove_none_from_dict(title_fontdict)
-    title_fontdict = dict(axes_fontdict, **title_fontdict)
-    title_fontproperties = FontProperties(**title_fontdict)
+#   title_fontdict = {
+#        'fname': title_fontfile,
+#        'family': title_fontfamily,
+#        'weight': title_fontweight,
+#        'style': title_fontstyle,
+#        'size': title_fontsize,
+#    }
+#    title_fontdict = remove_none_from_dict(title_fontdict)
+#    title_fontdict = dict(axes_fontdict, **title_fontdict)
+#    title_fontproperties = FontProperties(**title_fontdict)
 
     # Set scalebar defaults
     if scalebar_dict['show_scalebar'] is None:
@@ -1875,10 +1841,10 @@ def make_logo(dataframe=None,
 #        'ytick_length': ytick_length,
 #        'ytick_rotation': ytick_rotation,
         'ytick_format': ytick_format,
-        'font_dict': axes_fontdict.copy(),
-        'tick_fontproperties': tick_fontproperties,
-        'label_fontproperties': label_fontproperties,
-        'title_fontproperties': title_fontproperties,
+#        'font_dict': axes_fontdict.copy(),
+#        'tick_fontproperties': tick_fontproperties,
+#        'label_fontproperties': label_fontproperties,
+#        'title_fontproperties': title_fontproperties,
         'show_gridlines': gridline_param_dict['show_gridlines'],
         'gridline_dict': gridline_dict,
         'use_tightlayout': use_tightlayout,
