@@ -21,6 +21,8 @@ from logomaker.load_meme import load_meme
 #from documentation_parser import document_function
 from logomaker.documentation_parser import document_function
 import os
+#from logomaker import handle_errors,ControlledError,check
+from logomaker import logomaker_excepthook
 
 import pdb
 import sys
@@ -32,6 +34,7 @@ def remove_none_from_dict(d):
     """ Removes None values from a dictionary """
     assert isinstance(d, dict), 'Error: d is not a dictionary.'
     return dict([(k, v) for k, v in d.items() if v is not None])
+
 
 def make_logo(dataframe=None,
 
@@ -991,7 +994,7 @@ def make_logo(dataframe=None,
         one for each line. \n
 
     """
-
+    copy_of_parameters = locals()
     ######################################################################
     # Validate all parameters
     names, vargs, kwargs, default_values = inspect.getargspec(make_logo)
@@ -1021,6 +1024,11 @@ def make_logo(dataframe=None,
         #elif(name=='character_style_dict'):
         #    print(valid_value)
 
+    ###########################
+    # validate parameter values
+
+    _input_checks(**copy_of_parameters)
+
     ######################################################################
     # matrix
 
@@ -1037,18 +1045,19 @@ def make_logo(dataframe=None,
         if(eval(x) is not None):
             num_input_sources+=1
 
+
     if num_input_sources != 1:
-        assert False, \
-            'Error: exactly one of the following must be specified: %s.' %\
-            repr(exclusive_list)
+        sys.excepthook = logomaker_excepthook
+        raise Exception('Error: one of the following must be specified as a parameter: %s.' % repr(exclusive_list))
+
 
     # If matrix is specified
     if dataframe is not None:
         dataframe = validate_dataframe(dataframe)
 
 
-    else:
-        assert False, 'This should never happen.'
+    #else:
+    #    assert False, 'This should never happen.'
 
     ######################################################################
     # matrix.columns
@@ -1927,6 +1936,20 @@ def make_logo(dataframe=None,
 
     # Return logo to user
     return logo
+
+
+def _input_checks(*args,**kwargs):
+
+    # all the parameters info is contain in kwargs
+    if(kwargs['character_style_dict'] is not None):
+
+       if(kwargs['character_style_dict']['character_alpha']<=0):
+           sys.excepthook = logomaker_excepthook
+           raise Exception("Input Error: character_alpha = %d must be a positive float" % kwargs['character_style_dict']['character_alpha'])
+
+
+
+
 
 
 # Document make_logo

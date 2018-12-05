@@ -141,9 +141,10 @@ def get_color_dict(color_scheme, chars, alpha, shuffle_colors=False):
     if not (set(chars) <= set(color_dict.keys())):
         for c in chars:
             if not c in color_dict:
-                message = "Character '%s' is not in color_dict. Using black."\
+                message = "Warning: Character '%s' is not in color_dict. Using black."\
                     % c
-                warnings.warn(message, UserWarning)
+                #warnings.warn(message, UserWarning)
+                print(message)
                 color_dict[c] = to_rgb('black')
 
     # Shuffle colors if requested
