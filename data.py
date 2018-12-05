@@ -27,7 +27,8 @@ to_rna = {'A': 'a', 'C': 'c', 'G': 'g', 'T': 'u', 't': 'u', 'U': 'u'}
 to_PROTEIN = dict(zip(protein, PROTEIN))
 to_protein = dict(zip(PROTEIN, protein))
 
-from validate import validate_mat, validate_probability_mat, iupac_dict
+#from validate import validate_dataframe, validate_probability_mat, iupac_dict
+from logomaker.validate import validate_dataframe, validate_probability_mat, iupac_dict
 
 def transform_mat(matrix, to_type, from_type=None, background=None,
                   pseudocount=1, enrichment_logbase=2,
@@ -47,7 +48,7 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
     if (from_type is None) and (to_type is None):
 
         # Center values if requested
-        matrix = validate_mat(matrix, allow_nan=True)
+        matrix = validate_dataframe(matrix, allow_nan=True)
         if center_columns:
             means = matrix.mean(axis=1, skipna=True).values
             means[np.isnan(means)] = 0.0
@@ -59,7 +60,7 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
         return out_mat
 
     else:
-        matrix = validate_mat(matrix, allow_nan=False)
+        matrix = validate_dataframe(matrix, allow_nan=False)
 
     # If not changing types, just return matrix
     if from_type == to_type:
@@ -110,7 +111,7 @@ def counts_mat_to_probability_mat(count_mat, pseudocount=1):
     Converts a count_mat to a freq_mat
     '''
     # Validate mat before use
-    count_mat = validate_mat(count_mat)
+    count_mat = validate_dataframe(count_mat)
 
     # Compute freq_mat
     freq_mat = count_mat.copy()
@@ -143,7 +144,7 @@ def probability_mat_to_enrichment_mat(freq_mat, bg_mat, base=2,
             weight_mat.values - weight_mat.values.mean(axis=1)[:, np.newaxis]
 
     # Validate and return
-    weight_mat = validate_mat(weight_mat)
+    weight_mat = validate_dataframe(weight_mat)
     return weight_mat
 
 # Needed only for display purposes
@@ -169,7 +170,7 @@ def probability_mat_to_information_mat(freq_mat, bg_mat, units='bits'):
     info_mat.loc[:, :] = freq_mat.values*info_list[:,np.newaxis]
 
     # Validate and return
-    info_mat = validate_mat(info_mat)
+    info_mat = validate_dataframe(info_mat)
     return info_mat
 
 
@@ -244,7 +245,7 @@ def load_matrix(csv_file, csv_kwargs={}):
     # Make sure that a file name is specified
     assert csv_file is not None, 'Error: csv_file is not specified.'
     matrix = pd.read_csv(csv_file, **csv_kwargs)
-    matrix = validate_mat(matrix)
+    matrix = validate_dataframe(matrix)
     return matrix
 
 
@@ -306,6 +307,10 @@ def load_alignment(fasta_file=None,
 
     # Get seq length
     L = len(sequences[0])
+    #print('debugging:')
+    #print(type(sequences))
+    #print(L)
+    #print(np.shape(sequences))
     assert all([len(seq) == L for seq in sequences]), \
         'Error: not all sequences have length %d.' % L
 
@@ -437,7 +442,7 @@ def filter_columns(matrix,
 
 
     # Validate new matrix
-    matrix = validate_mat(matrix)
+    matrix = validate_dataframe(matrix)
 
     return matrix
 

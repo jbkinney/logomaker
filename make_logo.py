@@ -4,15 +4,22 @@ import inspect
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 import matplotlib as mpl
-from validate import validate_parameter, validate_dataframe, \
-    params_that_specify_colorschemes
-from data import load_alignment, load_matrix, iupac_to_probability_mat, \
-    counts_mat_to_probability_mat
-from Logo import Logo
-import data
-import color
-from load_meme import load_meme
-from documentation_parser import document_function
+#from validate import validate_parameter, validate_dataframe, \
+#    params_that_specify_colorschemes
+from logomaker.validate import validate_parameter, validate_dataframe, params_that_specify_colorschemes
+from logomaker.data import load_alignment, load_matrix, iupac_to_probability_mat, counts_mat_to_probability_mat
+#from data import load_alignment, load_matrix, iupac_to_probability_mat, \
+#    counts_mat_to_probability_mat
+#from Logo import Logo
+from logomaker.Logo import Logo
+#import data
+from logomaker import data
+#import color
+from logomaker import color
+#from load_meme import load_meme
+from logomaker.load_meme import load_meme
+#from documentation_parser import document_function
+from logomaker.documentation_parser import document_function
 import os
 
 import pdb
@@ -988,13 +995,28 @@ def make_logo(dataframe=None,
     ######################################################################
     # Validate all parameters
     names, vargs, kwargs, default_values = inspect.getargspec(make_logo)
-    user_values = [eval(name) for name in names]
 
+    user_values = []
+    for parameter_index in range(len(names)):
+        user_values.append(eval(names[parameter_index]))
 
     assert len(names)==len(default_values), \
         'len(names)==%d does not match len(default_values)==%d' %\
         (len(names), len(default_values))
 
+    # Parameters that specify dictionaries
+    params_that_specify_dicts = [
+        'character_style_dict',
+        'highlight_style_dict',
+        'fullheight_style_dict',
+        'font_style_dict',
+        'scalebar_dict',
+        'gridline_param_dict',
+        'baseline_param_dict',
+        'rcparams',
+        'csv_kwargs',
+        'background_csvkwargs'
+    ]
 
     for name, user_value, default_value in \
             zip(names, user_values, default_values):
@@ -1004,6 +1026,12 @@ def make_logo(dataframe=None,
 
         # Set parameter value equal to the valid value
         exec("%s = valid_value" % name)
+        if(name=='font_style_dict'):
+            font_style_dict = valid_value
+        elif (name == 'baseline_param_dict'):
+            baseline_param_dict = valid_value
+        elif(name=='rcparmas'):
+            rcparams = {}
 
     ######################################################################
     # matrix
@@ -1013,7 +1041,14 @@ def make_logo(dataframe=None,
 
     # Make sure that only one of the following is specified
     exclusive_list = ['dataframe']
-    num_input_sources = sum([eval(x) is not None for x in exclusive_list])
+
+    # python 3 work around for the following
+    #num_input_sources = sum([eval(x) is not None for x in exclusive_list])
+    num_input_sources=0
+    for x in exclusive_list:
+        if(eval(x) is not None):
+            num_input_sources+=1
+
     if num_input_sources != 1:
         assert False, \
             'Error: exactly one of the following must be specified: %s.' %\
@@ -1026,7 +1061,6 @@ def make_logo(dataframe=None,
 
     else:
         assert False, 'This should never happen.'
-
 
     ######################################################################
     # matrix.columns
@@ -1873,8 +1907,8 @@ def make_logo(dataframe=None,
     # Optionally draw logo
 
     # Set RC parameters
-    for key, value in rcparams.items():
-        mpl.rcParams[key] = value
+    #for key, value in rcparams.items():
+    #    mpl.rcParams[key] = value
 
     # Set default figsize
     if figsize is None:

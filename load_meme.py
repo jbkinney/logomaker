@@ -40,10 +40,10 @@ def load_meme(file_name,
             columns = [l.strip()[0] for l in text.split('\n') if
                        len(l.strip()) > 0]
         else:
-            print 'Could not determine alphabet. Returning None.'
+            print('Could not determine alphabet. Returning None.')
             return None
     if len(columns) == 0:
-        print 'Alphabet has zero length. Returning None.'
+        print('Alphabet has zero length. Returning None.')
         return None
 
     # Parse background
@@ -74,7 +74,7 @@ def load_meme(file_name,
     name_pattern = re.compile("^MOTIF +(?P<name>.*)$", flags=re.MULTILINE)
     name_matches = re.findall(name_pattern, file_contents)
     if not name_matches:
-        print 'Could not find any motif names in file. Returning None.'
+        print('Could not find any motif names in file. Returning None.')
         return None
 
     # If user only wants names
@@ -90,7 +90,7 @@ def load_meme(file_name,
         flags=re.MULTILINE)
     matrix_matches = re.finditer(matrix_pattern, file_contents)
     if not matrix_matches:
-        print 'Could not find any motifs in file. Returning None.'
+        print('Could not find any motifs in file. Returning None.')
         return None
 
     # Iterate through motifs
@@ -149,7 +149,7 @@ def load_meme(file_name,
         if background_dict is not None:
             return background_dict
         else:
-            print 'Could not find background line in file. Returning None.'
+            print('Could not find background line in file. Returning None.')
             return None
 
     # get_motif_dict
@@ -157,19 +157,19 @@ def load_meme(file_name,
         if len(matrix_dict) > 0:
             return matrix_dict
         else:
-            print 'Could not parse any motifs. Returning None.'
+            print('Could not parse any motifs. Returning None.')
 
     # get_motif_list
     elif get_list:
         if len(matrix_list) > 0:
             return matrix_list
         else:
-            print 'Could not parse any motifs. Returning None.'
+            print('Could not parse any motifs. Returning None.')
 
     # only return the requested motif by name
     elif motif_name is not None:
         if not motif_name in matrix_dict:
-            print 'Could not find motif of name %s. Returning None.' % motif_name
+            print('Could not find motif of name %s. Returning None.' % motif_name)
             return None
         else:
             return matrix_dict[motif_name]
@@ -177,7 +177,7 @@ def load_meme(file_name,
     # only return the requested motif by number
     elif motif_num is not None:
         if len(matrix_list) < motif_num:
-            print 'Could not find motif number %d. Returning None.' % motif_num
+            print('Could not find motif number %d. Returning None.' % motif_num)
             return None
         else:
             return matrix_list[motif_num - 1]

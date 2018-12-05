@@ -1,6 +1,7 @@
 import re
 import inspect
-import validate
+#import validate
+from logomaker import validate
 import warnings
 
 class ParameterDoc:

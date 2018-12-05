@@ -1,7 +1,8 @@
 from __future__ import division
 import ast
 import re
-from make_logo import make_logo
+#from make_logo import make_logo
+from logomaker.make_logo import make_logo
 import inspect
 import warnings
 

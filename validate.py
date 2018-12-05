@@ -11,13 +11,18 @@ import numbers
 import pdb
 import os
 
+from six import string_types
+
+
 from matplotlib.font_manager import FontProperties
 from matplotlib.textpath import TextPath
 from matplotlib.lines import Line2D
-from character import font_manager
+#from character import font_manager
+from logomaker.character import font_manager
 
 # Need for testing colors
-import color
+#import color
+from logomaker import color
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgb, to_rgba
 
@@ -594,7 +599,8 @@ def _validate_bool(name, user, default):
     """ Validates a boolean parameter parameter. """
 
     # Convert to bool if string is passed
-    if isinstance(user, basestring):
+    #if isinstance(user, basestring):
+    if isinstance(user, string_types):
         if user == 'True':
             user = True
         elif user == 'False':
@@ -630,7 +636,8 @@ def _validate_in_set(name, user, default, in_set):
         value = user
 
     # Otherwise, if user is string, try evaluating as literal
-    elif isinstance(user, basestring):
+    #elif isinstance(user, basestring):
+    elif isinstance(user, string_types):
         try:
             tmp = ast.literal_eval(user)
             if tmp in in_set:
@@ -679,7 +686,7 @@ def _validate_iupac(name, user, default):
     message = None
 
     # Check that user input is a string
-    if not isinstance(user, basestring):
+    if not isinstance(user, string_types):
         value = default
         message = "Value %s for parameter '%s' is not a string. " + \
                   "Using default value %s instead."
@@ -756,7 +763,7 @@ def _validate_fullheight(name, user, default):
      a dictionary or an array/list. """
 
     # Test whether parameter can be interpreted as a string
-    if isinstance(user, basestring):
+    if isinstance(user, string_types):
         user = ast.literal_eval(user)
 
     # If dictionary
@@ -791,7 +798,7 @@ def _validate_array(name, user, default, length=None, increasing=False):
 
     try:
         # If string, convert to list of numbers
-        if isinstance(user, basestring):
+        if isinstance(user, string_types):
             user = ast.literal_eval(user)
 
         if length is not None:
@@ -961,7 +968,7 @@ def _validate_ticklabels(name, user, default):
                   % (user, name, default)
 
     # Test that elements of user are strings or numbers
-    tests = [isinstance(u, basestring) or isinstance(u, numbers.Number) \
+    tests = [isinstance(u, string_types) or isinstance(u, numbers.Number) \
                 for u in user]
     if len(tests) > 0 and not all(tests):
         message = ("Cant interpret all elements of '%s', "
@@ -1006,7 +1013,7 @@ def validate_dataframe(dataframe, allow_nan=True):
     # Warn user when doing so
     cols = dataframe.columns
     for col in cols:
-        if not isinstance(col, basestring) or (len(col) != 1):
+        if not isinstance(col, string_types) or (len(col) != 1):
             del dataframe[col]
             message = ('Matrix has invalid column name "%s". This column ' +
                        'has been removed.') % col
@@ -1019,7 +1026,7 @@ def validate_dataframe(dataframe, allow_nan=True):
             continue
 
         # Convert column name to simple string if possible
-        assert isinstance(col_name,basestring), \
+        assert isinstance(col_name,string_types), \
             'Error: column name %s is not a string'%col_name
         new_col_name = str(col_name)
 
@@ -1284,7 +1291,6 @@ def _populate_default_dict_value(dict_name,dictionary_with_keys_vals,dict_set_by
 
 
     elif (dict_name == 'font_style_dict'):
-
         default_font_style_values = {
             'font_properties':None,
             'font_file':None,

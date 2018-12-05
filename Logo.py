@@ -2,7 +2,8 @@ from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
-import character
+#import character
+from logomaker import character
 from matplotlib.text import Text
 from matplotlib.lines import Line2D
 import pdb
