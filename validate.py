@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numbers
 import pdb
 import os
+from logomaker import handle_errors,ControlledError, check
 
 from six import string_types
 
@@ -1081,6 +1082,7 @@ def validate_probability_mat(matrix):
 
 # Implementation note: this method should contain a list of the valid keys of any dictionary
 # that can be entered as a parameter for logomaker
+@handle_errors
 def _validate_user_set_dict(dict_name,dictionary_with_keys_vals):
 
     if(dict_name=='character_style_dict'):
@@ -1186,10 +1188,13 @@ def _validate_user_set_dict(dict_name,dictionary_with_keys_vals):
     # need to fill condition for rcParams
 
     # if invalid key found, pop key.
-    for k in dictionary_with_keys_vals.keys():
+    #for k in dictionary_with_keys_vals.keys():
+    for k in list(dictionary_with_keys_vals):
         if (k not in valid_dict_keys):
-            warnings.warn(" Invalid key '%s' for %s, removing invalid key... " %(k,dict_name), UserWarning)
+            #warnings.warn(" Invalid key '%s' for %s, removing invalid key... " %(k,dict_name), UserWarning)
+            print("Warning: Invalid key '%s' for %s, removing invalid key... " %(k,dict_name))
             dictionary_with_keys_vals.pop(k)
+
 
     # find keys that the user did not provide and set them to defaults
     keys_not_set_by_user = list(set(dictionary_with_keys_vals).symmetric_difference(valid_dict_keys))

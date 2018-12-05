@@ -1004,20 +1004,6 @@ def make_logo(dataframe=None,
         'len(names)==%d does not match len(default_values)==%d' %\
         (len(names), len(default_values))
 
-    # Parameters that specify dictionaries
-    params_that_specify_dicts = [
-        'character_style_dict',
-        'highlight_style_dict',
-        'fullheight_style_dict',
-        'font_style_dict',
-        'scalebar_dict',
-        'gridline_param_dict',
-        'baseline_param_dict',
-        'rcparams',
-        'csv_kwargs',
-        'background_csvkwargs'
-    ]
-
     for name, user_value, default_value in \
             zip(names, user_values, default_values):
 
@@ -1032,6 +1018,8 @@ def make_logo(dataframe=None,
             baseline_param_dict = valid_value
         elif(name=='rcparmas'):
             rcparams = {}
+        #elif(name=='character_style_dict'):
+        #    print(valid_value)
 
     ######################################################################
     # matrix
