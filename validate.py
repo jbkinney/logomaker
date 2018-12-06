@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import numbers
 import pdb
 import os
-from logomaker import handle_errors,ControlledError, check
+from logomaker import ControlledError, check
 
 from six import string_types
 
@@ -991,24 +991,23 @@ def _validate_ticklabels(name, user, default):
 
 def validate_dataframe(dataframe, allow_nan=True):
     '''
-    Runs assert statements to verify that df is indeed a motif dataframe.
+    Runs checks to verify that df is indeed a motif dataframe.
     Returns a cleaned-up version of df if possible
     '''
+
+    check(isinstance(dataframe,pd.DataFrame),
+          'Input Error: dataframe needs to be a valid pandas dataframe, dataframe entered: '+str(type(dataframe)))
 
     # Copy and preserve logomaker_type
     dataframe = dataframe.copy()
 
-    assert type(dataframe) == pd.core.frame.DataFrame, 'Error: df is not a dataframe'
-
     if not allow_nan:
         # Make sure all entries are finite numbers
-        assert np.isfinite(dataframe.values).all(), \
-            'Error: some matrix elements are not finite.' +\
-            'Set allow_nan=True to allow.'
+        check(np.isfinite(dataframe.values).all(),'Input Error: some matrix elements are not finite.' + 'Set allow_nan=True to allow.')
 
     # Make sure the matrix has a finite number of rows and columns
-    assert dataframe.shape[0] >= 1, 'Error: matrix has zero rows.'
-    assert dataframe.shape[1] >= 1, 'Error: matrix has zero columns.'
+    check(dataframe.shape[0] >= 1, 'Input Error: matrix has zero rows.')
+    check(dataframe.shape[1] >= 1, 'Input Error: matrix has zero columns.')
 
     # Remove columns whose names aren't strings exactly 1 character long.
     # Warn user when doing so
@@ -1027,20 +1026,17 @@ def validate_dataframe(dataframe, allow_nan=True):
             continue
 
         # Convert column name to simple string if possible
-        assert isinstance(col_name,string_types), \
-            'Error: column name %s is not a string'%col_name
+        check(isinstance(col_name, string_types), 'Error: column name %s is not a string' % col_name)
         new_col_name = str(col_name)
 
         # If column name is not a single chracter, try extracting single character
         # after an underscore
         if len(new_col_name) != 1:
             new_col_name = new_col_name.split('_')[-1]
-            assert (len(new_col_name)==1), \
-                'Error: could not extract single character from colum name %s'%col_name
+            check((len(new_col_name)==1),'Error: could not extract single character from colum name %s'%col_name)
 
         # Make sure that colun name is not a whitespace character
-        assert re.match('\S',new_col_name), \
-            'Error: column name "%s" is a whitespace charcter.'%repr(col_name)
+        check(re.match('\S',new_col_name),'Error: column name "%s" is a whitespace charcter.'%repr(col_name))
 
         # Set revised column name
         dataframe.rename(columns={col_name:new_col_name}, inplace=True)

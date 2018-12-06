@@ -4,26 +4,15 @@ import inspect
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 import matplotlib as mpl
-#from validate import validate_parameter, validate_dataframe, \
-#    params_that_specify_colorschemes
 from logomaker.validate import validate_parameter, validate_dataframe, params_that_specify_colorschemes
 from logomaker.data import load_alignment, load_matrix, iupac_to_probability_mat, counts_mat_to_probability_mat
-#from data import load_alignment, load_matrix, iupac_to_probability_mat, \
-#    counts_mat_to_probability_mat
-#from Logo import Logo
 from logomaker.Logo import Logo
-#import data
 from logomaker import data
-#import color
 from logomaker import color
-#from load_meme import load_meme
 from logomaker.load_meme import load_meme
-#from documentation_parser import document_function
 from logomaker.documentation_parser import document_function
 import os
-#from logomaker import handle_errors,ControlledError,check
-from logomaker import logomaker_excepthook
-
+from logomaker import ControlledError, logomaker_excepthook, check
 import pdb
 import sys
 
@@ -994,11 +983,20 @@ def make_logo(dataframe=None,
         one for each line. \n
 
     """
+
     copy_of_parameters = locals()
+    _input_checks(**copy_of_parameters)
     ######################################################################
     # Validate all parameters
-    names, vargs, kwargs, default_values = inspect.getargspec(make_logo)
+    if (sys.version_info[0] == 2):
+        names, vargs, kwargs, default_values = inspect.getargspec(make_logo)
+    else:
+        argspec = inspect.getfullargspec(make_logo)
 
+        names = argspec.args
+        vargs = argspec.varargs
+        kwargs = argspec.varkw
+        default_values = argspec.defaults
     user_values = []
     for parameter_index in range(len(names)):
         user_values.append(eval(names[parameter_index]))
@@ -1013,6 +1011,7 @@ def make_logo(dataframe=None,
         # Validate parameter value
         valid_value = validate_parameter(name, user_value, default_value)
 
+
         # Set parameter value equal to the valid value
         exec("%s = valid_value" % name)
         if(name=='font_style_dict'):
@@ -1024,10 +1023,6 @@ def make_logo(dataframe=None,
         #elif(name=='character_style_dict'):
         #    print(valid_value)
 
-    ###########################
-    # validate parameter values
-
-    _input_checks(**copy_of_parameters)
 
     ######################################################################
     # matrix
@@ -1101,8 +1096,12 @@ def make_logo(dataframe=None,
     if negate_matrix:
         dataframe *= -1.0
 
+
+    if logo_type is None and matrix_type=='probability':
+        matrix_type = 'counts'
+        logo_type = 'probability'
     # Set logo_type equal to matrix_type if is currently None
-    if logo_type is None:
+    if logo_type is None and matrix_type!='probability':
         logo_type = matrix_type
     logo_type = validate_parameter('logo_type', logo_type, None)
 
@@ -1938,14 +1937,23 @@ def make_logo(dataframe=None,
     return logo
 
 
+# this is a supplemental method to validate and checks things
+# which the validate module might have missed, i.e. if a dictionary value
+# is out of the allowed range, this prints out a user-friendly message to
+# try to fix it.
 def _input_checks(*args,**kwargs):
-
     # all the parameters info is contain in kwargs
-    if(kwargs['character_style_dict'] is not None):
 
+    if(kwargs['dataframe'] is None):
+        ControlledError('Input Error: dataframe cannot be none. Please enter a valid pandas dataframe')
+
+    valid_matrix_type_values = [None,'counts','probability','enrichment','information']
+    check(kwargs['matrix_type'] in valid_matrix_type_values,
+          'Input Error: matrix_type = %s; must be in %s' % (kwargs['matrix_type'], valid_matrix_type_values))
+
+    if(kwargs['character_style_dict'] is not None):
        if(kwargs['character_style_dict']['character_alpha']<=0):
-           sys.excepthook = logomaker_excepthook
-           raise Exception("Input Error: character_alpha = %d must be a positive float" % kwargs['character_style_dict']['character_alpha'])
+           ControlledError("Input Error: character_alpha = %d must be a positive float" % kwargs['character_style_dict']['character_alpha'])
 
 
 

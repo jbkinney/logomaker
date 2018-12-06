@@ -7,6 +7,7 @@ from logomaker import character
 from matplotlib.text import Text
 from matplotlib.lines import Line2D
 import pdb
+from six import string_types
 
 SMALL = 1E-6
 
@@ -52,7 +53,7 @@ class Logo:
         # Set wild type sequence
         self.highlight_sequence = highlight_sequence
         if self.highlight_sequence is not None:
-            assert isinstance(self.highlight_sequence, basestring), \
+            assert isinstance(self.highlight_sequence, string_types), \
                 'Error: highlight_sequence is not a string.'
             assert len(self.highlight_sequence ) == len(self.poss), \
                 'Error: highlight_sequence has a different length than matrix.'

@@ -111,6 +111,7 @@ def counts_mat_to_probability_mat(count_mat, pseudocount=1):
     Converts a count_mat to a freq_mat
     '''
     # Validate mat before use
+
     count_mat = validate_dataframe(count_mat)
 
     # Compute freq_mat

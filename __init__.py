@@ -11,18 +11,21 @@ from matplotlib.colors import to_rgba
 import matplotlib as mpl
 import pdb
 from functools import wraps
-
-
 import sys
 import os
 
-class ControlledError(Exception):
+# method that helps complete the implementation of
+# Controlled Error for logomaker.
+def logomaker_excepthook(type, value, traceback):
+    print(value)
 
-    def __init__(self, value):
-        self.value = value
 
-    def __str__(self):
-        return self.value
+# this message prints out a message
+# and stops execution and hides traceback.
+def ControlledError(message):
+        sys.excepthook = logomaker_excepthook
+        raise Exception(message)
+
 
 def check(condition, message):
     '''
@@ -41,8 +44,9 @@ class Dummy():
 
 def handle_errors(func):
     """
-    Decorator function to handle MPAthic errors
+    Decorator function to handle logomaker errors
     """
+
 
     @wraps(func)
     def wrapped_func(*args, **kwargs):
@@ -50,9 +54,11 @@ def handle_errors(func):
         # Get should_fail debug flag
         should_fail = kwargs.pop('should_fail', None)
 
+
         try:
             # Execute function
             result = func(*args, **kwargs)
+
             error = False
 
             # If function didn't raise error, process results
@@ -115,30 +121,17 @@ def handle_errors(func):
                 obj.mistake = mistake
                 return obj
 
+
     return wrapped_func
 
 
-#sys.path.insert(1,'../')
+# module imports
 from logomaker import validate
-#import validate
-#from validate import validate_parameter, validate_dataframe
 from logomaker.validate import validate_parameter, validate_dataframe
 
-#from data import load_alignment
 from logomaker.data import load_alignment
-
-#from Logo import Logo
 from logomaker.Logo import Logo
-
-
-#from make_logo import make_logo
 from logomaker.make_logo import make_logo
-
-#from character import get_fontnames_dict, get_fontnames
 from logomaker.character import get_fontnames_dict, get_fontnames
-
-#from make_styled_logo import make_styled_logo
 from logomaker.make_styled_logo import make_styled_logo
 from logomaker.load_meme import load_meme
-
-#from load_meme import load_meme
