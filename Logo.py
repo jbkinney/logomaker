@@ -337,7 +337,7 @@ class Logo:
             char.draw(ax)
 
         # Set limits
-        ax.set_xlim(self.axes_style['xlim'])
+        #ax.set_xlim(self.axes_style['xlim'])
         ax.set_ylim(self.axes_style['ylim'])
 
         # Draw baseline

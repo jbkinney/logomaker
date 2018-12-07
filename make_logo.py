@@ -96,7 +96,7 @@ def make_logo(dataframe=None,
               baseline_param_dict = None,
 
               # x-axis formatting
-              xlim=None,
+              #xlim=None,
 
               # y-axis formatting
               show_binary_yaxis=None,
@@ -1552,10 +1552,10 @@ def make_logo(dataframe=None,
         ylim = [ymin, ymax]
 
     # Set xlim (will not be None)
-    if xlim is None:
-        xmin = dataframe.index.min() - .5
-        xmax = dataframe.index.max() + .5
-        xlim = [xmin, xmax]
+    #if xlim is None:
+    #    xmin = dataframe.index.min() - .5
+    #    xmax = dataframe.index.max() + .5
+    #    xlim = [xmin, xmax]
 
     # Set xticks
 #    if xtick_spacing is None and (axes_type in ['classic', 'everything']):
@@ -1764,8 +1764,8 @@ def make_logo(dataframe=None,
         scalebar_dict['scalebar_color'] = mpl.rcParams['axes.edgecolor']
     if scalebar_dict['scalebar_linewidth'] is None:
         scalebar_dict['scalebar_linewidth'] = 2
-    if scalebar_dict['scalebar_x'] is None:
-        scalebar_dict['scalebar_x'] = xlim[0]-.5
+#    if scalebar_dict['scalebar_x'] is None:
+#        scalebar_dict['scalebar_x'] = xlim[0]-.5
     if scalebar_dict['scalebar_length'] is None:
         scalebar_dict['scalebar_length'] = 1
     if scalebar_dict['scalebar_ymin'] is None:
@@ -1870,7 +1870,7 @@ def make_logo(dataframe=None,
 #        'yticks': yticks,
 #        'yticklabels': yticklabels,
 #        'ylabel': ylabel,
-        'xlim': xlim,
+#        'xlim': xlim,
 #        'xticks': xticks,
 #        'xticklabels': xticklabels,
 #        'xlabel': xlabel,
