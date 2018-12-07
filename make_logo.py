@@ -15,6 +15,7 @@ import os
 from logomaker import ControlledError, logomaker_excepthook, check
 import pdb
 import sys
+import matplotlib.colors
 
 default_fig_width = 8
 default_fig_height_per_line = 2
@@ -985,7 +986,6 @@ def make_logo(dataframe=None,
     """
 
     copy_of_parameters = locals()
-    _input_checks(**copy_of_parameters)
     ######################################################################
     # Validate all parameters
     if (sys.version_info[0] == 2):
@@ -1014,16 +1014,26 @@ def make_logo(dataframe=None,
 
         # Set parameter value equal to the valid value
         exec("%s = valid_value" % name)
+
+        # the following is the only way to make dicts work in python 3
         if(name=='font_style_dict'):
             font_style_dict = valid_value
         elif (name == 'baseline_param_dict'):
             baseline_param_dict = valid_value
+        elif (name == 'highlight_style_dict'):
+            highlight_style_dict = valid_value
         elif(name=='rcparmas'):
             rcparams = {}
-        #elif(name=='character_style_dict'):
-        #    print(valid_value)
+        elif(name=='character_style_dict'):
+            character_style_dict = valid_value
+        elif (name == 'fullheight_style_dict'):
+            fullheight_style_dict = valid_value
+        elif (name == 'gridline_param_dict'):
+            gridline_param_dict = valid_value
+        elif (name == 'scalebar_dict'):
+            scalebar_dict = valid_value
 
-
+    _input_checks(**copy_of_parameters)
     ######################################################################
     # matrix
 
@@ -1096,13 +1106,16 @@ def make_logo(dataframe=None,
     if negate_matrix:
         dataframe *= -1.0
 
-
     if logo_type is None and matrix_type=='probability':
         matrix_type = 'counts'
         logo_type = 'probability'
     # Set logo_type equal to matrix_type if is currently None
-    if logo_type is None and matrix_type!='probability':
+    elif logo_type is None and matrix_type=='information':
+        matrix_type = 'counts'
+        logo_type = 'information'
+    elif logo_type is None:
         logo_type = matrix_type
+
     logo_type = validate_parameter('logo_type', logo_type, None)
 
     # Get background matrix, only if it has not yet been set
@@ -1581,8 +1594,8 @@ def make_logo(dataframe=None,
 #            xlabel = ''
 #        if yticks is None:
 #            yticks = []
-        if ylabel is None:
-            ylabel = ''
+#        if ylabel is None:
+#            ylabel = ''
         if left_spine is None:
             left_spine = False
         if right_spine is None:
@@ -1952,8 +1965,20 @@ def _input_checks(*args,**kwargs):
           'Input Error: matrix_type = %s; must be in %s' % (kwargs['matrix_type'], valid_matrix_type_values))
 
     if(kwargs['character_style_dict'] is not None):
-       if(kwargs['character_style_dict']['character_alpha']<=0):
-           ControlledError("Input Error: character_alpha = %d must be a positive float" % kwargs['character_style_dict']['character_alpha'])
+
+        if (kwargs['character_style_dict']['character_alpha'] is not None):
+            if(kwargs['character_style_dict']['character_alpha']<=0 or kwargs['character_style_dict']['character_alpha']>1.0):
+                ControlledError("Input Error: character_alpha = %d must be a positive float between 0-1" % kwargs['character_style_dict']['character_alpha'])
+
+
+        available_colors = list(matplotlib.colors.cnames)
+        available_colors.append('classic')
+        available_colors.append('charge')
+        available_colors.append('hydrophobicity')
+        available_colors.append('random')
+
+        check(kwargs['character_style_dict']['character_colors'] in available_colors,
+              'Input Error: character_colors = %s; must be in %s' % (kwargs['character_style_dict']['character_colors'], available_colors))
 
 
 

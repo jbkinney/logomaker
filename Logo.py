@@ -13,6 +13,7 @@ SMALL = 1E-6
 
 # Logo base class
 class Logo:
+
     def __init__(self,
                  matrix,
                  font_properties,
@@ -79,7 +80,8 @@ class Logo:
             try:
                 max_alpha_val = abs(self.df.values).max()
             except:
-                pdb.set_trace()
+                #pdb.set_trace()
+                pass
 
         # Compute ymin and ymax of logo.
         # Set NaN values to zero when doing so
@@ -448,7 +450,8 @@ class Logo:
                                rotation=textstyle['rotation'],
                                fontdict=fontdict)
             ax.yaxis.set_tick_params(length=0)
-            ax.grid('off')
+            ax.grid(self,'off')
+            #ax.grid('off')
             ax.spines['right'].set_visible(False)
 
         # Do final drawing
