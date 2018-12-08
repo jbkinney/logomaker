@@ -14,3 +14,5 @@ pip install logomaker
 * Documentation: "http://logomaker.readthedocs.org"
 * Github: "https://github.com/jbkinney/logomaker"
 * PyPI: "https://pypi.python.org/pypi/logomaker"
+
+![Figure1](https://raw.github.com/jbkinney/logomaker/master/pngs/Figure1.png)
