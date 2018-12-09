@@ -30,7 +30,7 @@ def make_logo(dataframe=None,
 
               # Matrix transformation (make_logo only)
               matrix_type=None,
-              logo_type=None,
+              #logo_type=None,
               background=None,
               pseudocount=1.0,
               enrichment_logbase=2,
@@ -96,7 +96,7 @@ def make_logo(dataframe=None,
               baseline_param_dict = None,
 
               # x-axis formatting
-              #xlim=None,
+              xlim=None,
 
               # y-axis formatting
               show_binary_yaxis=None,
@@ -986,6 +986,9 @@ def make_logo(dataframe=None,
     """
 
     copy_of_parameters = locals()
+
+    # quick way of getting rid of logo_type as a parameter.
+    logo_type = None
     ######################################################################
     # Validate all parameters
     if (sys.version_info[0] == 2):
@@ -1552,10 +1555,10 @@ def make_logo(dataframe=None,
         ylim = [ymin, ymax]
 
     # Set xlim (will not be None)
-    #if xlim is None:
-    #    xmin = dataframe.index.min() - .5
-    #    xmax = dataframe.index.max() + .5
-    #    xlim = [xmin, xmax]
+    if xlim is None:
+        xmin = dataframe.index.min() - .5
+        xmax = dataframe.index.max() + .5
+        xlim = [xmin, xmax]
 
     # Set xticks
 #    if xtick_spacing is None and (axes_type in ['classic', 'everything']):
@@ -1764,8 +1767,8 @@ def make_logo(dataframe=None,
         scalebar_dict['scalebar_color'] = mpl.rcParams['axes.edgecolor']
     if scalebar_dict['scalebar_linewidth'] is None:
         scalebar_dict['scalebar_linewidth'] = 2
-#    if scalebar_dict['scalebar_x'] is None:
-#        scalebar_dict['scalebar_x'] = xlim[0]-.5
+    if scalebar_dict['scalebar_x'] is None:
+        scalebar_dict['scalebar_x'] = xlim[0]-.5
     if scalebar_dict['scalebar_length'] is None:
         scalebar_dict['scalebar_length'] = 1
     if scalebar_dict['scalebar_ymin'] is None:
@@ -1870,7 +1873,7 @@ def make_logo(dataframe=None,
 #        'yticks': yticks,
 #        'yticklabels': yticklabels,
 #        'ylabel': ylabel,
-#        'xlim': xlim,
+        'xlim': xlim,
 #        'xticks': xticks,
 #        'xticklabels': xticklabels,
 #        'xlabel': xlabel,
@@ -1977,8 +1980,8 @@ def _input_checks(*args,**kwargs):
         available_colors.append('hydrophobicity')
         available_colors.append('random')
 
-        check(kwargs['character_style_dict']['character_colors'] in available_colors,
-              'Input Error: character_colors = %s; must be in %s' % (kwargs['character_style_dict']['character_colors'], available_colors))
+        #check(kwargs['character_style_dict']['character_colors'] in available_colors,
+        #      'Input Error: character_colors = %s; must be in %s' % (kwargs['character_style_dict']['character_colors'], available_colors))
 
 
 
