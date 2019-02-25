@@ -1136,7 +1136,7 @@ def _validate_user_set_dict(dict_name,dictionary_with_keys_vals):
 
         valid_dict_keys = [
             'font_properties',
-            'font_file = None',
+            'font_file',
             'font_family',
             'font_weight',
             'font_style',

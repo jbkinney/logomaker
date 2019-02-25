@@ -237,6 +237,7 @@ def set_bg_mat(background, matrix):
 
     # Normalize new_bg_mat as probability matrix
     new_bg_mat = normalize_probability_matrix(new_bg_mat)
+
     return new_bg_mat
 
 
@@ -280,7 +281,8 @@ def load_alignment(fasta_file=None,
 
         # Load csv file as a dataframe
         df = pd.read_csv(csv_file, **csv_kwargs)
-        df = df.fillna(csv_fillna)
+        #df = df.fillna(csv_fillna)
+        df = df.fillna(csv_file)
 
         # Make sure that seq_col is in df
         assert seq_col in df.columns, \
