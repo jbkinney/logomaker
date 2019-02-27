@@ -124,6 +124,9 @@ def handle_errors(func):
 
     return wrapped_func
 
+# this circumvents a non-logomaker error with python 3. Will debug.
+import warnings
+warnings.filterwarnings("ignore")
 
 # module imports
 from logomaker import validate
