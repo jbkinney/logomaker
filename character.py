@@ -30,52 +30,57 @@ class Glyph:
 
     def __init__(self,
                  ax,
-                 char,
-                 pos,
-                 ymin=None,
-                 ymax=None,
+                 p,
+                 c,
+                 floor=None,
+                 ceiling=None,
                  width=1,
                  font_family='sans',
                  font_weight='bold',
                  color='black',
-                 max_hstretch=None,
+                 max_horizontal_stretch=None,
                  flip=False,
                  mirror=False,
                  zorder=None,
-                 alpha=1):
+                 alpha=1,
+                 draw_now=True):
 
-        # Set xmin and xmax
+        # Do basic checks
         assert width > 0, 'Error: Must have width > 0'
-        xmin = pos - width / 2
-        xmax = pos + width / 2
 
-        # Set ymin and height
+        # Set floor and ceiling to axes ylim value if None is passed for either
         ax_ymin, ax_ymax = ax.get_ylim()
-        if ymin is None:
-            ymin = ax_ymin
-        if ymax is None:
-            ymax = ax_ymax
-        height = ymax-ymin
-        assert height > 0, 'Error: Must have ymax > ymin'
+        if floor is None:
+            floor = ax_ymin
+        if ceiling is None:
+            ceiling = ax_ymax
+        assert ceiling > floor, 'Error: Must have ceiling > floor'
 
         # Set attributes
-        self.pos = pos
-        self.xmin = xmin
-        self.xmax = xmax
-        self.ymin = ymin
-        self.ymax = ymax
+        self.p = p
+        self.floor = floor
+        self.ceiling = ceiling
         self.width = width
-        self.height = height
-        self.char = char
+        self.c = c
         self.flip = flip
         self.mirror = mirror
         self.zorder = zorder
-        self.max_hstretch = max_hstretch
+        self.max_hstretch = max_horizontal_stretch
         self.alpha = alpha
         self.color = color
         self.font_family = font_family
         self.font_weight = font_weight
         self.ax = ax
+
+        # Draw now if requested
+        if draw_now:
+            self.draw()
+
+    def draw(self):
+        '''
+        Draws Glyph given current parameters except for the following,
+        which are ignored after the constructor is called: xmin, xmax, height.
+        '''
 
         # Make patch
         self.patch = self._make_patch()
@@ -90,18 +95,22 @@ class Glyph:
         add patch to an axes object, though
         '''
 
+        # Set xmin and height
+        xmin = self.p - self.width / 2
+        height = self.ceiling - self.floor
+
+        # Create bounding box
+        bbox = Bbox.from_bounds(xmin,
+                                self.floor,
+                                self.width,
+                                height)
+
         # Set font properties
         font_properties = FontProperties(family=self.font_family,
                                          weight=self.font_weight)
 
-        # Create bounding box
-        bbox = Bbox.from_bounds(self.xmin,
-                                self.ymin,
-                                self.width,
-                                self.height)
-
         # Create raw path
-        tmp_path = TextPath((0, 0), self.char, size=1,
+        tmp_path = TextPath((0, 0), self.c, size=1,
                             prop=font_properties)
 
         # If need to flip char, do it within tmp_path
@@ -130,7 +139,7 @@ class Glyph:
         # THIS IS THE KEY TRANSFORMATION
         # 1. Translate char path so that lower left corner is at origin
         # 2. Scale char path to desired width and height
-        # 3. Translate char path to desired pos
+        # 3. Translate char path to desired position
         transformation = Affine2D() \
             .translate(tx=-tmp_bbox.xmin, ty=-tmp_bbox.ymin) \
             .scale(sx=hstretch, sy=vstretch) \
@@ -261,7 +270,7 @@ def put_char_in_box(ax,
     # THIS IS THE KEY TRANSFORMATION
     # 1. Translate char path so that lower left corner is at origin
     # 2. Scale char path to desired width and height
-    # 3. Translate char path to desired pos
+    # 3. Translate char path to desired position
     transformation = Affine2D() \
         .translate(tx=-tmp_bbox.xmin, ty=-tmp_bbox.ymin) \
         .scale(sx=hstretch, sy=vstretch) \
