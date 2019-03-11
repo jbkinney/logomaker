@@ -13,7 +13,7 @@ font_manager = FontManager()
 def get_font_families():
     """
     Returns a list of valid font_family options for use, e.g., in Glyph or
-    BasicLogo constructors.
+    Logo constructors.
 
     parameters
     ----------

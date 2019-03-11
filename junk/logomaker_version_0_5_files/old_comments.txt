@@ -4,7 +4,7 @@
 
     Returns:
 
-        logo (logomaker.Logo): Logo object. Draw by using logo.draw(ax).
+        logo (logomaker.OldLogo): OldLogo object. Draw by using logo.draw(ax).
 
     Args:
 
@@ -85,7 +85,7 @@
         boxalpha (float): Opacity of each logo character bounding box. Values
             are restricted to interval [0, 1].
 
-        highlight_sequence (str, pd.DataFrame): Logo characters to highlight.
+        highlight_sequence (str, pd.DataFrame): OldLogo characters to highlight.
             Can take a variety of inputs:
             - string, listing a sequence with the same length and characters
                 as logo.

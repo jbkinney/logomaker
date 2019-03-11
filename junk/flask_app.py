@@ -357,7 +357,7 @@ use_tightlayout : True"""
             logomaker.make_styled_logo(style_file=style_file, fasta_file=dataFileName)
     except:
         # display this message in lieu of failed logo rendering.
-        logoFailure = "ERROR: Could not draw Logo"
+        logoFailure = "ERROR: Could not draw OldLogo"
     '''
 
     # save the logo as a stream of bytes which can be passed into

@@ -218,7 +218,7 @@ ignore_characters (str, None): Specifies the set of characters to not
     by characters.
 
 #######################################################################
-### Logo character styling
+### OldLogo character styling
 
 character_colors (color scheme):  Face color of logo characters. Default 'gray'.
     Here and in what follows a variable of type 'color' can
@@ -350,9 +350,9 @@ fullheight_width (float >= 0): Overrides width when applied to fullheight
     positions
 
 #######################################################################
-### Logo character font
+### OldLogo character font
 
-# Logo characters #
+# OldLogo characters #
 
 font_properties (FontProperties, None): The logo character font
     properties. If FontProperties, overrides all of the font_*

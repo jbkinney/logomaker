@@ -1,17 +1,10 @@
 from __future__ import division
-import numpy as np
-import scipy as sp
-import matplotlib.pyplot as plt
-import pandas as pd
-import matplotlib as mpl
 
 # Import LogoMaker
 import sys
 sys.path.append('../')
 import logomaker
 import inspect
-import make_logo
-
 
 param_dict = logomaker.documentation_parser.parse_documentation_file('make_logo_arguments.txt')
 

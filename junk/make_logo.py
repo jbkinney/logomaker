@@ -6,7 +6,7 @@ from matplotlib.font_manager import FontProperties
 import matplotlib as mpl
 from logomaker.validate import validate_parameter, validate_dataframe, params_that_specify_colorschemes
 from logomaker.data import load_alignment, load_matrix, iupac_to_probability_mat, counts_mat_to_probability_mat
-from logomaker.Logo import Logo
+from logomaker.OldLogo import OldLogo
 from logomaker import data
 from logomaker import color
 from logomaker.load_meme import load_meme
@@ -977,10 +977,10 @@ def make_logo(dataframe=None,
     Returns
     -------
     
-    logo (a logomaker.Logo object). 
+    logo (a logomaker.OldLogo object).
         The figure and axes on which the logo is drawn are saved in \n
         logo.fig and logo.ax respectively. (If a single-line logo is \n 
-        drawn) If a multi-line logo is drawn: list of logomaker.Logo objects, \n
+        drawn) If a multi-line logo is drawn: list of logomaker.OldLogo objects, \n
         one for each line. \n
 
     """
@@ -1799,7 +1799,7 @@ def make_logo(dataframe=None,
     }
     scalebar_textstyle = remove_none_from_dict(scalebar_textstyle)
 
-    # This is what gets passed to Logo()
+    # This is what gets passed to OldLogo()
     scalebar_style = {
         'line_kwargs': scalebar_linestyle,
         'text_kwargs': scalebar_textstyle,
@@ -1897,7 +1897,7 @@ def make_logo(dataframe=None,
     }
 
     ######################################################################
-    # Create Logo instance
+    # Create OldLogo instance
     logo = Logo(matrix=dataframe,
                 #highlight_sequence=highlight_sequence,
                 highlight_sequence=highlight_style_dict['highlight_sequence'],

@@ -374,7 +374,7 @@ params_for_later_validation = {
 
 def validate_parameter(name, user, default):
     """
-    Validates any parameter passed to make_logo or Logo.__init__.
+    Validates any parameter passed to make_logo or OldLogo.__init__.
     If user is valid of parameter name, silently returns user.
     If user is invalid, issues warning and retuns default instead
     """
