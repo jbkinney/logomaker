@@ -3,8 +3,124 @@ from logomaker import Glyph
 from logomaker import color
 import pandas as pd
 
-# Logo base class
+
 class  BaseLogo:
+    """
+    BaseLogo represents a basic logo, drawn on a specified axes object
+    using a specified matrix.
+
+    attributes
+    ----------
+
+    ax: (matplotlib Axes object)
+        The axes object on which to draw the logo.
+
+    matrix: (pd.DataFrame)
+        A matrix specifying character heights and positions. Note that
+        positions index rows while characters index columns.
+
+    negate: (bool)
+        If True, all values in matrix are multiplied by -1. This can be
+        useful when illustrating negative energy values in an energy matrix.
+
+    center: (bool)
+        If True, the stack of characters at each position will be centered
+        around zero. This is accomplished by subtracting the mean value
+        in each row of the matrix from each element in that row.
+
+    colors: (color scheme)
+        Face color of logo characters. Default 'gray'. Here and in
+        what follows a variable of type 'color' can take a variety of value
+        types.
+         - (str) A Logomaker color scheme in which the color is determined
+             by the specific character being drawn. Options are,
+             + For DNA/RNA: 'classic', 'grays', 'base_paring'.
+             + For protein: 'hydrophobicity', 'chemistry', 'charge'.
+         - (str) A built-in matplotlib color name  such as 'k' or 'tomato'
+         - (str) A built-in matplotlib colormap name such as  'viridis' or
+             'Purples'. In this case, the color within the colormap will
+             depend on the character being drawn.
+         - (list) An RGB color (3 floats in interval [0,1]) or RGBA color
+             (4 floats in interval [0,1]).
+         - (dict) A dictionary mapping of characters to colors, in which
+             case the color will depend  on the character being drawn.
+             E.g., {'A': 'green','C': [ 0.,  0.,  1.], 'G': 'y',
+             'T': [ 1.,  0.,  0.,  0.5]}
+
+    edgecolor: (matplotlib color)
+        Color to use for edges of all glyphs in logo.
+
+    edgewidth: (float > 0)
+        Width to use for edges of all glyphs in logo.
+
+    font_family: (str)
+        The font name to use when rendering glyphs. Specifically, this is
+        the value passed as the 'family' parameter when calling the
+        FontProperties constructor. From matplotlib documentation:
+        "family: A list of font names in decreasing order of priority.
+        The items may include a generic font family name, either
+        'serif', 'sans-serif', 'cursive', 'fantasy', or 'monospace'.
+        In that case, the actual font to be used will be looked up from
+        the associated rcParam in matplotlibrc."
+        Run logomaker.get_font_families() for list of (some but not all) valid
+        options on your system.
+
+    font_weight: (str)
+        The font weight to use when rendering glyphs. Specifically, this is
+        the value passed as the 'weight' parameter in the FontProperties
+        constructor. From matplotlib documentation: "weight: A numeric
+        value in the range 0-1000 or one of 'ultralight', 'light',
+        'normal', 'regular', 'book', 'medium', 'roman', 'semibold',
+        'demibold', 'demi', 'bold', 'heavy', 'extra bold', 'black'."
+
+
+    alpha: (float in [0,1])
+        Opacity of rendered glyphs.
+
+    flip_below: (bool)
+        If True, glyphs below the x-axis (which correspond to negative
+        values in the matrix) will be flipped upside down.
+
+    shade_below: (float in [0,1])
+        If True, glyphs below the x-axis (which correspond to negative
+        values in the matrix) will made darker by multiplying color RGB
+        values by 1.0-shade_below.
+
+    fade_below:
+        If True, glyphs below the x-axis (which correspond to negative
+        values in the matrix) will made more transparenty by multiplying
+        alpha by 1.0-fade_below.
+
+    width:
+        Width of each rendered glyph in position units.
+
+    vpad: (float in [0,1])
+        Amount of whitespace to leave within the bounds of a glyph above
+        and below the rendered character. Specifically, in a glyph of
+        height h, a margin of size h*vpad/2 will be left blank both above
+        and below the rendered character.
+
+    vsep: (float > 0)
+        Amount of whitespace to leave between rendered glyphs. Unlike vpad,
+        vsep is NOT relative to glyph height. The vsep-sized margin between
+        glyphs on either side of the x-axis will always be centered on the
+        x-axis.
+
+    dont_stretch_more_than: (str)
+        This parameter limits the amount that a character will be
+        horizontally stretched when rendering a glyph. Specifying an
+        wide character such as 'W' corresponds to less potential stretching,
+        while specifying a narrow character such as '.' corresponds to more
+        stretching. Note that the specified character does not have to be
+        a character rendered in the logo.
+
+    draw_now: (bool)
+        If True, the logo is rendered immediately after it is specified.
+        Set to False if you wish to change the properties of any glyphs
+        after initial specification, e.g. by running
+        BaseLogo.highlight_sequence().
+
+    """
 
     def __init__(self,
                  ax,
@@ -26,123 +142,6 @@ class  BaseLogo:
                  dont_stretch_more_than='A',
                  draw_now=True,
                  ):
-
-        """
-        BaseLogo represents a basic logo, drawn on a specified axes object
-        using a specified matrix.
-
-        attributes
-        ----------
-
-        ax: (matplotlib Axes object)
-            The axes object on which to draw the logo.
-
-        matrix: (pd.DataFrame)
-            A matrix specifying character heights and positions. Note that
-            positions index rows while characters index columns.
-
-        negate: (bool)
-            If True, all values in matrix are multiplied by -1. This can be
-            useful when illustrating negative energy values in an energy matrix.
-
-        center: (bool)
-            If True, the stack of characters at each position will be centered
-            around zero. This is accomplished by subtracting the mean value
-            in each row of the matrix from each element in that row.
-
-        colors: (color scheme)
-            Face color of logo characters. Default 'gray'. Here and in
-            what follows a variable of type 'color' can take a variety of value
-            types.
-             - (str) A Logomaker color scheme in which the color is determined
-                 by the specific character being drawn. Options are,
-                 + For DNA/RNA: 'classic', 'grays', 'base_paring'.
-                 + For protein: 'hydrophobicity', 'chemistry', 'charge'.
-             - (str) A built-in matplotlib color name  such as 'k' or 'tomato'
-             - (str) A built-in matplotlib colormap name such as  'viridis' or
-                 'Purples'. In this case, the color within the colormap will
-                 depend on the character being drawn.
-             - (list) An RGB color (3 floats in interval [0,1]) or RGBA color
-                 (4 floats in interval [0,1]).
-             - (dict) A dictionary mapping of characters to colors, in which
-                 case the color will depend  on the character being drawn.
-                 E.g., {'A': 'green','C': [ 0.,  0.,  1.], 'G': 'y',
-                 'T': [ 1.,  0.,  0.,  0.5]}
-
-        edgecolor: (matplotlib color)
-            Color to use for edges of all glyphs in logo.
-
-        edgewidth: (float > 0)
-            With to use for edges of all glyphs in logo.
-
-        font_family: (str)
-            The font name to use when rendering glyphs. Specifically, this is
-            the value passed as the 'family' parameter when calling the
-            FontProperties constructor. From matplotlib documentation:
-            "family: A list of font names in decreasing order of priority.
-            The items may include a generic font family name, either
-            'serif', 'sans-serif', 'cursive', 'fantasy', or 'monospace'.
-            In that case, the actual font to be used will be looked up from
-            the associated rcParam in matplotlibrc."
-            Run logomaker.get_font_families() for list of (some but not all) valid
-            options on your system.
-
-        font_weight: (str)
-            The font weight to use when rendering glyphs. Specifically, this is
-            the value passed as the 'weight' parameter in the FontProperties
-            constructor. From matplotlib documentation: "weight: A numeric
-            value in the range 0-1000 or one of 'ultralight', 'light',
-            'normal', 'regular', 'book', 'medium', 'roman', 'semibold',
-            'demibold', 'demi', 'bold', 'heavy', 'extra bold', 'black'."
-
-
-        alpha: (float in [0,1])
-            Opacity of rendered glyphs.
-
-        flip_below: (bool)
-            If True, glyphs below the x-axis (which correspond to negative
-            values in the matrix) will be flipped upside down.
-
-        shade_below: (float in [0,1])
-            If True, glyphs below the x-axis (which correspond to negative
-            values in the matrix) will made darker by multiplying color RGB
-            values by 1.0-shade_below.
-
-        fade_below:
-            If True, glyphs below the x-axis (which correspond to negative
-            values in the matrix) will made more transparenty by multiplying
-            alpha by 1.0-fade_below.
-
-        width:
-            Width of each rendered glyph in position units.
-
-        vpad: (float in [0,1])
-            Amount of whitespace to leave within the bounds of a glyph above
-            and below the rendered character. Specifically, in a glyph of
-            height h, a margin of size h*vpad/2 will be left blank both above
-            and below the rendered character.
-
-        vsep: (float > 0)
-            Amount of whitespace to leave between rendered glyphs. Unlike vpad,
-            vsep is NOT relative to glyph height. The vsep-sized margin between
-            glyphs on either side of the x-axis will always be centered on the
-            x-axis.
-
-        dont_stretch_more_than: (str)
-            This parameter limits the amount that a character will be
-            horizontally stretched when rendering a glyph. Specifying an
-            wide character such as 'W' corresponds to less potential stretching,
-            while specifying a narrow character such as '.' corresponds to more
-            stretching. Note that the specified character does not have to be
-            a character rendered in the logo.
-
-        draw_now: (bool)
-            If True, the logo is rendered immediately after it is specified.
-            Set to False if you wish to change the properties of any glyphs
-            after initial specification, e.g. by running
-            BaseLogo.highlight_sequence().
-
-        """
 
         # Save attributes
         self.ax = ax

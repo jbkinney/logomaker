@@ -6,12 +6,22 @@ from matplotlib.font_manager import FontManager, FontProperties
 # Create global font manager instance. This takes a second or two
 font_manager = FontManager()
 
-def get_fontnames_dict():
-    ttf_dict = dict([(f.name,f.fname) for f in font_manager.ttflist])
-    return ttf_dict
 
 def get_font_families():
-    fontnames_dict = get_fontnames_dict()
+    """
+    Returns a list of valid font_family options for use, e.g., in Glyph or
+    BaseLogo constructors.
+
+    parameters
+    ----------
+    None.
+
+    returns
+    -------
+    List of valid font_family names. This will vary from system to system.
+
+    """
+    fontnames_dict = dict([(f.name,f.fname) for f in font_manager.ttflist])
     fontnames = list(fontnames_dict.keys())
     fontnames.sort()
     return fontnames
@@ -19,45 +29,89 @@ def get_font_families():
 
 class Glyph:
     """
-    A Glyph represents to a character, drawn on a specified axes at a specified
+    A Glyph represents a character, drawn on a specified axes at a specified
     position, rendered using specified styling such as color and font.
 
     attributes
     ----------
 
-    ax:
+    ax: (matplotlib Axes object)
+        The axes object on which to draw the logo.
 
-    p:
+    p: (number)
+        Axes x-coordinate of glyph center.
 
-    c:
+    c: (str)
+        Character represeted by glyph.
 
-    floor:
+    floor: (float)
+        Axes y-coordinate of glyph bottom. Must be < ceiling
 
-    ceiling:
+    ceiling: (float)
+        Axes y-coordinate of glyph top. Must be > floor.
 
-    width:
+    width: (float > 0)
+        Axes x-span of glyph.
 
-    vpad:
+    vpad: (float in [0,1])
+        Amount of whitespace to leave within the glyph bounding box above
+        and below the rendered glyph itself. Specifically, in a glyph with
+        height h = ceiling-floor, a margin of size h*vpad/2 will be left blank
+        both above and below the rendered character.
 
-    font_family:
+    font_family: (str)
+        The font name to use when rendering the glyph. Specifically, this is
+        the value passed as the 'family' parameter when calling the
+        FontProperties constructor. From matplotlib documentation:
+        "family: A list of font names in decreasing order of priority.
+        The items may include a generic font family name, either
+        'serif', 'sans-serif', 'cursive', 'fantasy', or 'monospace'.
+        In that case, the actual font to be used will be looked up from
+        the associated rcParam in matplotlibrc."
+        Run logomaker.get_font_families() for list of (some but not all) valid
+        options on your system.
 
-    font_weight:
+    font_weight: (str)
+        The font weight to use when rendering the glyph. Specifically, this is
+        the value passed as the 'weight' parameter in the FontProperties
+        constructor. From matplotlib documentation: "weight: A numeric
+        value in the range 0-1000 or one of 'ultralight', 'light',
+        'normal', 'regular', 'book', 'medium', 'roman', 'semibold',
+        'demibold', 'demi', 'bold', 'heavy', 'extra bold', 'black'."
 
-    color:
+    color: (matplotlib color)
+        Color to use for the face of the glyph.
 
-    edgewidth:
+    edgecolor: (matplotlib color)
+        Color to use for edges of the glyph.
 
-    edgecolor:
+    edgewidth: (float > 0)
+        Width to use for edges of all glyphs in logo.
 
-    dont_stretch_more_than:
+    dont_stretch_more_than: (str)
+        This parameter limits the amount that a character will be
+        horizontally stretched when rendering tue glyph. Specifying an
+        wide character such as 'W' corresponds to less potential stretching,
+        while specifying a narrow character such as '.' corresponds to more
+        stretching.
 
-    flip:
+    flip: (bool)
+        If True, the glyph will be rendered flipped upside down.
 
-    mirror:
+    mirror: (bool)
+        If True, a mirror image of the glyph will be rendered.
 
-    zorder:
+    zorder: (number)
+        Placement of glyph within the Axes z-stack.
 
-    alpha:
+    alpha: (float in [0,1])
+        Opacity of the rendered glyph.
+
+    draw_now: (bool)
+        If True, the glyph is rendered immediately after it is specified.
+        Set to False if you might wish to change the properties of this glyph
+        after initial specification.
+
     """
 
     def __init__(self,
@@ -114,10 +168,19 @@ class Glyph:
         if draw_now:
             self.draw()
 
+
     def draw(self):
         '''
-        Draws Glyph given current parameters except for the following,
-        which are ignored after the constructor is called: xmin, xmax, height.
+        Draws Glyph given current parameters.
+
+        parameters
+        ----------
+        None.
+
+        returns
+        -------
+        None.
+
         '''
 
         # Make patch
@@ -129,8 +192,8 @@ class Glyph:
 
     def _make_patch(self):
         '''
-        Makes patch corresponding to char. Does NOT yet
-        add patch to an axes object, though
+        Makes patch corresponding to char. Does NOT
+        add this patch to an axes object, though; that is done by draw().
         '''
 
         # Set xmin and height
