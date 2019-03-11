@@ -10,7 +10,7 @@ def get_fontnames_dict():
     ttf_dict = dict([(f.name,f.fname) for f in font_manager.ttflist])
     return ttf_dict
 
-def get_fontnames():
+def get_font_families():
     fontnames_dict = get_fontnames_dict()
     fontnames = list(fontnames_dict.keys())
     fontnames.sort()
@@ -37,13 +37,19 @@ class Glyph:
 
     width:
 
+    vpad:
+
     font_family:
 
     font_weight:
 
     color:
 
-    max_horizontal_stretch:
+    edgewidth:
+
+    edgecolor:
+
+    dont_stretch_more_than:
 
     flip:
 
@@ -61,10 +67,13 @@ class Glyph:
                  floor=None,
                  ceiling=None,
                  width=1,
+                 vpad=0.0,
                  font_family='sans',
                  font_weight='bold',
-                 color='black',
-                 max_horizontal_stretch=None,
+                 color='gray',
+                 edgecolor='black',
+                 edgewidth=0.0,
+                 dont_stretch_more_than='A',
                  flip=False,
                  mirror=False,
                  zorder=None,
@@ -87,13 +96,16 @@ class Glyph:
         self.floor = floor
         self.ceiling = ceiling
         self.width = width
+        self.vpad = vpad
         self.c = c
         self.flip = flip
         self.mirror = mirror
         self.zorder = zorder
-        self.max_hstretch = max_horizontal_stretch
+        self.dont_stretch_more_than = dont_stretch_more_than
         self.alpha = alpha
         self.color = color
+        self.edgecolor = edgecolor
+        self.edgewidth = edgewidth
         self.font_family = font_family
         self.font_weight = font_weight
         self.ax = ax
@@ -125,11 +137,14 @@ class Glyph:
         xmin = self.p - self.width / 2
         height = self.ceiling - self.floor
 
-        # Create bounding box
+        # Compute vpad
+        vpad = self.vpad * height
+
+        # Create bounding box, leaving requested amount of padding
         bbox = Bbox.from_bounds(xmin,
-                                self.floor,
+                                self.floor+vpad/2,
                                 self.width,
-                                height)
+                                height-vpad)
 
         # Set font properties
         font_properties = FontProperties(family=self.font_family,
@@ -137,6 +152,10 @@ class Glyph:
 
         # Create raw path
         tmp_path = TextPath((0, 0), self.c, size=1,
+                            prop=font_properties)
+
+        # Create path for max_stretched_character
+        msc_path = TextPath((0, 0), self.dont_stretch_more_than, size=1,
                             prop=font_properties)
 
         # If need to flip char, do it within tmp_path
@@ -149,13 +168,14 @@ class Glyph:
             transformation = Affine2D().scale(sx=-11, sy=1)
             tmp_path = transformation.transform_path(tmp_path)
 
-        # Get bounding box for temporary char path
+        # Get bounding box for temporary character and max_stretched_character
         tmp_bbox = tmp_path.get_extents()
+        msc_bbox = msc_path.get_extents()
 
         # Compute horizontal stretch and shift needed to center char
-        hstretch = bbox.width / tmp_bbox.width
-        if self.max_hstretch is not None:
-            hstretch = min(hstretch, self.max_hstretch)
+        hstretch_tmp = bbox.width / tmp_bbox.width
+        hstretch_msc = bbox.width / msc_bbox.width
+        hstretch = min(hstretch_tmp, hstretch_msc)
         char_width = hstretch * tmp_bbox.width
         char_shift = (bbox.width - char_width) / 2.0
 
@@ -177,8 +197,8 @@ class Glyph:
                           facecolor=self.color,
                           zorder=self.zorder,
                           alpha=self.alpha,
-                          edgecolor=None,
-                          linewidth=0)
+                          edgecolor=self.edgecolor,
+                          linewidth=self.edgewidth)
 
         # Return patch
         return patch
