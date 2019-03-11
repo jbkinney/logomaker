@@ -19,6 +19,17 @@ protein = [c.lower() for c in PROTEIN]
 PROTEIN_STOP = PROTEIN + ['*']
 protein_stop = protein + ['*']
 
+alphabets_dict = {
+    'DNA': DNA,
+    'RNA': RNA,
+    'dna': dna,
+    'rna': rna,
+    'PROTEIN': PROTEIN,
+    'protein': protein,
+    'PROTEIN*': PROTEIN_STOP,
+    'protein*': protein_stop
+}
+
 # Character transformations dictionaries
 to_DNA = {'a': 'A', 'c': 'C', 'g': 'G', 't': 'T', 'U': 'T', 'u': 'T'}
 to_dna = {'A': 'a', 'C': 'c', 'G': 'g', 'T': 't', 'U': 't', 'u': 't'}
@@ -27,8 +38,10 @@ to_rna = {'A': 'a', 'C': 'c', 'G': 'g', 'T': 'u', 't': 'u', 'U': 'u'}
 to_PROTEIN = dict(zip(protein, PROTEIN))
 to_protein = dict(zip(PROTEIN, protein))
 
-#from validate import validate_dataframe, validate_probability_mat, iupac_dict
-from logomaker.validate import validate_dataframe, validate_probability_mat, iupac_dict
+# from validate import validate_dataframe, validate_probability_mat, iupac_dict
+from logomaker.validate import validate_dataframe, validate_probability_mat, \
+    iupac_dict
+
 
 def transform_mat(matrix, to_type, from_type=None, background=None,
                   pseudocount=1, enrichment_logbase=2,
@@ -77,7 +90,7 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
         probability_mat = \
             counts_mat_to_probability_mat(matrix, pseudocount=pseudocount)
     else:
-        assert False, 'Error! from_type %s is invalid.'%from_type
+        assert False, 'Error! from_type %s is invalid.' % from_type
 
     # Compute out_mat from freq_mat
     if to_type == 'counts':
@@ -101,10 +114,11 @@ def transform_mat(matrix, to_type, from_type=None, background=None,
                                                      units=information_units)
 
     else:
-        assert False, 'Error! to_type %s is invalid.'%to_type
+        assert False, 'Error! to_type %s is invalid.' % to_type
 
     # Return out_mat
     return out_mat
+
 
 def counts_mat_to_probability_mat(count_mat, pseudocount=1):
     '''
@@ -117,7 +131,7 @@ def counts_mat_to_probability_mat(count_mat, pseudocount=1):
     # Compute freq_mat
     freq_mat = count_mat.copy()
     vals = count_mat.values + pseudocount
-    freq_mat.loc[:,:] = vals / vals.sum(axis=1)[:,np.newaxis]
+    freq_mat.loc[:, :] = vals / vals.sum(axis=1)[:, np.newaxis]
     freq_mat = normalize_probability_matrix(freq_mat)
 
     # Validate and return
@@ -137,7 +151,7 @@ def probability_mat_to_enrichment_mat(freq_mat, bg_mat, base=2,
 
     # Compute weight_mat
     weight_mat = freq_mat.copy()
-    weight_mat.loc[:, :] = np.log2(freq_mat / bg_mat)/np.log2(base)
+    weight_mat.loc[:, :] = np.log2(freq_mat / bg_mat) / np.log2(base)
 
     # Center if requested
     if centering:
@@ -148,16 +162,17 @@ def probability_mat_to_enrichment_mat(freq_mat, bg_mat, base=2,
     weight_mat = validate_dataframe(weight_mat)
     return weight_mat
 
+
 # Needed only for display purposes
 def probability_mat_to_information_mat(freq_mat, bg_mat, units='bits'):
     '''
     Converts a prob df to an information df
     '''
     # Set units
-    if units=='bits':
+    if units == 'bits':
         multiplier = 1
-    elif units=='nats':
-        multiplier = 1./np.log2(np.e)
+    elif units == 'nats':
+        multiplier = 1. / np.log2(np.e)
     else:
         assert False, 'Error: invalid selection for units = %s' % units
 
@@ -166,9 +181,9 @@ def probability_mat_to_information_mat(freq_mat, bg_mat, units='bits'):
     info_mat = freq_mat.copy()
 
     info_list = (freq_mat.values * multiplier *
-                 np.log2(freq_mat.values/bg_mat.values)).sum(axis=1)
+                 np.log2(freq_mat.values / bg_mat.values)).sum(axis=1)
 
-    info_mat.loc[:, :] = freq_mat.values*info_list[:,np.newaxis]
+    info_mat.loc[:, :] = freq_mat.values * info_list[:, np.newaxis]
 
     # Validate and return
     info_mat = validate_dataframe(info_mat)
@@ -215,7 +230,7 @@ def set_bg_mat(background, matrix):
 
     # Expand single-row background data frame
     elif type(background) == pd.core.frame.DataFrame and \
-                    background.shape == (1, num_cols):
+            background.shape == (1, num_cols):
         assert all(matrix.columns == background.columns), \
             'Error: df and bg_mat have different columns.'
         new_bg_mat = matrix.copy()
@@ -223,7 +238,7 @@ def set_bg_mat(background, matrix):
 
     # Use full background dataframe
     elif type(background) == pd.core.frame.DataFrame and \
-                    len(background.index) == len(matrix.index):
+            len(background.index) == len(matrix.index):
         assert all(matrix.columns == background.columns), \
             'Error: df and bg_mat have different columns.'
         new_bg_mat = background.copy()
@@ -263,7 +278,6 @@ def load_alignment(fasta_file=None,
                    positions=None,
                    ignore_characters='.-',
                    occurance_threshold=0):
-
     # If loading file name
     if fasta_file is not None:
 
@@ -281,20 +295,19 @@ def load_alignment(fasta_file=None,
 
         # Load csv file as a dataframe
         df = pd.read_csv(csv_file, **csv_kwargs)
-        #df = df.fillna(csv_fillna)
+        # df = df.fillna(csv_fillna)
         df = df.fillna(csv_file)
 
         # Make sure that seq_col is in df
         assert seq_col in df.columns, \
             ('Error: seq_col %s is not in the columns %s read from '
-            + 'csv_file %s') % (seq_col, df.columns, csv_file)
+             + 'csv_file %s') % (seq_col, df.columns, csv_file)
 
         # Get sequences
         sequences = df[seq_col].values
 
         # Optionally set sequence_counts
         if ct_col is not None:
-
             # Make sure that seq_col is in df
             assert seq_col in df.columns, \
                 ('Error: ct_col %s is not None, but neither is it in the '
@@ -310,10 +323,10 @@ def load_alignment(fasta_file=None,
 
     # Get seq length
     L = len(sequences[0])
-    #print('debugging:')
-    #print(type(sequences))
-    #print(L)
-    #print(np.shape(sequences))
+    # print('debugging:')
+    # print(type(sequences))
+    # print(L)
+    # print(np.shape(sequences))
     assert all([len(seq) == L for seq in sequences]), \
         'Error: not all sequences have length %d.' % L
 
@@ -328,7 +341,7 @@ def load_alignment(fasta_file=None,
 
     # If positions is not specified by user, make it
     if positions is not None:
-        assert len(positions) == L, 'Error: positions, if passed, must be '+\
+        assert len(positions) == L, 'Error: positions, if passed, must be ' + \
                                     'same length as sequences.'
     else:
         positions = range(L)
@@ -371,7 +384,6 @@ def filter_columns(matrix,
                    sequence_type=None,
                    characters=None,
                    ignore_characters='.-'):
-
     # Rename characters if appropriate
     if sequence_type is None:
         translation_dict = {}
@@ -389,7 +401,7 @@ def filter_columns(matrix,
         translation_dict = to_PROTEIN
     else:
         message = \
-            "Could not interpret sequence_type = %s. Columns not filtered." %\
+            "Could not interpret sequence_type = %s. Columns not filtered." % \
             repr(sequence_type)
         warnings.warn(message, UserWarning)
         translation_dict = {}
@@ -428,7 +440,7 @@ def filter_columns(matrix,
         # Remove invalid characters, giving a warning while doing so
         matrix.drop(invalid_chars, axis=1, inplace=True)
         message = ("Invalid matrix columns %s for sequence_type %s." +
-                   " These columns have been removed.") %\
+                   " These columns have been removed.") % \
                   (repr(invalid_chars), sequence_type)
         warnings.warn(message, UserWarning)
 
@@ -442,7 +454,6 @@ def filter_columns(matrix,
         new_columns = list(matrix.columns)
         new_columns.sort()
         matrix = matrix.loc[:, new_columns]
-
 
     # Validate new matrix
     matrix = validate_dataframe(matrix)

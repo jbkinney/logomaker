@@ -2,6 +2,9 @@ from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch
 from matplotlib.transforms import Affine2D, Bbox
 from matplotlib.font_manager import FontManager, FontProperties
+from matplotlib.colors import to_rgb
+import matplotlib.pyplot as plt
+import pdb
 
 # Create global font manager instance. This takes a second or two
 font_manager = FontManager()
@@ -115,9 +118,9 @@ class Glyph:
     """
 
     def __init__(self,
-                 ax,
                  p,
                  c,
+                 ax=None,
                  floor=None,
                  ceiling=None,
                  width=1,
@@ -138,12 +141,12 @@ class Glyph:
         assert width > 0, 'Error: Must have width > 0'
 
         # Set floor and ceiling to axes ylim value if None is passed for either
-        ax_ymin, ax_ymax = ax.get_ylim()
-        if floor is None:
-            floor = ax_ymin
-        if ceiling is None:
-            ceiling = ax_ymax
-        assert ceiling > floor, 'Error: Must have ceiling > floor'
+        # ax_ymin, ax_ymax = ax.get_ylim()
+        # if floor is None:
+        #     floor = ax_ymin
+        # if ceiling is None:
+        #     ceiling = ax_ymax
+        # assert ceiling > floor, 'Error: Must have ceiling > floor'
 
         # Set attributes
         self.p = p
@@ -157,7 +160,7 @@ class Glyph:
         self.zorder = zorder
         self.dont_stretch_more_than = dont_stretch_more_than
         self.alpha = alpha
-        self.color = color
+        self.color = to_rgb(color)
         self.edgecolor = edgecolor
         self.edgewidth = edgewidth
         self.font_family = font_family
@@ -168,8 +171,13 @@ class Glyph:
         if draw_now:
             self.draw()
 
+    def set_attributes(self, **kwargs):
+        for key, value in kwargs.items():
+            if key in ('color', 'edgecolor'):
+                value = to_rgb(value)
+            self.__dict__[key] = value
 
-    def draw(self):
+    def draw(self, ax=None):
         '''
         Draws Glyph given current parameters.
 
@@ -186,8 +194,17 @@ class Glyph:
         # Make patch
         self.patch = self._make_patch()
 
+        # If user passed ax, use that
+        if ax is not None:
+            self.ax = ax
+
+        # If ax is not set, set to gca
+        if self.ax is None:
+            self.ax = plt.gca()
+
         # Draw character
-        self.ax.add_patch(self.patch)
+        if self.patch is not None:
+            self.ax.add_patch(self.patch)
 
 
     def _make_patch(self):
@@ -196,9 +213,18 @@ class Glyph:
         add this patch to an axes object, though; that is done by draw().
         '''
 
-        # Set xmin and height
-        xmin = self.p - self.width / 2
+        # Set height
         height = self.ceiling - self.floor
+
+        # If height is zero, just return none
+        if height == 0.0:
+            return None
+
+        # Set xmin
+        try:
+            xmin = self.p - self.width / 2
+        except:
+            pdb.set_trace()
 
         # Compute vpad
         vpad = self.vpad * height
