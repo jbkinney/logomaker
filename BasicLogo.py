@@ -4,9 +4,9 @@ from logomaker import color
 import pandas as pd
 
 
-class  BaseLogo:
+class BasicLogo:
     """
-    BaseLogo represents a basic logo, drawn on a specified axes object
+    BasicLogo represents a basic logo, drawn on a specified axes object
     using a specified matrix.
 
     attributes
@@ -118,7 +118,7 @@ class  BaseLogo:
         If True, the logo is rendered immediately after it is specified.
         Set to False if you wish to change the properties of any glyphs
         after initial specification, e.g. by running
-        BaseLogo.highlight_sequence().
+        BasicLogo.highlight_sequence().
 
     """
 
@@ -174,7 +174,7 @@ class  BaseLogo:
         if self.negate:
             self.matrix_df = -self.matrix_df
 
-        # Note: BaseLogo does NOT expect df to change after it is passed
+        # Note: BasicLogo does NOT expect df to change after it is passed
         # to the constructor. But one can change character attributes
         # before drawing.
 
@@ -210,18 +210,18 @@ class  BaseLogo:
     def modify_glyph(self, p, c, params_dict):
         """
         Modifies the properties of a component glyph in a logo. If using this,
-        set draw_now=False in the BaseLogo constructor.
+        set draw_now=False in the BasicLogo constructor.
 
         parameter
         ---------
 
         p: (number)
             Position of modified glyph. Must index a row in the matrix passed
-            to the BaseLogo constructor.
+            to the BasicLogo constructor.
 
         c: (str)
             Character of modified glyph. Must index a column in the matrix
-            passed to the BaseLogo constructor.
+            passed to the BasicLogo constructor.
 
         params_dict:
             A dict object specifying new values for certain glyph parameters.
@@ -287,7 +287,7 @@ class  BaseLogo:
 
     def draw(self):
         """
-        Draws glyphs on the axes object 'ax' provided to the BaseLogo
+        Draws glyphs on the axes object 'ax' provided to the BasicLogo
         constructor
 
         parameters
