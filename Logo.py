@@ -4,6 +4,7 @@ from logomaker import Matrix
 from logomaker import color as lm_color
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 import pdb
 
 
@@ -12,6 +13,7 @@ chars_to_colors_dict = {
     tuple('ACGU'): 'classic',
     tuple('ACDEFGHIKLMNPQRSTVWY'): 'hydrophobicity',
 }
+
 
 class Logo:
     """
@@ -82,9 +84,8 @@ class Logo:
                  colors=None,
                  flip_below=True,
                  vsep=0.0,
-                 draw_now=True,
                  zorder=0,
-                 ):
+                 draw_now=True):
 
         # Set matrix_df. How to do this will depend on whether self.matrix
         # is a pd.DataFrame or a Matrix object.
@@ -121,8 +122,10 @@ class Logo:
         self.center = center
         self.flip_below = flip_below
         self.vsep = vsep
-        self.draw_now = draw_now
         self.zorder = zorder
+
+        # Set flag for whether Logo has been drawn
+        self.has_been_drawn = False
 
         # Negate values if requested
         if self.negate:
@@ -147,11 +150,36 @@ class Logo:
         self._compute_characters()
 
         # Draw now if requested
-        if self.draw_now:
+        if draw_now:
             self.draw()
 
+    def style_glyphs(self, colors=None, draw_now=True, ax=None, **kwargs):
+        """
+        Modifies the properties of all glyphs in a logo.
 
-    def style_glyphs(self, colors=None, **kwargs):
+        parameter
+        ---------
+
+        colors: (color scheme)
+            Color specification for glyphs. See logomaker.Logo for details.
+
+        draw_now: (bool)
+            Whether to readraw modified logo on current Axes.
+
+        ax: (matplotlib Axes object)
+            New axes, if any, on which to draw logo if draw_now=True.
+
+        **kwargs:
+            Keyword arguments to pass to Glyph.set_attributes()
+
+        returns
+        -------
+        None
+
+        """
+
+        # Update ax
+        self._update_ax(ax)
 
         # Reset colors if provided
         if colors is not None:
@@ -176,26 +204,73 @@ class Logo:
                 this_color = self.rgba_dict[g.c][:3]
                 g.set_attributes(color=this_color)
 
+        # Draw now if requested
+        if draw_now:
+            self.draw()
 
-    def add_below_effects(self,
-                          shade=0.0,
-                          fade=0.0,
-                          flip=True):
+    def style_glyphs_below(self,
+                           shade=0.0,
+                           fade=0.0,
+                           flip=True,
+                           draw_now=True,
+                           ax=None,
+                           **kwargs):
+
+        """
+        Modifies the properties of all glyphs in a logo.
+
+        parameter
+        ---------
+
+        colors: (color scheme)
+            Color specification for glyphs. See logomaker.Logo for details.
+
+        draw_now: (bool)
+            Whether to readraw modified logo on current Axes.
+
+        ax: (matplotlib Axes object)
+            New axes, if any, on which to draw logo if draw_now=True.
+
+        **kwargs:
+            Keyword arguments to pass to Glyph.set_attributes()
+
+        returns
+        -------
+        None
+
+        """
+
+        # Update ax
+        self._update_ax(ax)
+
+        # Iterate over all positions and characters
         for p in self.ps:
             for c in self.cs:
+
+                # If matrix value is < 0
                 v = self.matrix_df.loc[p, c]
                 if v < 0:
+
+                    #  Get glyph
                     g = self.glyph_df.loc[p, c]
-                    #pdb.set_trace()
-                    g.color = np.array(g.color) * (1.0 - shade)
-                    g.alpha = g.alpha * (1.0 - fade)
-                    g.flip = flip
 
+                    # Modify color and alpha
+                    color = np.array(g.color) * (1.0 - shade)
+                    alpha = g.alpha * (1.0 - fade)
 
-    def style_single_glyph(self, p, c, draw_now=True, **kwargs):
+                    # Set glyph attributes
+                    g.set_attributes(color=color,
+                                     alpha=alpha,
+                                     flip=flip,
+                                     **kwargs)
+
+        # Draw now if requested
+        if draw_now:
+            self.draw()
+
+    def style_single_glyph(self, p, c, draw_now=True, ax=None, **kwargs):
         """
-        Modifies the properties of a component glyph in a logo. If using this,
-        set draw_now=False in the Logo constructor.
+        Modifies the properties of a component glyph in a logo.
 
         parameter
         ---------
@@ -208,6 +283,12 @@ class Logo:
             Character of modified glyph. Must index a column in the matrix
             passed to the Logo constructor.
 
+        draw_now: (bool)
+            Whether to readraw modified logo on current Axes.
+
+        ax: (matplotlib Axes object)
+            New axes, if any, on which to draw logo if draw_now=True.
+
         **kwargs:
             Keyword arguments to pass to Glyph.set_attributes()
 
@@ -216,6 +297,9 @@ class Logo:
         None
 
         """
+
+        # Update ax
+        self._update_ax(ax)
 
         assert p in self.glyph_df.index, \
             'Error: p=%s is not a valid position' % p
@@ -231,8 +315,11 @@ class Logo:
         if draw_now:
             self.draw()
 
-
-    def style_glyphs_in_sequence(self, sequence, draw_now=True, **kwargs):
+    def style_glyphs_in_sequence(self,
+                                 sequence,
+                                 draw_now=True,
+                                 ax=None,
+                                 **kwargs):
         """
         Highlights a specified sequence by changing the parameters of the
         glyphs at each corresponding position in that sequence. To use this,
@@ -244,6 +331,12 @@ class Logo:
             A string the same length as the logo, specifying which character
             to highlight at each position.
 
+        draw_now: (bool)
+            Whether to readraw modified logo on current Axes.
+
+        ax: (matplotlib Axes object)
+            New axes, if any, on which to draw logo if draw_now=True.
+
         **kwargs:
             Keyword arguments to pass to Glyph.set_attributes()
 
@@ -252,6 +345,9 @@ class Logo:
         None
 
         """
+
+        # Update Axes
+        self._update_ax(ax)
 
         assert len(sequence) == self.L, \
             'Error: sequence to highlight does not have same length as logo.'
@@ -274,29 +370,117 @@ class Logo:
         if draw_now:
             self.draw()
 
-    def highlight_column(self, ax=None,
-                         color='yellow',
-                         width=1.0,
-                         alpha=1.0,
-                         floor=None,
-                         ceiling=None):
-        pass;
+    def highlight_position(self, p, **kwargs):
 
+        """
+        ** Can only modify Axes that has already been set. **
+
+        parameters
+        ----------
+        p: (number)
+            Single position to highlight
+
+        **kwargs:
+            Other parameters to pass to highlight_position_range()
+
+        returns
+        -------
+        None
+
+        """
+
+        assert self.has_been_drawn, \
+            'Error: Cannot call this function until Log0 has been drawn.'
+
+        self.highlight_position_range(pmin=p, pmax=p, **kwargs)
+
+    def highlight_position_range(self, pmin, pmax,
+                                 padding=0.0,
+                                 color='yellow',
+                                 edgecolor=None,
+                                 floor=None,
+                                 ceiling=None,
+                                 zorder=-2,
+                                 **kwargs):
+        """
+        Highlights multiple positions
+        ** Can only modify Axes that has already been set. **
+
+        parameters
+        ----------
+        pmin: (number)
+            Lowest position to highlight.
+            
+        pmax: (number)
+            Highest position to highlight.
+            
+        padding: (number >= -0,5)
+            Amount of padding on either side of highlighted positions to add.
+            
+        color: (matplotlib color)
+            Matplotlib color.
+            
+        floor: (number)
+            Lower-most extent of highlight. If None, is set to Axes ymin.
+            
+        ceiling: (number)
+            Upper-most extent of highlight. If None, is set to Axes ymax.
+            
+        zorder: (number)
+            Placement of highlight rectangle in Axes z-stack.
+
+        **kwargs:
+            Other parmeters to pass to highlight_single_position
+
+        returns
+        -------
+        None
+
+        """
+
+        assert self.has_been_drawn, \
+            'Error: Cannot call this function until Log0 has been drawn.'
+
+        # If floor or ceiling have not been specified, using Axes ylims
+        ymin, ymax = self.ax.get_ylim()
+        if floor is None:
+            floor = ymin
+        if ceiling is None:
+            ceiling = ymax
+        assert floor < ceiling, \
+            'Error: floor < ceiling not satisfied.'
+
+        # Set coordinates of rectangle
+        assert pmin <= pmax, \
+            'Error: pmin <= pmax not satisfied.'
+        assert padding >= -0.5, \
+            'Error: padding >= -0.5 not satisfied'
+        x = pmin - .5 - padding
+        y = floor
+        width = pmax - pmin + 1 + 2*padding
+        height = ceiling-floor
+
+        # Draw rectangle
+        patch = Rectangle(xy=(x, y),
+                          width=width,
+                          height=height,
+                          facecolor=color,
+                          edgecolor=edgecolor,
+                          zorder=zorder,
+                          **kwargs)
+        self.ax.add_patch(patch)
 
     def draw_baseline(self,
-                      ax=None,
                       zorder=-1,
                       color='black',
                       linewidth=0.5,
                       **kwargs):
         """
         Draws a line along the x-axis.
+        ** Can only modify Axes that has already been set. **
 
         parameters
         ----------
-
-        ax: (matplotlib Axes object)
-            The axes object on which to draw the logo
 
         zorder: (number)
             The z-stacked location where the baseline is drawn
@@ -316,8 +500,8 @@ class Logo:
         None
         """
 
-        # Update ax
-        self._update_ax(ax)
+        assert self.has_been_drawn, \
+            'Error: Cannot call this function until Log0 has been drawn.'
 
         # Render baseline
         self.ax.axhline(zorder=zorder,
@@ -325,8 +509,7 @@ class Logo:
                         linewidth=linewidth,
                         **kwargs)
 
-
-    def style_xticks(self, ax=None,
+    def style_xticks(self,
                      anchor=0,
                      spacing=1,
                      fmt='%d',
@@ -334,12 +517,10 @@ class Logo:
                      **kwargs):
         """
         Formats and styles tick marks along the x-axis.
+        ** Can only modify Axes that has already been set. **
 
         parameters
         ----------
-
-        ax: (matplotlib Axes object)
-            The axes object on which to draw the logo
 
         anchor: (int)
             Anchors tick marks at a specific number. Even if this number
@@ -364,8 +545,8 @@ class Logo:
         None
         """
 
-        # Update ax
-        self._update_ax(ax)
+        assert self.has_been_drawn, \
+            'Error: Cannot call this function until Log0 has been drawn.'
 
         # Get list of positions, ps, that spans all those in matrix_df
         p_min = min(self.ps)
@@ -380,21 +561,18 @@ class Logo:
         xticklabels = [fmt % p for p in xticks]
         self.ax.set_xticklabels(xticklabels, rotation=rotation, **kwargs)
 
-
-    def style_spines(self, ax=None,
+    def style_spines(self,
                      spines=('top', 'bottom', 'left', 'right'),
                      visible=True,
                      linewidth=1.0,
                      color='black',
                      bounds=None):
         """
-        Turns
+        Turns spines on an off.
+        ** Can only modify Axes that has already been set. **
 
         parameters
         ----------
-
-        ax: (matplotlib Axes object)
-            The axes object on which to draw the logo
 
         spines: (tuple of str)
             Specifies which of the four spines to modify. Default lists
@@ -420,8 +598,8 @@ class Logo:
         None
         """
 
-        # Update ax
-        self._update_ax(ax)
+        assert self.has_been_drawn, \
+            'Error: Cannot call this function until Log0 has been drawn.'
 
         # Iterate over all spines
         for name, spine in self.ax.spines.items():
@@ -436,7 +614,6 @@ class Logo:
 
                 if bounds is not None:
                     spine.set_bounds(bounds[0], bounds[1])
-
 
     def draw(self, ax=None):
         """
@@ -453,17 +630,25 @@ class Logo:
 
         """
 
-        # If user passed ax, use that
-        if ax is not None:
-            self.ax = ax
+        # Update ax
+        self._update_ax(ax)
 
-        # If ax is not set, set to gca
+        # If ax is still None, grab plt.gca()
         if self.ax is None:
             self.ax = plt.gca()
+
+        # Clear previous content from ax
+        self.ax.clear()
+
+        # Flag that this logo has not been drawn
+        self.has_been_drawn = False
 
         # Draw each glyph
         for g in self.glyph_list:
             g.draw(self.ax)
+
+        # Flag that this logo has indeed been drawn
+        self.has_been_drawn = True
 
         # Set xlims
         xmin = min([g.p - .5*g.width for g in self.glyph_list])
@@ -475,16 +660,10 @@ class Logo:
         ymax = max([g.ceiling for g in self.glyph_list])
         self.ax.set_ylim([ymin, ymax])
 
-
     def _update_ax(self, ax):
-        # If user passed ax, use that
+        """ Reset ax if user has passed a new one."""
         if ax is not None:
             self.ax = ax
-
-        # If ax is not set, set to gca
-        if self.ax is None:
-            self.ax = plt.gca()
-
 
     def _compute_characters(self):
         """
@@ -539,5 +718,6 @@ class Logo:
 
         # Set glyph_df attribute
         self.glyph_df = glyph_df
-        self.glyph_list = [g for g in self.glyph_df.values.ravel() if isinstance(g, Glyph.Glyph)]
+        self.glyph_list = [g for g in self.glyph_df.values.ravel()
+                           if isinstance(g, Glyph.Glyph)]
 
