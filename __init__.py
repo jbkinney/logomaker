@@ -130,4 +130,13 @@ from logomaker.Glyph import Glyph
 from logomaker.Matrix import Matrix
 from logomaker.Glyph import list_font_families
 
-from logomaker.data import transform_mat
+from logomaker.data import transform_matrix
+from logomaker.data import center_matrix
+from logomaker.data import normalize_matrix
+from logomaker.data import get_background_mat
+from logomaker.data import iupac_to_probability_mat
+from logomaker.data import alignment_to_counts_mat
+
+from logomaker.validate import validate_matrix
+from logomaker.validate import validate_probability_mat
+from logomaker.validate import validate_information_mat

@@ -1093,14 +1093,14 @@ def make_logo(dataframe=None,
     # Enforce integer positions and set as index
     #dataframe['pos'] = dataframe['pos'].astype(int)
     #dataframe.set_index('pos', inplace=True, drop=True)
-    #dataframe = validate_dataframe(dataframe)
+    #dataframe = validate_matrix(dataframe)
     #positions = dataframe.index
 
     # Shift bg_mat positions too if bg_mat is specified
     #if bg_mat is not None:
         #bg_mat['pos'] = positions
         #bg_mat.set_index('pos', inplace=True, drop=True)
-        #bg_mat = validate_dataframe(bg_mat)
+        #bg_mat = validate_matrix(bg_mat)
 
     ######################################################################
     # matrix.values

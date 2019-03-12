@@ -1,483 +1,494 @@
 from __future__ import division
 import numpy as np
 import pandas as pd
-import re
 import pdb
-from Bio import SeqIO
-import warnings
+
 
 # Set constants
-SMALL = 1E-6
-
-# Character lists
-DNA = list('ACGT')
-RNA = list('ACGU')
-dna = [c.lower() for c in DNA]
-rna = [c.lower() for c in DNA]
-PROTEIN = list('RKDENQSGHTAPYVMCLFIW')
-protein = [c.lower() for c in PROTEIN]
-PROTEIN_STOP = PROTEIN + ['*']
-protein_stop = protein + ['*']
-
-alphabets_dict = {
-    'DNA': DNA,
-    'RNA': RNA,
-    'dna': dna,
-    'rna': rna,
-    'PROTEIN': PROTEIN,
-    'protein': protein,
-    'PROTEIN*': PROTEIN_STOP,
-    'protein*': protein_stop
-}
-
-# Character transformations dictionaries
-to_DNA = {'a': 'A', 'c': 'C', 'g': 'G', 't': 'T', 'U': 'T', 'u': 'T'}
-to_dna = {'A': 'a', 'C': 'c', 'G': 'g', 'T': 't', 'U': 't', 'u': 't'}
-to_RNA = {'a': 'A', 'c': 'C', 'g': 'G', 't': 'U', 'T': 'U', 'u': 'U'}
-to_rna = {'A': 'a', 'C': 'c', 'G': 'g', 'T': 'u', 't': 'u', 'U': 'u'}
-to_PROTEIN = dict(zip(protein, PROTEIN))
-to_protein = dict(zip(PROTEIN, protein))
-
-# from validate import validate_dataframe, validate_probability_mat, iupac_dict
-from logomaker.validate import validate_dataframe, validate_probability_mat, \
-    iupac_dict
+SMALL = np.finfo(float).tiny
 
 
-def transform_mat(matrix, to_type, from_type=None, background=None,
-                  pseudocount=1, enrichment_logbase=2,
-                  center_columns=True, information_units='bits'):
-    '''
-    transform_mat(): transforms a matrix of one type into another.
-    :param matrix: input matrix, in data frame format
-    :param from_type: type of matrix to transform from
-    :param to_type: type of matrix to transform to
-    :param background: background base frequencies
-    :param gamma: parameter for converting energies to frequencies
-    :param pseudocount: psuedocount used to convert count_mat to freq_mat
-    :return: out_mat, a matrix in data frame format of the specified output type
-    '''
+# from validate import validate_matrix, validate_probability_mat, iupac_dict
+from logomaker.validate import validate_matrix, \
+                               validate_probability_mat, \
+                               validate_information_mat, \
+                               iupac_dict
+
+
+def transform_matrix(df, from_type, to_type, background=None, pseudocount=1):
+    """
+    Transforms a matrix of one type into a matrix of another type.
+
+    i = position
+    c, d = character
+
+    l = pseudocount
+    C = number of characters
+
+    N_ic = counts matrix element
+    P_ic = probability matrix element
+    Q_ic = background probability matrix element
+    W_ic = weight matrix element
+    I_ic = information matrix element
+
+    counts -> probability:
+        P_ic = (N_ic + l)/(N_i + C*l), N_i = sum_c(N_ic)
+
+    probability -> weight:
+        W_ic = log_2(P_ic / Q_ic)
+
+    weight -> probability:
+        P_ic = Q_ic * 2^(W_ic)
+
+    probability -> information:
+        I_ic = P_ic * sum_d(P_id * log2(P_id / W_id))
+
+    information -> probability:
+        P_ic = I_ic / sum_d(I_id)
+
+
+    parameters
+    ----------
+
+    df: (dataframe)
+        The matrix to be transformed.
+
+    from_type: (str)
+        Type of input matrix. Must be one of 'counts', 'probability',
+        'weight', or 'information'.
+
+    to_type: (str)
+        Type of output matrix. Must be one of 'probability', 'weight', or
+        'information'. Can NOT be 'counts'.
+
+    background: (array, or df)
+        Specification of background probabilities. If array, should be the
+        same length as df.columns and correspond to the probability of each
+        column's character. If df, should be a probability matrix the same
+        shape as df.
+
+    pseudocount: (number >= 0)
+        Pseudocount to use when transforming from a count matrix to a
+        probability matrix.
+
+    returns
+    -------
+    out_df: (dataframe)
+        Transformed matrix
+    """
+
+    FROM_TYPES = {'counts', 'probability', 'weight', 'information'}
+    TO_TYPES = {'probability', 'weight', 'information'}
+
 
     # Check that matrix is valid
-    if (from_type is None) and (to_type is None):
+    df = validate_matrix(df, allow_nan=False)
 
-        # Center values if requested
-        matrix = validate_dataframe(matrix, allow_nan=True)
-        if center_columns:
-            means = matrix.mean(axis=1, skipna=True).values
-            means[np.isnan(means)] = 0.0
-            out_mat = matrix.copy()
-            out_mat.iloc[:, :] = matrix.values - means[:, np.newaxis]
-        else:
-            out_mat = matrix.copy()
+    assert from_type in FROM_TYPES, \
+        'Error: invalid from_type=%s' % from_type
 
-        return out_mat
+    assert to_type in TO_TYPES, \
+        'Error: invalid to_type=%s' % from_type
 
-    else:
-        matrix = validate_dataframe(matrix, allow_nan=False)
-
-    # If not changing types, just return matrix
-    if from_type == to_type:
-        return matrix
-
-    # Create background matrix
-    bg_mat = set_bg_mat(background=background, matrix=matrix)
-
-    # Compute freq_mat from from_type
+    # If converting from a probability matrix
     if from_type == 'probability':
-        probability_mat = validate_probability_mat(matrix)
 
-    elif from_type == 'counts':
-        probability_mat = \
-            counts_mat_to_probability_mat(matrix, pseudocount=pseudocount)
+        if to_type == 'weight':
+            out_df = _probability_mat_to_weight_mat(df, background)
+
+        elif to_type == 'information':
+            out_df = _probability_mat_to_information_mat(df, background)
+
+        elif to_type == 'probability':
+            out_df = df.copy()
+
+    # Otherwise, convert to probability matrix, then call function again
     else:
-        assert False, 'Error! from_type %s is invalid.' % from_type
 
-    # Compute out_mat from freq_mat
-    if to_type == 'counts':
+        # If converting from a counts matrix
         if from_type == 'counts':
-            out_mat = matrix
+            prob_df = _counts_mat_to_probability_mat(df, pseudocount)
+
+        # If converting from a weight matrix
+        elif from_type == 'weight':
+            prob_df = _weight_mat_to_probability_mat(df, background)
+
+        elif from_type == 'information':
+            prob_df = _information_mat_to_probability_mat(df, background)
+
         else:
-            assert False, 'Cannot convert from %s to count_mat' % \
-                          from_type
+            assert False, 'Invalid from_type = %s' % from_type
 
-    elif to_type == 'probability':
-        out_mat = probability_mat
-
-    elif to_type == 'enrichment':
-        out_mat = \
-            probability_mat_to_enrichment_mat(probability_mat, bg_mat,
-                                              base=enrichment_logbase,
-                                              centering=center_columns)
-
-    elif to_type == 'information':
-        out_mat = probability_mat_to_information_mat(probability_mat, bg_mat,
-                                                     units=information_units)
-
-    else:
-        assert False, 'Error! to_type %s is invalid.' % to_type
-
-    # Return out_mat
-    return out_mat
-
-
-def counts_mat_to_probability_mat(count_mat, pseudocount=1):
-    '''
-    Converts a count_mat to a freq_mat
-    '''
-    # Validate mat before use
-
-    count_mat = validate_dataframe(count_mat)
-
-    # Compute freq_mat
-    freq_mat = count_mat.copy()
-    vals = count_mat.values + pseudocount
-    freq_mat.loc[:, :] = vals / vals.sum(axis=1)[:, np.newaxis]
-    freq_mat = normalize_probability_matrix(freq_mat)
+        out_df = transform_matrix(prob_df,
+                                  from_type='probability',
+                                  to_type=to_type,
+                                  background=background)
 
     # Validate and return
-    freq_mat = validate_probability_mat(freq_mat)
-    return freq_mat
+    out_df = validate_matrix(out_df)
+    return out_df
 
 
-def probability_mat_to_enrichment_mat(freq_mat, bg_mat, base=2,
-                                      centering=True):
-    '''
-    Converts a probability matrix to an enrichment matrix
-    '''
-    # Validate mat before use
-    freq_mat = validate_probability_mat(freq_mat + SMALL)
+def _counts_mat_to_probability_mat(df, pseudocount=1.0):
+    """
+    Converts a counts matrix to a probability matrix
+    """
 
-    # Make sure base is a float
+    assert pseudocount >= 0, 'Error: Pseudocount must be >= 0. '
 
-    # Compute weight_mat
-    weight_mat = freq_mat.copy()
-    weight_mat.loc[:, :] = np.log2(freq_mat / bg_mat) / np.log2(base)
+    # Validate matrix before use
+    df = validate_matrix(df)
 
-    # Center if requested
-    if centering:
-        weight_mat.loc[:, :] = \
-            weight_mat.values - weight_mat.values.mean(axis=1)[:, np.newaxis]
+    # Compute out_df
+    out_df = df.copy()
+    vals = df.values + pseudocount
+    out_df.loc[:, :] = vals / vals.sum(axis=1)[:, np.newaxis]
+    out_df = normalize_matrix(out_df)
 
     # Validate and return
-    weight_mat = validate_dataframe(weight_mat)
-    return weight_mat
+    out_df = validate_probability_mat(out_df)
+    return out_df
+
+
+def _probability_mat_to_weight_mat(df, background=None):
+    """
+    Converts a probability matrix to a weight matrix
+    """
+
+    # Validate matrix before use
+    df = validate_probability_mat(df)
+
+    # Get background matrix
+    bg_df = get_background_mat(df, background)
+
+    # Compute out_df
+    out_df = df.copy()
+    out_df.loc[:, :] = np.log2(df+SMALL) - np.log2(bg_df+SMALL)
+
+    # Validate and return
+    out_df = validate_matrix(out_df)
+    return out_df
+
+
+def _weight_mat_to_probability_mat(df, background=None):
+    """
+    Converts a probability matrix to a weight matrix
+    """
+
+    # Validate matrix before use
+    df = validate_matrix(df)
+
+    # Get background matrix
+    bg_df = get_background_mat(df, background)
+
+    # Compute out_df
+    out_df = df.copy()
+    out_df.loc[:, :] = bg_df.values * np.power(2, df.values)
+
+    # Normalize matrix. Needed if matrix is centered.
+    out_df = normalize_matrix(out_df)
+
+    # Validate and return
+    out_df = validate_probability_mat(out_df)
+    return out_df
 
 
 # Needed only for display purposes
-def probability_mat_to_information_mat(freq_mat, bg_mat, units='bits'):
-    '''
-    Converts a prob df to an information df
-    '''
-    # Set units
-    if units == 'bits':
-        multiplier = 1
-    elif units == 'nats':
-        multiplier = 1. / np.log2(np.e)
-    else:
-        assert False, 'Error: invalid selection for units = %s' % units
+def _probability_mat_to_information_mat(df, background=None):
+    """
+    Converts a probability matrix to an information matrix
+    """
 
-    # Validate mat before use
-    freq_mat = validate_probability_mat(freq_mat + SMALL)
-    info_mat = freq_mat.copy()
+    # Validate matrix before use
+    df = validate_probability_mat(df)
 
-    info_list = (freq_mat.values * multiplier *
-                 np.log2(freq_mat.values / bg_mat.values)).sum(axis=1)
+    # Get background matrix
+    bg_df = get_background_mat(df, background)
 
-    info_mat.loc[:, :] = freq_mat.values * info_list[:, np.newaxis]
+    # Compute out_df
+    out_df = df.copy()
+    fg_vals = df.values
+    bg_vals = bg_df.values
+    tmp_vals = fg_vals*(np.log2(fg_vals+SMALL)-np.log2(bg_vals+SMALL))
+    info_vec = tmp_vals.sum(axis=1)
+    out_df.loc[:, :] = fg_vals * info_vec[:, np.newaxis]
 
     # Validate and return
-    info_mat = validate_dataframe(info_mat)
-    return info_mat
+    out_df = validate_matrix(out_df)
+    return out_df
+
+
+# Needed only for display purposes
+def _information_mat_to_probability_mat(df, background=None):
+    """
+    Converts a probability matrix to an information matrix
+    """
+
+    # Validate matrix before use
+    df = validate_matrix(df)
+
+    # Just need to normalize matrix
+    out_df = normalize_matrix(df)
+
+    # Validate and return
+    out_df = validate_probability_mat(out_df)
+    return out_df
 
 
 # Normalize a data frame of probabilities
-def normalize_probability_matrix(freq_mat, regularize=True):
-    mat = freq_mat.copy()
-    assert all(np.ravel(mat.values) >= 0), \
+def normalize_matrix(df):
+    """
+    Normalizes a matrix df to a probability matrix out_df
+    """
+
+    # Validate matrix
+    df = validate_matrix(df)
+
+    # Make sure all df values are zero
+    assert all(df.values.ravel() >= 0), \
         'Error: Some data frame entries are negative.'
-    mat.loc[:, :] = mat.values / mat.values.sum(axis=1)[:, np.newaxis]
-    if regularize:
-        mat.loc[:, :] += SMALL
-    return mat
+
+    # Check to see if values sum to one
+    sums = df.sum(axis=1).values
+
+    # If any sums are close to zero, abort
+    assert not any(np.isclose(sums, 0.0)), \
+        'Error: some columns in df sum to nearly zero.'
+    out_df = df.copy()
+    out_df.loc[:, :] = df.values / sums[:, np.newaxis]
+
+    # Validate and return
+    out_df = validate_probability_mat(out_df)
+    return out_df
 
 
-def set_bg_mat(background, matrix):
-    '''
-    Creates a background matrix given a background specification and matrix
-    with the right rows and columns
-     '''
-    num_pos, num_cols = matrix.shape
 
-    # Create background from scratch
+# Normalize a data frame of probabilities
+def center_matrix(df):
+    """
+    Centers each row of a matrix about zero by subtracting out the mean.
+    """
+
+    # Validate matrix
+    df = validate_matrix(df)
+
+    # Check to see if values sum to one
+    means = df.mean(axis=1).values
+
+    # If any sums are close to zero, abort
+    out_df = df.copy()
+    out_df.loc[:, :] = df.values - means[:, np.newaxis]
+
+    # Validate and return
+    out_df = validate_matrix(out_df)
+    return out_df
+
+
+def get_background_mat(df, background):
+    """
+    Creates a background matrix given a background specification. There
+    are three possiblities:
+
+    1. background is None => out_df represents a uniform background
+    2. background is a vector => this vector is normalized then used as
+        the entries of the rows of out_df
+    3. background is a dataframe => it is then normalized and use as out_df
+    """
+
+    # Get dimensions of df
+    num_pos, num_cols = df.shape
+
+    # Create background using df as template
+    out_df = df.copy()
+
+    # If background is not specified, use uniform background
     if background is None:
-        new_bg_mat = matrix.copy()
-        new_bg_mat.loc[:, :] = 1 / num_cols
+        out_df.loc[:, :] = 1 / num_cols
 
-    # Expand rows of list or numpy array background
-    elif type(background) == list or type(background) == np.ndarray:
-        assert len(background) == matrix.shape[1], \
+    # If background is array-like
+    elif isinstance(background, (np.ndarray, list, tuple)):
+        background = np.array(background)
+        assert len(background) == num_cols, \
             'Error: df and background have mismatched dimensions.'
-        new_bg_mat = matrix.copy()
-        background = np.array(background).ravel()
-        new_bg_mat.loc[:, :] = background
+        out_df.loc[:, :] = background[np.newaxis, :]
+        out_df = normalize_matrix(out_df)
 
-    elif type(background) == dict:
-        assert set(background.keys()) == set(matrix.columns), \
-            'Error: df and background have different columns.'
-        new_bg_mat = matrix.copy()
-        for i in new_bg_mat.index:
-            new_bg_mat.loc[i, :] = background
-
-    # Expand single-row background data frame
-    elif type(background) == pd.core.frame.DataFrame and \
-            background.shape == (1, num_cols):
-        assert all(matrix.columns == background.columns), \
+    # If background is a dataframe
+    elif isinstance(background, pd.core.frame.DataFrame):
+        background = validate_matrix(background)
+        assert all(df.index == background.index), \
+            'Error: df and bg_mat have different indexes.'
+        assert all(df.columns == background.columns), \
             'Error: df and bg_mat have different columns.'
-        new_bg_mat = matrix.copy()
-        new_bg_mat.loc[:, :] = background.values.ravel()
+        out_df = background.copy()
+        out_df = normalize_matrix(out_df)
 
-    # Use full background dataframe
-    elif type(background) == pd.core.frame.DataFrame and \
-            len(background.index) == len(matrix.index):
-        assert all(matrix.columns == background.columns), \
-            'Error: df and bg_mat have different columns.'
-        new_bg_mat = background.copy()
-
-    else:
-        assert False, 'Error: bg_mat and df are incompatible'
-
-    # Match indices of new_bg_mat to matrix
-    new_bg_mat['pos'] = matrix.index.astype(int)
-    new_bg_mat.set_index('pos', inplace=True, drop=True)
-
-    # Normalize new_bg_mat as probability matrix
-    new_bg_mat = normalize_probability_matrix(new_bg_mat)
-
-    return new_bg_mat
+    # validate as probability matrix
+    out_df = validate_probability_mat(out_df)
+    return out_df
 
 
-def load_matrix(csv_file, csv_kwargs={}):
-    """ Loads a matrix from a csv file """
-
-    # Make sure that a file name is specified
-    assert csv_file is not None, 'Error: csv_file is not specified.'
-    matrix = pd.read_csv(csv_file, **csv_kwargs)
-    matrix = validate_dataframe(matrix)
-    return matrix
-
-
-def load_alignment(fasta_file=None,
-                   csv_file=None,
-                   seq_col=None,
-                   ct_col=None,
-                   csv_kwargs={},
-                   sequences=None,
-                   sequence_counts=None,
-                   sequence_type=None,
-                   characters=None,
-                   positions=None,
-                   ignore_characters='.-',
-                   occurance_threshold=0):
-    # If loading file name
-    if fasta_file is not None:
-
-        # Load sequences using SeqIO
-        sequences = [str(record.seq) for record in \
-                     SeqIO.parse(fasta_file, "fasta")]
-
-    # If loading from a CSV file
-    elif csv_file is not None:
-
-        # Make sure that seq_col is specified
-        assert seq_col is not None, \
-            'Error: seq_col is None. If csv_file is specified, seq_col must' \
-            + ' also be specified'
-
-        # Load csv file as a dataframe
-        df = pd.read_csv(csv_file, **csv_kwargs)
-        # df = df.fillna(csv_fillna)
-        df = df.fillna(csv_file)
-
-        # Make sure that seq_col is in df
-        assert seq_col in df.columns, \
-            ('Error: seq_col %s is not in the columns %s read from '
-             + 'csv_file %s') % (seq_col, df.columns, csv_file)
-
-        # Get sequences
-        sequences = df[seq_col].values
-
-        # Optionally set sequence_counts
-        if ct_col is not None:
-            # Make sure that seq_col is in df
-            assert seq_col in df.columns, \
-                ('Error: ct_col %s is not None, but neither is it in the '
-                 + 'columns %s loaded from csv_file'
-                 + ' file %s') % (ct_col, df.columns, csv_file)
-
-            # Load sequences counts
-            sequence_counts = df[ct_col].values
-
-    # Make sure that, whatever was passed, sequences is set
-    assert sequences is not None, \
-        'Error: either fasta_file or sequences must not be None.'
-
-    # Get seq length
-    L = len(sequences[0])
-    # print('debugging:')
-    # print(type(sequences))
-    # print(L)
-    # print(np.shape(sequences))
-    assert all([len(seq) == L for seq in sequences]), \
-        'Error: not all sequences have length %d.' % L
-
-    # Get counts list
-    if sequence_counts is None:
-        assert len(sequences) > 0, 'Error: sequences is empty'
-        counts_array = np.ones(len(sequences))
-    else:
-        assert len(sequence_counts) == len(sequences), \
-            'Error: sequence_counts is not the same length as sequences'
-        counts_array = np.array(sequence_counts)
-
-    # If positions is not specified by user, make it
-    if positions is not None:
-        assert len(positions) == L, 'Error: positions, if passed, must be ' + \
-                                    'same length as sequences.'
-    else:
-        positions = range(L)
-
-    # Create counts matrix
-    counts_mat = pd.DataFrame(index=positions).fillna(0)
-
-    # Create array of characters at each position
-    char_array = np.array([np.array(list(seq)) for seq in sequences])
-
-    # Get list of unique characters
-    unique_characters = np.unique(char_array.ravel())
-    unique_characters.sort()
-
-    # Sum of the number of occurances of each character at each position
-    for c in unique_characters:
-        v = (char_array == c).astype(float)
-        v *= counts_array[:, np.newaxis]
-        counts_mat.loc[:, c] = v.sum(axis=0).ravel()
-
-    # Filter columns
-    counts_mat = filter_columns(counts_mat,
-                                sequence_type=sequence_type,
-                                characters=characters,
-                                ignore_characters=ignore_characters)
-
-    # Remove rows with too few counts
-    position_counts = counts_mat.values.sum(axis=1)
-    max_counts = position_counts.max()
-    positions_to_keep = position_counts >= occurance_threshold * max_counts
-    counts_mat = counts_mat.loc[positions_to_keep, :]
-
-    # Name index
-    counts_mat.index.name = 'pos'
-
-    return counts_mat
-
-
-def filter_columns(matrix,
-                   sequence_type=None,
-                   characters=None,
-                   ignore_characters='.-'):
-    # Rename characters if appropriate
-    if sequence_type is None:
-        translation_dict = {}
-    elif sequence_type == 'dna':
-        translation_dict = to_dna
-    elif sequence_type == 'DNA':
-        translation_dict = to_DNA
-    elif sequence_type == 'rna':
-        translation_dict = to_rna
-    elif sequence_type == 'RNA':
-        translation_dict = to_RNA
-    elif sequence_type == 'protein':
-        translation_dict = to_protein
-    elif sequence_type == 'PROTEIN':
-        translation_dict = to_PROTEIN
-    else:
-        message = \
-            "Could not interpret sequence_type = %s. Columns not filtered." % \
-            repr(sequence_type)
-        warnings.warn(message, UserWarning)
-        translation_dict = {}
-
-    # Copy matrix as a precaution
-    # The resulting copy will undergo a number of modifications
-    matrix = matrix.copy()
-
-    # Get current list of columns
-    cols = list(matrix.columns)
-
-    # Remove any columns to ignore
-    for char in ignore_characters:
-        if char in cols:
-            del matrix[char]
-
-    # If manually restricting to specific characters, do it:
-    if characters is not None:
-        new_columns = [c for c in characters if c in matrix.columns]
-        matrix = matrix.loc[:, new_columns]
-
-    # Otherwise performing translation, do it
-    elif len(translation_dict) > 0:
-
-        # Union of keys and values.
-        allowed_chars = set(translation_dict.values()) | \
-                        set(translation_dict.keys())
-        invalid_chars = list(set(matrix.columns) - allowed_chars)
-        invalid_chars.sort()
-
-        # assert len(invalid_chars)==0, \
-        #     'Matrix contains invalid characters %s ' % \
-        #     repr(list(invalid_chars)) + \
-        #     ' for sequence_type %s ' % sequence_type
-
-        # Remove invalid characters, giving a warning while doing so
-        matrix.drop(invalid_chars, axis=1, inplace=True)
-        message = ("Invalid matrix columns %s for sequence_type %s." +
-                   " These columns have been removed.") % \
-                  (repr(invalid_chars), sequence_type)
-        warnings.warn(message, UserWarning)
-
-        # Rename columns
-        matrix = matrix.rename(columns=translation_dict)
-
-        # Collapse columns with same name
-        matrix = matrix.groupby(matrix.columns, axis=1).sum()
-
-        # Order columns alphabetically
-        new_columns = list(matrix.columns)
-        new_columns.sort()
-        matrix = matrix.loc[:, new_columns]
-
-    # Validate new matrix
-    matrix = validate_dataframe(matrix)
-
-    return matrix
-
-
-def iupac_to_probability_mat(iupac):
-    """Returns a probability matrix correspondign to a specified iupac string
+def iupac_to_probability_mat(iupac_string):
+    """
+    Generates a probability matrix corresponding to an IUPAC string.
+    Supports only DNA IUPAC strings.
     """
 
     # Create counts matrix based on IUPAC string
-    L = len(iupac)
-    rows = range(L)
+    L = len(iupac_string)
     cols = list('ACGT')
-    counts_mat = pd.DataFrame(index=rows, columns=cols).fillna(0)
-    for i, c in enumerate(list(iupac)):
+    counts_mat = pd.DataFrame(columns=cols).fillna(0)
+    for i, c in enumerate(list(iupac_string)):
         bs = iupac_dict[c]
         for b in bs:
             counts_mat.loc[i, b] = 1
 
     # Convert counts matrix to probability matrix
-    probability_mat = counts_mat_to_probability_mat(counts_mat,
-                                                    pseudocount=SMALL)
+    out_df = normalize_matrix()
 
-    # Return probability matrix to user
-    return probability_mat
+    # Vaidate and return matrix
+    out_df = validate_matrix(out_df)
+    return out_df
+
+
+def alignment_to_counts_mat(sequences, characters_to_ignore='.-'):
+    """
+    Creates a counts matrix from a list of sequence
+    """
+
+    # Create array of characters at each position
+    char_array = np.array([np.array(list(seq)) for seq in sequences])
+    L = char_array.shape[1]
+
+    # Get list of unique characters
+    unique_characters = np.unique(char_array.ravel())
+    unique_characters.sort()
+
+    # Remove characters to ignore
+    columns = [c for c in unique_characters if not c in characters_to_ignore]
+    index = list(range(L))
+    out_df = pd.DataFrame(data=0, columns=columns, index=index)
+
+    # Sum of the number of occurrances of each character at each position
+    for c in columns:
+        out_df.loc[:, c] = (char_array == c).astype(float).sum(axis=0).ravel()
+
+    # Validate counts matrix and return
+    out_df = validate_matrix(out_df)
+    return out_df
+
+
+# from Bio import SeqIO
+# def load_alignment(fasta_file=None,
+#                    csv_file=None,
+#                    seq_col=None,
+#                    ct_col=None,
+#                    csv_kwargs={},
+#                    sequences=None,
+#                    sequence_counts=None,
+#                    sequence_type=None,
+#                    characters=None,
+#                    positions=None,
+#                    ignore_characters='.-',
+#                    occurance_threshold=0):
+#     # If loading file name
+#     if fasta_file is not None:
+#
+#         # Load sequences using SeqIO
+#         sequences = [str(record.seq) for record in \
+#                      SeqIO.parse(fasta_file, "fasta")]
+#
+#     # If loading from a CSV file
+#     elif csv_file is not None:
+#
+#         # Make sure that seq_col is specified
+#         assert seq_col is not None, \
+#             'Error: seq_col is None. If csv_file is specified, seq_col must' \
+#             + ' also be specified'
+#
+#         # Load csv file as a dataframe
+#         df = pd.read_csv(csv_file, **csv_kwargs)
+#         # df = df.fillna(csv_fillna)
+#         df = df.fillna(csv_file)
+#
+#         # Make sure that seq_col is in df
+#         assert seq_col in df.columns, \
+#             ('Error: seq_col %s is not in the columns %s read from '
+#              + 'csv_file %s') % (seq_col, df.columns, csv_file)
+#
+#         # Get sequences
+#         sequences = df[seq_col].values
+#
+#         # Optionally set sequence_counts
+#         if ct_col is not None:
+#             # Make sure that seq_col is in df
+#             assert seq_col in df.columns, \
+#                 ('Error: ct_col %s is not None, but neither is it in the '
+#                  + 'columns %s loaded from csv_file'
+#                  + ' file %s') % (ct_col, df.columns, csv_file)
+#
+#             # Load sequences counts
+#             sequence_counts = df[ct_col].values
+#
+#     # Make sure that, whatever was passed, sequences is set
+#     assert sequences is not None, \
+#         'Error: either fasta_file or sequences must not be None.'
+#
+#     # Get seq length
+#     L = len(sequences[0])
+#     # print('debugging:')
+#     # print(type(sequences))
+#     # print(L)
+#     # print(np.shape(sequences))
+#     assert all([len(seq) == L for seq in sequences]), \
+#         'Error: not all sequences have length %d.' % L
+#
+#     # Get counts list
+#     if sequence_counts is None:
+#         assert len(sequences) > 0, 'Error: sequences is empty'
+#         counts_array = np.ones(len(sequences))
+#     else:
+#         assert len(sequence_counts) == len(sequences), \
+#             'Error: sequence_counts is not the same length as sequences'
+#         counts_array = np.array(sequence_counts)
+#
+#     # If positions is not specified by user, make it
+#     if positions is not None:
+#         assert len(positions) == L, 'Error: positions, if passed, must be ' + \
+#                                     'same length as sequences.'
+#     else:
+#         positions = range(L)
+#
+#     # Create counts matrix
+#     counts_mat = pd.DataFrame(index=positions).fillna(0)
+#
+#     # Create array of characters at each position
+#     char_array = np.array([np.array(list(seq)) for seq in sequences])
+#
+#     # Get list of unique characters
+#     unique_characters = np.unique(char_array.ravel())
+#     unique_characters.sort()
+#
+#     # Sum of the number of occurances of each character at each position
+#     for c in unique_characters:
+#         v = (char_array == c).astype(float)
+#         v *= counts_array[:, np.newaxis]
+#         counts_mat.loc[:, c] = v.sum(axis=0).ravel()
+#
+#     # Filter columns
+#     counts_mat = filter_columns(counts_mat,
+#                                 sequence_type=sequence_type,
+#                                 characters=characters,
+#                                 ignore_characters=ignore_characters)
+#
+#     # Remove rows with too few counts
+#     position_counts = counts_mat.values.sum(axis=1)
+#     max_counts = position_counts.max()
+#     positions_to_keep = position_counts >= occurance_threshold * max_counts
+#     counts_mat = counts_mat.loc[positions_to_keep, :]
+#
+#     # Name index
+#     counts_mat.index.name = 'pos'
+#
+#     return counts_mat
+

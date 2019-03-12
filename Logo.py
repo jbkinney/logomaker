@@ -1,12 +1,14 @@
+from __future__ import division
 import numpy as np
-from logomaker import Glyph
-from logomaker import Matrix
-from logomaker import color as lm_color
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import pdb
 
+# Import stuff from logomaker
+from logomaker.Glyph import Glyph
+from logomaker import color as lm_color
+from logomaker.validate import validate_matrix
 
 chars_to_colors_dict = {
     tuple('ACGT'): 'classic',
@@ -73,11 +75,10 @@ class Logo:
         Set to False if you wish to change the properties of any glyphs
         after initial specification, e.g. by running
         Logo.highlight_sequence().
-
     """
 
     def __init__(self,
-                 matrix,
+                 df,
                  ax=None,
                  negate=False,
                  center=False,
@@ -87,28 +88,18 @@ class Logo:
                  zorder=0,
                  draw_now=True):
 
-        # Set matrix_df. How to do this will depend on whether self.matrix
-        # is a pd.DataFrame or a Matrix object.
-        assert isinstance(matrix, (pd.DataFrame, Matrix.Matrix)), \
-            'Error: matrix must be either a pd.DataFrame object ' +\
-            'or a Matrix object'
-
-        # If user passed a dataframe, convert to a Matrix object
-        if isinstance(matrix, pd.DataFrame):
-            self.matrix = Matrix.Matrix(matrix)
-        else:
-            self.matrix = matrix
-        self.matrix_df = self.matrix.df
+        # Validate matrix and save it
+        self.df = validate_matrix(df)
 
         # Compute length
-        self.L = len(self.matrix_df)
+        self.L = len(self.df)
 
         # Get list of characters
-        self.cs = np.array([str(c) for c in self.matrix_df.columns])
+        self.cs = np.array([str(c) for c in self.df.columns])
         self.C = len(self.cs)
 
         # Get list of positions
-        self.ps = np.array([float(p) for p in self.matrix_df.index])
+        self.ps = np.array([float(p) for p in self.df.index])
 
         # Set colors by identifying default or otherwise setting to gray
         if colors is None:
@@ -129,7 +120,7 @@ class Logo:
 
         # Negate values if requested
         if self.negate:
-            self.matrix_df = -self.matrix_df
+            self.df = -self.df
 
         # Note: Logo does NOT expect df to change after it is passed
         # to the constructor. But one can change character attributes
@@ -137,8 +128,8 @@ class Logo:
 
         # Fill NaN values of matrix_df with zero
         if self.center:
-            self.matrix_df.loc[:, :] = self.matrix_df.values - \
-                self.matrix_df.values.mean(axis=1)[:, np.newaxis]
+            self.df.loc[:, :] = self.df.values - \
+                                self.df.values.mean(axis=1)[:, np.newaxis]
 
         # Compute color dictionary
         self.rgba_dict = lm_color.get_color_dict(
@@ -175,7 +166,6 @@ class Logo:
         returns
         -------
         None
-
         """
 
         # Update ax
@@ -237,7 +227,6 @@ class Logo:
         returns
         -------
         None
-
         """
 
         # Update ax
@@ -248,7 +237,7 @@ class Logo:
             for c in self.cs:
 
                 # If matrix value is < 0
-                v = self.matrix_df.loc[p, c]
+                v = self.df.loc[p, c]
                 if v < 0:
 
                     #  Get glyph
@@ -295,7 +284,6 @@ class Logo:
         returns
         -------
         None
-
         """
 
         # Update ax
@@ -343,7 +331,6 @@ class Logo:
         returns
         -------
         None
-
         """
 
         # Update Axes
@@ -386,7 +373,6 @@ class Logo:
         returns
         -------
         None
-
         """
 
         assert self.has_been_drawn, \
@@ -435,7 +421,6 @@ class Logo:
         returns
         -------
         None
-
         """
 
         assert self.has_been_drawn, \
@@ -627,7 +612,6 @@ class Logo:
         returns
         -------
         None
-
         """
 
         # Update ax
@@ -679,7 +663,7 @@ class Logo:
         for p in self.ps:
 
             # Get sorted values and corresponding characters
-            vs = np.array(self.matrix_df.loc[p, :])
+            vs = np.array(self.df.loc[p, :])
             ordered_indices = np.argsort(vs)
             vs = vs[ordered_indices]
             cs = [str(c) for c in self.cs[ordered_indices]]
@@ -701,14 +685,14 @@ class Logo:
                 flip = (v < 0 and self.flip_below)
 
                 # Create glyph if height is finite
-                glyph = Glyph.Glyph(p, c,
-                                    ax=self.ax,
-                                    floor=floor,
-                                    ceiling=ceiling,
-                                    color=this_color,
-                                    flip=flip,
-                                    draw_now=False,
-                                    zorder=self.zorder)
+                glyph = Glyph(p, c,
+                            ax=self.ax,
+                            floor=floor,
+                            ceiling=ceiling,
+                            color=this_color,
+                            flip=flip,
+                            draw_now=False,
+                            zorder=self.zorder)
 
                 # Add glyph to glyph_df
                 glyph_df.loc[p, c] = glyph
@@ -719,5 +703,5 @@ class Logo:
         # Set glyph_df attribute
         self.glyph_df = glyph_df
         self.glyph_list = [g for g in self.glyph_df.values.ravel()
-                           if isinstance(g, Glyph.Glyph)]
+                           if isinstance(g, Glyph)]
 
