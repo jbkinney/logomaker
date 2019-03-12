@@ -124,22 +124,10 @@ def handle_errors(func):
 
     return wrapped_func
 
-
+# Rename useful stuff from within Logomaker
 from logomaker.Logo import Logo
 from logomaker.Glyph import Glyph
 from logomaker.Matrix import Matrix
+from logomaker.Glyph import list_font_families
 
-# this circumvents a non-logomaker error with python 3. Will debug.
-#import warnings
-#warnings.filterwarnings("ignore")
-
-# module imports
-#from logomaker import validate
-#from logomaker.validate import validate_parameter, validate_dataframe
-
-#from logomaker.data import load_alignment
-#from logomaker.OldLogo import OldLogo
-#from logomaker.make_logo import make_logo
-#from logomaker.character import get_fontnames_dict, get_fontnames
-#from logomaker.make_styled_logo import make_styled_logo
-#from logomaker.load_meme import load_meme
+from logomaker.data import transform_mat

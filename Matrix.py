@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from six import string_types
 
+
+
 class Matrix:
     """
     Container class for matrix models

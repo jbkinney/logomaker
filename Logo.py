@@ -1,10 +1,17 @@
 import numpy as np
 from logomaker import Glyph
 from logomaker import Matrix
-from logomaker import color
+from logomaker import color as lm_color
 import pandas as pd
 import matplotlib.pyplot as plt
 import pdb
+
+
+chars_to_colors_dict = {
+    tuple('ACGT'): 'classic',
+    tuple('ACGU'): 'classic',
+    tuple('ACDEFGHIKLMNPQRSTVWY'): 'hydrophobicity',
+}
 
 class Logo:
     """
@@ -72,10 +79,11 @@ class Logo:
                  ax=None,
                  negate=False,
                  center=False,
-                 colors='classic',
+                 colors=None,
                  flip_below=True,
                  vsep=0.0,
                  draw_now=True,
+                 zorder=0,
                  ):
 
         # Set matrix_df. How to do this will depend on whether self.matrix
@@ -91,14 +99,30 @@ class Logo:
             self.matrix = matrix
         self.matrix_df = self.matrix.df
 
+        # Compute length
+        self.L = len(self.matrix_df)
+
+        # Get list of characters
+        self.cs = np.array([str(c) for c in self.matrix_df.columns])
+        self.C = len(self.cs)
+
+        # Get list of positions
+        self.ps = np.array([float(p) for p in self.matrix_df.index])
+
+        # Set colors by identifying default or otherwise setting to gray
+        if colors is None:
+            key = tuple(self.cs)
+            colors = chars_to_colors_dict.get(key,'gray')
+        self.colors = colors
+
         # Save other attributes
         self.ax = ax
         self.negate = bool(negate)
-        self.colors = colors
         self.center = center
         self.flip_below = flip_below
         self.vsep = vsep
         self.draw_now = draw_now
+        self.zorder = zorder
 
         # Negate values if requested
         if self.negate:
@@ -113,18 +137,8 @@ class Logo:
             self.matrix_df.loc[:, :] = self.matrix_df.values - \
                 self.matrix_df.values.mean(axis=1)[:, np.newaxis]
 
-        # Compute length
-        self.L = len(self.matrix_df)
-
-        # Get list of characters
-        self.cs = np.array([str(c) for c in self.matrix_df.columns])
-        self.C = len(self.cs)
-
-        # Get list of positions
-        self.ps = np.array([float(p) for p in self.matrix_df.index])
-
         # Compute color dictionary
-        self.rgba_dict = color.get_color_dict(
+        self.rgba_dict = lm_color.get_color_dict(
                                     color_scheme=self.colors,
                                     chars=self.cs,
                                     alpha=1)
@@ -142,10 +156,14 @@ class Logo:
         # Reset colors if provided
         if colors is not None:
             self.colors = colors
-            self.rgba_dict = color.get_color_dict(
+            self.rgba_dict = lm_color.get_color_dict(
                                     color_scheme=self.colors,
                                     chars=self.cs,
                                     alpha=1)
+
+        # Record zorder if this is provided
+        if 'zorder' in kwargs.keys():
+            self.zorder = kwargs['zorder']
 
         # Modify all glyphs
         for g in self.glyph_list:
@@ -174,7 +192,7 @@ class Logo:
                     g.flip = flip
 
 
-    def style_single_glyph(self, p, c, **kwargs):
+    def style_single_glyph(self, p, c, draw_now=True, **kwargs):
         """
         Modifies the properties of a component glyph in a logo. If using this,
         set draw_now=False in the Logo constructor.
@@ -209,8 +227,12 @@ class Logo:
         g = self.glyph_df.loc[p, c]
         g.set_attributes(**kwargs)
 
+        # Draw now
+        if draw_now:
+            self.draw()
 
-    def style_glyphs_in_sequence(self, sequence, **kwargs):
+
+    def style_glyphs_in_sequence(self, sequence, draw_now=True, **kwargs):
         """
         Highlights a specified sequence by changing the parameters of the
         glyphs at each corresponding position in that sequence. To use this,
@@ -247,6 +269,173 @@ class Logo:
 
             # Modify the glyph corresponding character c at position p
             self.style_single_glyph(p, c, **kwargs)
+
+        # Draw now
+        if draw_now:
+            self.draw()
+
+    def highlight_column(self, ax=None,
+                         color='yellow',
+                         width=1.0,
+                         alpha=1.0,
+                         floor=None,
+                         ceiling=None):
+        pass;
+
+
+    def draw_baseline(self,
+                      ax=None,
+                      zorder=-1,
+                      color='black',
+                      linewidth=0.5,
+                      **kwargs):
+        """
+        Draws a line along the x-axis.
+
+        parameters
+        ----------
+
+        ax: (matplotlib Axes object)
+            The axes object on which to draw the logo
+
+        zorder: (number)
+            The z-stacked location where the baseline is drawn
+
+        color: (matplotlib color)
+            Color to use for the baseline
+
+        linewidth: (float >= 0)
+            Width of the baseline
+
+        **kwargs:
+            Additional keyword arguments to be passed to ax.axhline()
+
+
+        returns
+        -------
+        None
+        """
+
+        # Update ax
+        self._update_ax(ax)
+
+        # Render baseline
+        self.ax.axhline(zorder=zorder,
+                        color=color,
+                        linewidth=linewidth,
+                        **kwargs)
+
+
+    def style_xticks(self, ax=None,
+                     anchor=0,
+                     spacing=1,
+                     fmt='%d',
+                     rotation=0.0,
+                     **kwargs):
+        """
+        Formats and styles tick marks along the x-axis.
+
+        parameters
+        ----------
+
+        ax: (matplotlib Axes object)
+            The axes object on which to draw the logo
+
+        anchor: (int)
+            Anchors tick marks at a specific number. Even if this number
+            is not within the x-axis limits, it fixes the register for
+            tick marks.
+
+        spacing: (int > 0)
+            The spacing between adjacent tick marks
+
+        fmt: (str)
+            String used to format tick labels.
+
+        rotation: (number)
+            Angle, in degrees, with which to draw tick mark labels.
+
+        **kwargs:
+            Additional keyword arguments to be passed to ax.set_xticklabels()
+
+
+        returns
+        -------
+        None
+        """
+
+        # Update ax
+        self._update_ax(ax)
+
+        # Get list of positions, ps, that spans all those in matrix_df
+        p_min = min(self.ps)
+        p_max = max(self.ps)
+        ps = np.arange(p_min, p_max+1)
+
+        # Compute and set xticks
+        xticks = ps[(ps - anchor) % spacing == 0]
+        self.ax.set_xticks(xticks)
+
+        # Compute and set xticklabels
+        xticklabels = [fmt % p for p in xticks]
+        self.ax.set_xticklabels(xticklabels, rotation=rotation, **kwargs)
+
+
+    def style_spines(self, ax=None,
+                     spines=('top', 'bottom', 'left', 'right'),
+                     visible=True,
+                     linewidth=1.0,
+                     color='black',
+                     bounds=None):
+        """
+        Turns
+
+        parameters
+        ----------
+
+        ax: (matplotlib Axes object)
+            The axes object on which to draw the logo
+
+        spines: (tuple of str)
+            Specifies which of the four spines to modify. Default lists
+            all possible entries.
+
+        visible: (bool)
+            Whether or not a spine is drawn.
+
+        color: (matplotlib color)
+            Spine color.
+
+        linewidth: (float >= 0)
+            Spine width.
+
+        bounds: ([float, float])
+            Specifies the upper- and lower-bounds of a spine.
+
+        **kwargs:
+            Additional keyword arguments to be passed to ax.axhline()
+
+        returns
+        -------
+        None
+        """
+
+        # Update ax
+        self._update_ax(ax)
+
+        # Iterate over all spines
+        for name, spine in self.ax.spines.items():
+
+            # If name is in the set of spines to modify
+            if name in spines:
+
+                # Modify given spine
+                spine.set_visible(visible)
+                spine.set_color(color)
+                spine.set_linewidth(linewidth)
+
+                if bounds is not None:
+                    spine.set_bounds(bounds[0], bounds[1])
 
 
     def draw(self, ax=None):
@@ -285,6 +474,16 @@ class Logo:
         ymin = min([g.floor for g in self.glyph_list])
         ymax = max([g.ceiling for g in self.glyph_list])
         self.ax.set_ylim([ymin, ymax])
+
+
+    def _update_ax(self, ax):
+        # If user passed ax, use that
+        if ax is not None:
+            self.ax = ax
+
+        # If ax is not set, set to gca
+        if self.ax is None:
+            self.ax = plt.gca()
 
 
     def _compute_characters(self):
@@ -329,7 +528,8 @@ class Logo:
                                     ceiling=ceiling,
                                     color=this_color,
                                     flip=flip,
-                                    draw_now=False)
+                                    draw_now=False,
+                                    zorder=self.zorder)
 
                 # Add glyph to glyph_df
                 glyph_df.loc[p, c] = glyph
@@ -341,143 +541,3 @@ class Logo:
         self.glyph_df = glyph_df
         self.glyph_list = [g for g in self.glyph_df.values.ravel() if isinstance(g, Glyph.Glyph)]
 
-
-old_docstring = \
-    """
-    Logo represents a basic logo, drawn on a specified axes object
-    using a specified matrix.
-
-    attributes
-    ----------
-
-    ax: (matplotlib Axes object)
-        The axes object on which to draw the logo.
-
-    matrix: (pd.DataFrame)
-        A matrix specifying character heights and positions. Note that
-        positions index rows while characters index columns.
-
-    negate: (bool)
-        If True, all values in matrix are multiplied by -1. This can be
-        useful when illustrating negative energy values in an energy matrix.
-
-    center: (bool)
-        If True, the stack of characters at each position will be centered
-        around zero. This is accomplished by subtracting the mean value
-        in each row of the matrix from each element in that row.
-
-    colors: (color scheme)
-        Face color of logo characters. Default 'gray'. Here and in
-        what follows a variable of type 'color' can take a variety of value
-        types.
-         - (str) A Logomaker color scheme in which the color is determined
-             by the specific character being drawn. Options are,
-             + For DNA/RNA: 'classic', 'grays', 'base_paring'.
-             + For protein: 'hydrophobicity', 'chemistry', 'charge'.
-         - (str) A built-in matplotlib color name  such as 'k' or 'tomato'
-         - (str) A built-in matplotlib colormap name such as  'viridis' or
-             'Purples'. In this case, the color within the colormap will
-             depend on the character being drawn.
-         - (list) An RGB color (3 floats in interval [0,1]) or RGBA color
-             (4 floats in interval [0,1]).
-         - (dict) A dictionary mapping of characters to colors, in which
-             case the color will depend  on the character being drawn.
-             E.g., {'A': 'green','C': [ 0.,  0.,  1.], 'G': 'y',
-             'T': [ 1.,  0.,  0.,  0.5]}
-
-    edgecolor: (matplotlib color)
-        Color to use for edges of all glyphs in logo.
-
-    edgewidth: (float > 0)
-        Width to use for edges of all glyphs in logo.
-
-    font_family: (str)
-        The font name to use when rendering glyphs. Specifically, this is
-        the value passed as the 'family' parameter when calling the
-        FontProperties constructor. From matplotlib documentation:
-        "family: A list of font names in decreasing order of priority.
-        The items may include a generic font family name, either
-        'serif', 'sans-serif', 'cursive', 'fantasy', or 'monospace'.
-        In that case, the actual font to be used will be looked up from
-        the associated rcParam in matplotlibrc."
-        Run logomaker.get_font_families() for list of (some but not all) valid
-        options on your system.
-
-    font_weight: (str)
-        The font weight to use when rendering glyphs. Specifically, this is
-        the value passed as the 'weight' parameter in the FontProperties
-        constructor. From matplotlib documentation: "weight: A numeric
-        value in the range 0-1000 or one of 'ultralight', 'light',
-        'normal', 'regular', 'book', 'medium', 'roman', 'semibold',
-        'demibold', 'demi', 'bold', 'heavy', 'extra bold', 'black'."
-
-
-    alpha: (float in [0,1])
-        Opacity of rendered glyphs.
-
-    flip_below: (bool)
-        If True, glyphs below the x-axis (which correspond to negative
-        values in the matrix) will be flipped upside down.
-
-    shade_below: (float in [0,1])
-        If True, glyphs below the x-axis (which correspond to negative
-        values in the matrix) will made darker by multiplying color RGB
-        values by 1.0-shade_below.
-
-    fade_below:
-        If True, glyphs below the x-axis (which correspond to negative
-        values in the matrix) will made more transparenty by multiplying
-        alpha by 1.0-fade_below.
-
-    width:
-        Width of each rendered glyph in position units.
-
-    vpad: (float in [0,1])
-        Amount of whitespace to leave within the bounds of a glyph above
-        and below the rendered character. Specifically, in a glyph of
-        height h, a margin of size h*vpad/2 will be left blank both above
-        and below the rendered character.
-
-    vsep: (float > 0)
-        Amount of whitespace to leave between rendered glyphs. Unlike vpad,
-        vsep is NOT relative to glyph height. The vsep-sized margin between
-        glyphs on either side of the x-axis will always be centered on the
-        x-axis.
-
-    dont_stretch_more_than: (str)
-        This parameter limits the amount that a character will be
-        horizontally stretched when rendering a glyph. Specifying an
-        wide character such as 'W' corresponds to less potential stretching,
-        while specifying a narrow character such as '.' corresponds to more
-        stretching. Note that the specified character does not have to be
-        a character rendered in the logo.
-
-    draw_now: (bool)
-        If True, the logo is rendered immediately after it is specified.
-        Set to False if you wish to change the properties of any glyphs
-        after initial specification, e.g. by running
-        Logo.highlight_sequence().
-
-    """
-
-
-# def __init__(self,
-#              matrix,
-#              ax=None,
-#              negate=False,
-#              center=False,
-#              colors='classic',
-#              edgecolor='black',
-#              edgewidth=0.0,
-#              font_family='sans',
-#              font_weight='bold',
-#              alpha=1.0,
-#              flip_below=True,
-#              shade_below=0.0,
-#              fade_below=0.0,
-#              width=1.0,
-#              vpad=0.0,
-#              vsep=0.0,
-#              dont_stretch_more_than='A',
-#              draw_now=True,
-#              ):

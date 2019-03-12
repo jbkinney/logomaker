@@ -80,292 +80,292 @@ def _try_some_code(code_lines, **kwargs):
 LOGOMAKER_TYPES = {'counts', 'probability', 'enrichment', 'information'}
 
 # Names of parameters that can take on any float value
-# params_with_float_values = {
-#     'xtick_anchor',
-#     'xtick_rotation',
-#     'ytick_rotation',
-#     'character_zorder',
-#     'highlight_zorder',
-#     'fullheight_zorder',
-#     'baseline_zorder',
-#     'vline_zorder',
-#     'scalebar_x',
-#     'scalebar_ymin',
-#     'scalebar_textrotation',
-# }
+params_with_float_values = {
+    'xtick_anchor',
+    'xtick_rotation',
+    'ytick_rotation',
+    'character_zorder',
+    'highlight_zorder',
+    'fullheight_zorder',
+    'baseline_zorder',
+    'vline_zorder',
+    'scalebar_x',
+    'scalebar_ymin',
+    'scalebar_textrotation',
+}
 
 # Names of numerical parameters that must be > 0
-# params_greater_than_0 = {
-#     'dpi',
-#     'xtick_spacing',
-#     'max_positions_per_line',
-# }
+params_greater_than_0 = {
+    'dpi',
+    'xtick_spacing',
+    'max_positions_per_line',
+}
 
 # Names of numerical parameters that must be >= 0
-# params_greater_or_equal_to_0 = {
-#     'pseudocount',
-#     'counts_threshold',
-#     'character_edgewidth',
-#     'character_boxedgewidth',
-#     'highlight_edgewidth',
-#     'highlight_boxedgewidth',
-#     'fullheight_edgewidth',
-#     'fullheight_boxedgewidth',
-#     'max_alpha_val',
-#     'hpad',
-#     'vpad',
-#     'gridline_width',
-#     'baseline_width',
-#     'vline_width',
-#     'xtick_length',
-#     'ytick_length',
-#     'scalebar_length',
-#     'scalebar_linewidth',
-# }
+params_greater_or_equal_to_0 = {
+    'pseudocount',
+    'counts_threshold',
+    'character_edgewidth',
+    'character_boxedgewidth',
+    'highlight_edgewidth',
+    'highlight_boxedgewidth',
+    'fullheight_edgewidth',
+    'fullheight_boxedgewidth',
+    'max_alpha_val',
+    'hpad',
+    'vpad',
+    'gridline_width',
+    'baseline_width',
+    'vline_width',
+    'xtick_length',
+    'ytick_length',
+    'scalebar_length',
+    'scalebar_linewidth',
+}
 
 # Names of numerical parameters in the interval [0,1]
-# params_between_0_and_1 = {
-#     'character_alpha',
-#     'character_edgealpha',
-#     'character_boxalpha',
-#     'character_boxedgealpha',
-#     'highlight_alpha',
-#     'highlight_edgealpha',
-#     'highlight_boxalpha',
-#     'highlight_boxedgealpha',
-#     'fullheight_alpha',
-#     'fullheight_edgealpha',
-#     'fullheight_boxalpha',
-#     'fullheight_boxedgealpha',
-#     'below_shade',
-#     'below_alpha',
-#     'width',
-#     'fullheight_width',
-#     'vsep',
-#     'fullheight_vsep',
-#     'gridline_alpha',
-#     'baseline_alpha',
-# }
+params_between_0_and_1 = {
+    'character_alpha',
+    'character_edgealpha',
+    'character_boxalpha',
+    'character_boxedgealpha',
+    'highlight_alpha',
+    'highlight_edgealpha',
+    'highlight_boxalpha',
+    'highlight_boxedgealpha',
+    'fullheight_alpha',
+    'fullheight_edgealpha',
+    'fullheight_boxalpha',
+    'fullheight_boxedgealpha',
+    'below_shade',
+    'below_alpha',
+    'width',
+    'fullheight_width',
+    'vsep',
+    'fullheight_vsep',
+    'gridline_alpha',
+    'baseline_alpha',
+}
 
 # Names of parameters allowed to take on a small number of specific values
-# params_with_values_in_dict = {
-#     'matrix_type': LOGOMAKER_TYPES,
-#     'logo_type': LOGOMAKER_TYPES,
-#     'background_mattype': ['counts', 'probability'],
-#     'enrichment_logbase': [2, np.e, 10],
-#     'information_units': ['bits', 'nats'],
-#     'sequence_type': ['dna', 'DNA',
-#                       'rna', 'RNA',
-#                       'protein', 'PROTEIN'],
-#     'stack_order': ['big_on_top',
-#                     'small_on_top',
-#                     'fixed_going_up',
-#                     'fixed_going_down'],
-#     'axes_type': ['classic',
-#                   'naked',
-#                   'everything',
-#                   'rails',
-#                   'vlines',
-#                   'scalebar'],
-#     'gridline_axis': ['x', 'y', 'both'],
-# }
+params_with_values_in_dict = {
+    'matrix_type': LOGOMAKER_TYPES,
+    'logo_type': LOGOMAKER_TYPES,
+    'background_mattype': ['counts', 'probability'],
+    'enrichment_logbase': [2, np.e, 10],
+    'information_units': ['bits', 'nats'],
+    'sequence_type': ['dna', 'DNA',
+                      'rna', 'RNA',
+                      'protein', 'PROTEIN'],
+    'stack_order': ['big_on_top',
+                    'small_on_top',
+                    'fixed_going_up',
+                    'fixed_going_down'],
+    'axes_type': ['classic',
+                  'naked',
+                  'everything',
+                  'rails',
+                  'vlines',
+                  'scalebar'],
+    'gridline_axis': ['x', 'y', 'both'],
+}
 
 # Names of parameters whose values are True or False
-# params_with_boolean_values = {
-#     'center_columns',
-#     'draw_now',
-#     'use_transparency',
-#     'below_flip',
-#     'uniform_stretch',
-#     'show_gridlines',
-#     'show_baseline',
-#     'show_binary_yaxis',
-#     'left_spine',
-#     'right_spine',
-#     'top_spine',
-#     'bottom_spine',
-#     'use_tightlayout',
-#     'show_position_zero',
-#     'remove_flattened_characters',
-#     'csv_delim_whitespace',
-#     'highlight_bgconsensus',
-#     'negate_matrix',
-#     'show_scalebar',
-# }
+params_with_boolean_values = {
+    'center_columns',
+    'draw_now',
+    'use_transparency',
+    'below_flip',
+    'uniform_stretch',
+    'show_gridlines',
+    'show_baseline',
+    'show_binary_yaxis',
+    'left_spine',
+    'right_spine',
+    'top_spine',
+    'bottom_spine',
+    'use_tightlayout',
+    'show_position_zero',
+    'remove_flattened_characters',
+    'csv_delim_whitespace',
+    'highlight_bgconsensus',
+    'negate_matrix',
+    'show_scalebar',
+}
 
-# # Names of parameters whose values are strings
-# params_with_string_values = {
-#     'meme_motifname',
-#     'save_to_file',
-#     'characters',
-#     'ignore_characters',
-#     'highlight_sequence',
-#     'max_stretched_character',
-#     'style_sheet',
-#     'xtick_format',
-#     'xlabel',
-#     'ytick_format',
-#     'ylabel',
-#     'title',
-#     'csv_delimiter',
-#     'scalebar_text',
-#     'scalebar_texthalignment',
-#     'scalebar_textvalignment'
-# }
-#
-# # Names of parameters whose values specify a numerical interval
-# params_that_specify_intervals = {
-#     'position_range',
-#     'xlim',
-#     'ylim'
-# }
-#
-# # Names of parameters whose values are ordered numerical arrays
-# params_that_are_ordered_arrays = {
-#     'xticks',
-#     'yticks'
-# }
-#
-# # Names of parameters that specify color schemes
-# params_that_specify_colorschemes = {
-#     'character_colors',
-#     'character_edgecolors',
-#     'character_boxcolors',
-#     'character_boxedgecolors',
-#     'highlight_colors',
-#     'highlight_edgecolors',
-#     'highlight_boxcolors',
-#     'highlight_boxedgecolors',
-#     'fullheight_colors',
-#     'fullheight_edgecolors',
-#     'fullheight_boxcolors',
-#     'fullheight_boxedgecolors',
-# }
-#
-# # Names of parameters that specify colors:
-# params_that_specify_colors = {
-#     'gridline_color',
-#     'baseline_color',
-#     'vline_color',
-#     'scalebar_color',
-# }
+# Names of parameters whose values are strings
+params_with_string_values = {
+    'meme_motifname',
+    'save_to_file',
+    'characters',
+    'ignore_characters',
+    'highlight_sequence',
+    'max_stretched_character',
+    'style_sheet',
+    'xtick_format',
+    'xlabel',
+    'ytick_format',
+    'ylabel',
+    'title',
+    'csv_delimiter',
+    'scalebar_text',
+    'scalebar_texthalignment',
+    'scalebar_textvalignment'
+}
 
-#
-# # Names of parameters that specify fontsize
-# params_that_specify_FontProperties = {
-#     'font_file': 'fname',
-#     'font_family': 'family',
-#     'font_weight': 'weight',
-#     'font_style': 'style',
-#
-#     'axes_fontfile': 'fname',
-#     'axes_fontfamily': 'family',
-#     'axes_fontweight': 'weight',
-#     'axes_fontstyle': 'style',
-#     'axes_fontsize': 'size',
-#
-#     'tick_fontfile': 'fname',
-#     'tick_fontfamily': 'family',
-#     'tick_fontweight': 'weight',
-#     'tick_fontstyle': 'style',
-#     'tick_fontsize': 'size',
-#
-#     'label_fontfile': 'fname',
-#     'label_fontfamily': 'family',
-#     'label_fontweight': 'weight',
-#     'label_fontstyle': 'style',
-#     'label_fontsize': 'size',
-#
-#     'title_fontfile': 'fname',
-#     'title_fontfamily': 'family',
-#     'title_fontweight': 'weight',
-#     'title_fontstyle': 'style',
-#     'title_fontsize': 'size',
-# }
+# Names of parameters whose values specify a numerical interval
+params_that_specify_intervals = {
+    'position_range',
+    'xlim',
+    'ylim'
+}
 
-# params_that_specify_linestyles = {
-#     'gridline_style',
-#     'baseline_style',
-#     'vline_style',
-# }
-#
-# # Names of parameters that cannot have None value
-# params_that_cant_be_none = {
-#     'pseudocount',
-#     'enrichment_logbase',
-#     'center_columns',
-#     'information_units',
-#     'draw_now',
-#     'colors',
-#     'alpha',
-#     'edgecolors',
-#     'edgealpha',
-#     'edgewidth',
-#     'boxcolors',
-#     'boxalpha',
-#     'boxedgecolors',
-#     'boxedgealpha',
-#     'boxedgewidth',
-#     'stack_order',
-#     'use_transparency',
-#     'below_shade',
-#     'below_alpha',
-#     'below_flip',
-#     'hpad',
-#     'vpad',
-#     'width',
-#     'uniform_stretch',
-#     'axes_type',
-#     'rcparams',
-#     'xtick_anchor',
-#     'use_tightlayout',
-#     'show_position_zero',
-#     'highlight_bgconsensus',
-#     'negate_matrix'
-# }
+# Names of parameters whose values are ordered numerical arrays
+params_that_are_ordered_arrays = {
+    'xticks',
+    'yticks'
+}
+
+# Names of parameters that specify color schemes
+params_that_specify_colorschemes = {
+    'character_colors',
+    'character_edgecolors',
+    'character_boxcolors',
+    'character_boxedgecolors',
+    'highlight_colors',
+    'highlight_edgecolors',
+    'highlight_boxcolors',
+    'highlight_boxedgecolors',
+    'fullheight_colors',
+    'fullheight_edgecolors',
+    'fullheight_boxcolors',
+    'fullheight_boxedgecolors',
+}
+
+# Names of parameters that specify colors:
+params_that_specify_colors = {
+    'gridline_color',
+    'baseline_color',
+    'vline_color',
+    'scalebar_color',
+}
+
+
+# Names of parameters that specify fontsize
+params_that_specify_FontProperties = {
+    'font_file': 'fname',
+    'font_family': 'family',
+    'font_weight': 'weight',
+    'font_style': 'style',
+
+    'axes_fontfile': 'fname',
+    'axes_fontfamily': 'family',
+    'axes_fontweight': 'weight',
+    'axes_fontstyle': 'style',
+    'axes_fontsize': 'size',
+
+    'tick_fontfile': 'fname',
+    'tick_fontfamily': 'family',
+    'tick_fontweight': 'weight',
+    'tick_fontstyle': 'style',
+    'tick_fontsize': 'size',
+
+    'label_fontfile': 'fname',
+    'label_fontfamily': 'family',
+    'label_fontweight': 'weight',
+    'label_fontstyle': 'style',
+    'label_fontsize': 'size',
+
+    'title_fontfile': 'fname',
+    'title_fontfamily': 'family',
+    'title_fontweight': 'weight',
+    'title_fontstyle': 'style',
+    'title_fontsize': 'size',
+}
+
+params_that_specify_linestyles = {
+    'gridline_style',
+    'baseline_style',
+    'vline_style',
+}
+
+# Names of parameters that cannot have None value
+params_that_cant_be_none = {
+    'pseudocount',
+    'enrichment_logbase',
+    'center_columns',
+    'information_units',
+    'draw_now',
+    'colors',
+    'alpha',
+    'edgecolors',
+    'edgealpha',
+    'edgewidth',
+    'boxcolors',
+    'boxalpha',
+    'boxedgecolors',
+    'boxedgealpha',
+    'boxedgewidth',
+    'stack_order',
+    'use_transparency',
+    'below_shade',
+    'below_alpha',
+    'below_flip',
+    'hpad',
+    'vpad',
+    'width',
+    'uniform_stretch',
+    'axes_type',
+    'rcparams',
+    'xtick_anchor',
+    'use_tightlayout',
+    'show_position_zero',
+    'highlight_bgconsensus',
+    'negate_matrix'
+}
 
 # Parameters that specify tick labels
-# params_that_specify_ticklabels = {
-#     'xticklabels',
-#     'yticklabels',
-# }
-#
-# # Parameters that specify file names
-# params_that_specify_filenames = {
-#     'fasta_file',
-#     'meme_file',
-#     'sequences_csvfile',
-#     'background_seqcsvfile',
-#     'matrix_csvfile',
-#     'background_matcsvfile'
-# }
-#
-# # Parameters that specify dictionaries
-# params_that_specify_dicts = {
-#     'character_style_dict',
-#     'highlight_style_dict',
-#     'fullheight_style_dict',
-#     'font_style_dict',
-#     'scalebar_dict',
-#     'gridline_param_dict',
-#     'baseline_param_dict',
-#     'rcparams',
-#     'csv_kwargs',
-#     'background_csvkwargs'
-# }
-#
-# # Names of parameters to leave for later validatation
-# params_for_later_validation = {
-#     'background',
-#     'ct_col',
-#     'background_ctcol',
-#     'seq_col',
-#     'background_seqcol',
-#     'csv_index_col',
-#     'csv_header',
-#     'csv_usecols',
-# }
-#
+params_that_specify_ticklabels = {
+    'xticklabels',
+    'yticklabels',
+}
+
+# Parameters that specify file names
+params_that_specify_filenames = {
+    'fasta_file',
+    'meme_file',
+    'sequences_csvfile',
+    'background_seqcsvfile',
+    'matrix_csvfile',
+    'background_matcsvfile'
+}
+
+# Parameters that specify dictionaries
+params_that_specify_dicts = {
+    'character_style_dict',
+    'highlight_style_dict',
+    'fullheight_style_dict',
+    'font_style_dict',
+    'scalebar_dict',
+    'gridline_param_dict',
+    'baseline_param_dict',
+    'rcparams',
+    'csv_kwargs',
+    'background_csvkwargs'
+}
+
+# Names of parameters to leave for later validatation
+params_for_later_validation = {
+    'background',
+    'ct_col',
+    'background_ctcol',
+    'seq_col',
+    'background_seqcol',
+    'csv_index_col',
+    'csv_header',
+    'csv_usecols',
+}
+
 
 #
 # Primary validation function

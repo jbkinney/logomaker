@@ -10,7 +10,7 @@ import pdb
 font_manager = FontManager()
 
 
-def get_font_families():
+def list_font_families():
     """
     Returns a list of valid font_family options for use, e.g., in Glyph or
     Logo constructors.
@@ -123,14 +123,14 @@ class Glyph:
                  ax=None,
                  floor=None,
                  ceiling=None,
-                 width=1,
-                 vpad=0.0,
+                 width=0.95,
+                 vpad=0.05,
                  font_family='sans',
                  font_weight='bold',
                  color='gray',
                  edgecolor='black',
                  edgewidth=0.0,
-                 dont_stretch_more_than='A',
+                 dont_stretch_more_than='E',
                  flip=False,
                  mirror=False,
                  zorder=None,
@@ -139,14 +139,6 @@ class Glyph:
 
         # Do basic checks
         assert width > 0, 'Error: Must have width > 0'
-
-        # Set floor and ceiling to axes ylim value if None is passed for either
-        # ax_ymin, ax_ymax = ax.get_ylim()
-        # if floor is None:
-        #     floor = ax_ymin
-        # if ceiling is None:
-        #     ceiling = ax_ymax
-        # assert ceiling > floor, 'Error: Must have ceiling > floor'
 
         # Set attributes
         self.p = p
@@ -171,11 +163,13 @@ class Glyph:
         if draw_now:
             self.draw()
 
+
     def set_attributes(self, **kwargs):
         for key, value in kwargs.items():
             if key in ('color', 'edgecolor'):
                 value = to_rgb(value)
             self.__dict__[key] = value
+
 
     def draw(self, ax=None):
         '''
