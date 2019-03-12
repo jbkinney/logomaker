@@ -39,7 +39,7 @@ class Glyph:
     ----------
 
     ax: (matplotlib Axes object)
-        The axes object on which to draw the logo.
+        The axes object on which to draw the glyph.
 
     p: (number)
         Axes x-coordinate of glyph center.
@@ -163,27 +163,36 @@ class Glyph:
         if draw_now:
             self.draw()
 
-
     def set_attributes(self, **kwargs):
+        """
+        Safe way to set the attributes of a Glyph object
+
+        parameters
+        ----------
+        **kwargs:
+            Attributes and their values.
+
+        """
         for key, value in kwargs.items():
             if key in ('color', 'edgecolor'):
                 value = to_rgb(value)
             self.__dict__[key] = value
 
-
     def draw(self, ax=None):
-        '''
+        """
         Draws Glyph given current parameters.
 
         parameters
         ----------
-        None.
+
+        ax: (matplotlib Axes object)
+            The axes object on which to draw the Glyph.
 
         returns
         -------
         None.
 
-        '''
+        """
 
         # Make patch
         self.patch = self._make_patch()
@@ -200,12 +209,11 @@ class Glyph:
         if self.patch is not None:
             self.ax.add_patch(self.patch)
 
-
     def _make_patch(self):
-        '''
+        """
         Makes patch corresponding to char. Does NOT
         add this patch to an axes object, though; that is done by draw().
-        '''
+        """
 
         # Set height
         height = self.ceiling - self.floor
