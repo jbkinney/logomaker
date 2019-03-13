@@ -127,7 +127,6 @@ def handle_errors(func):
 # Rename useful stuff from within Logomaker
 from logomaker.Logo import Logo
 from logomaker.Glyph import Glyph
-from logomaker.Matrix import Matrix
 from logomaker.Glyph import list_font_families
 
 from logomaker.data import transform_matrix
