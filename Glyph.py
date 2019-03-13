@@ -124,7 +124,7 @@ class Glyph:
                  floor=None,
                  ceiling=None,
                  width=0.95,
-                 vpad=0.05,
+                 vpad=0.00,
                  font_family='sans',
                  font_weight='bold',
                  color='gray',

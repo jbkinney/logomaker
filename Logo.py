@@ -3,12 +3,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
+from matplotlib.colors import to_rgb, to_rgba
 import pdb
 
 # Import stuff from logomaker
 from logomaker.Glyph import Glyph
 from logomaker import color as lm_color
-from logomaker.validate import validate_matrix
+from logomaker.validate import validate_matrix, validate_probability_mat
 
 chars_to_colors_dict = {
     tuple('ACGT'): 'classic',
@@ -67,6 +68,9 @@ class Logo:
         glyphs on either side of the x-axis will always be centered on the
         x-axis.
 
+    figsize: (number, number):
+        The default figure size for logos; only needed if ax is not supplied.
+
     ax: (matplotlib Axes object)
         The axes object on which to draw the logo.
 
@@ -79,13 +83,14 @@ class Logo:
 
     def __init__(self,
                  df,
-                 ax=None,
                  negate=False,
                  center=False,
                  colors=None,
                  flip_below=True,
                  vsep=0.0,
                  zorder=0,
+                 figsize=[10, 2.5],
+                 ax=None,
                  draw_now=True):
 
         # Validate matrix and save it
@@ -99,7 +104,7 @@ class Logo:
         self.C = len(self.cs)
 
         # Get list of positions
-        self.ps = np.array([float(p) for p in self.df.index])
+        self.ps = np.array([int(p) for p in self.df.index])
 
         # Set colors by identifying default or otherwise setting to gray
         if colors is None:
@@ -114,6 +119,7 @@ class Logo:
         self.flip_below = flip_below
         self.vsep = vsep
         self.zorder = zorder
+        self.figsize = tuple(figsize)
 
         # Set flag for whether Logo has been drawn
         self.has_been_drawn = False
@@ -197,6 +203,63 @@ class Logo:
         # Draw now if requested
         if draw_now:
             self.draw()
+
+
+    def fade_glyphs_in_probability_logo(self,
+                                        v_alpha0=0,
+                                        v_alpha1=1,
+                                        draw_now=True,
+                                        ax=None):
+
+        """
+        Fades glyphs in probability logo according to value
+
+        parameter
+        ---------
+
+        v_alpha0 / v_alpha1: (number in [0,1])
+            Matrix values marking alpha=0 and alpha=1
+
+        draw_now: (bool)
+            Whether to readraw modified logo on current Axes.
+
+        ax: (matplotlib Axes object)
+            New axes, if any, on which to draw logo if draw_now=True.
+
+        returns
+        -------
+        None
+         """
+
+        # Update ax
+        self._update_ax(ax)
+
+        # Make sure matrix is a probability matrix
+        self.df = validate_probability_mat(self.df)
+
+        # Iterate over all positions and characters
+        for p in self.ps:
+            for c in self.cs:
+
+                # Grab both glyph and value
+                v = self.df.loc[p, c]
+                g = self.glyph_df.loc[p, c]
+
+                # Compute new alpha
+                if v <= v_alpha0:
+                    alpha = 0
+                elif v >= v_alpha1:
+                    alpha = 1
+                else:
+                    alpha = (v - v_alpha0) / (v_alpha1 - v_alpha0)
+
+                # Set glyph attributes
+                g.set_attributes(alpha=alpha)
+
+        # Draw now if requested
+        if draw_now:
+            self.draw()
+
 
     def style_glyphs_below(self,
                            shade=0.0,
@@ -617,9 +680,10 @@ class Logo:
         # Update ax
         self._update_ax(ax)
 
-        # If ax is still None, grab plt.gca()
+        # If ax is still None, create figure
         if self.ax is None:
-            self.ax = plt.gca()
+            fig, ax = plt.subplots(1, 1, figsize=self.figsize)
+            self.ax = ax
 
         # Clear previous content from ax
         self.ax.clear()

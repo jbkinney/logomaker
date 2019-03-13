@@ -11,29 +11,9 @@ from matplotlib.colors import to_rgb, to_rgba
 from logomaker import ControlledError, check
 
 
-# Specifies IUPAC string transformations
-iupac_dict = {
-    'A': 'A',
-    'C': 'C',
-    'G': 'G',
-    'T': 'T',
-    'R': 'AG',
-    'Y': 'CT',
-    'S': 'GC',
-    'W': 'AT',
-    'K': 'GT',
-    'M': 'AC',
-    'B': 'CGT',
-    'D': 'AGT',
-    'H': 'ACT',
-    'V': 'ACG',
-    'N': 'ACGT'
-}
-
 #
 # Private validation functions
 #
-
 
 def _validate_number(name,
                      user,
@@ -263,7 +243,7 @@ def _validate_color(name, user, default):
     return value
 
 
-def validate_matrix(dataframe, allow_nan=True):
+def validate_matrix(dataframe, allow_nan=False):
     """
     Runs checks to verify that df is indeed a motif dataframe.
     Returns a cleaned-up version of df if possible

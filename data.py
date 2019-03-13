@@ -3,19 +3,37 @@ import numpy as np
 import pandas as pd
 import pdb
 
+# from validate import validate_matrix, validate_probability_mat, iupac_dict
+from logomaker.validate import validate_matrix, \
+                               validate_probability_mat, \
+                               validate_information_mat
+
+# Specifies IUPAC string transformations
+iupac_dict = {
+    'A': 'A',
+    'C': 'C',
+    'G': 'G',
+    'T': 'T',
+    'R': 'AG',
+    'Y': 'CT',
+    'S': 'GC',
+    'W': 'AT',
+    'K': 'GT',
+    'M': 'AC',
+    'B': 'CGT',
+    'D': 'AGT',
+    'H': 'ACT',
+    'V': 'ACG',
+    'N': 'ACGT'
+}
 
 # Set constants
 SMALL = np.finfo(float).tiny
 
-
-# from validate import validate_matrix, validate_probability_mat, iupac_dict
-from logomaker.validate import validate_matrix, \
-                               validate_probability_mat, \
-                               validate_information_mat, \
-                               iupac_dict
-
-
-def transform_matrix(df, from_type, to_type, background=None, pseudocount=1):
+def transform_matrix(df, from_type, to_type,
+                     background=None,
+                     pseudocount=1,
+                     center=False):
     """
     Transforms a matrix of one type into a matrix of another type.
 
@@ -71,6 +89,10 @@ def transform_matrix(df, from_type, to_type, background=None, pseudocount=1):
         Pseudocount to use when transforming from a count matrix to a
         probability matrix.
 
+    center: (bool)
+        Whether to center the output matrix. Note: this only works when
+        to_type = 'weight', as centering a matrix doesn't make sense otherwise.
+
     returns
     -------
     out_df: (dataframe)
@@ -80,49 +102,58 @@ def transform_matrix(df, from_type, to_type, background=None, pseudocount=1):
     FROM_TYPES = {'counts', 'probability', 'weight', 'information'}
     TO_TYPES = {'probability', 'weight', 'information'}
 
-
     # Check that matrix is valid
-    df = validate_matrix(df, allow_nan=False)
+    df = validate_matrix(df)
 
-    assert from_type in FROM_TYPES, \
-        'Error: invalid from_type=%s' % from_type
+    # If to_type == from_type, just return matrix
+    if from_type == to_type:
+        out_df = df.copy()
 
-    assert to_type in TO_TYPES, \
-        'Error: invalid to_type=%s' % from_type
-
-    # If converting from a probability matrix
-    if from_type == 'probability':
-
-        if to_type == 'weight':
-            out_df = _probability_mat_to_weight_mat(df, background)
-
-        elif to_type == 'information':
-            out_df = _probability_mat_to_information_mat(df, background)
-
-        elif to_type == 'probability':
-            out_df = df.copy()
-
-    # Otherwise, convert to probability matrix, then call function again
     else:
+        assert from_type in FROM_TYPES, \
+            'Error: invalid from_type=%s' % from_type
 
-        # If converting from a counts matrix
-        if from_type == 'counts':
-            prob_df = _counts_mat_to_probability_mat(df, pseudocount)
+        assert to_type in TO_TYPES, \
+            'Error: invalid to_type="%s"' % from_type
 
-        # If converting from a weight matrix
-        elif from_type == 'weight':
-            prob_df = _weight_mat_to_probability_mat(df, background)
+        # If converting from a probability matrix
+        if from_type == 'probability':
 
-        elif from_type == 'information':
-            prob_df = _information_mat_to_probability_mat(df, background)
+            if to_type == 'weight':
+                out_df = _probability_mat_to_weight_mat(df, background)
 
+            elif to_type == 'information':
+                out_df = _probability_mat_to_information_mat(df, background)
+
+        # Otherwise, convert to probability matrix, then call function again
         else:
-            assert False, 'Invalid from_type = %s' % from_type
 
-        out_df = transform_matrix(prob_df,
-                                  from_type='probability',
-                                  to_type=to_type,
-                                  background=background)
+            # If converting from a counts matrix
+            if from_type == 'counts':
+                prob_df = _counts_mat_to_probability_mat(df, pseudocount)
+
+            # If converting from a weight matrix
+            elif from_type == 'weight':
+                prob_df = _weight_mat_to_probability_mat(df, background)
+
+            elif from_type == 'information':
+                prob_df = _information_mat_to_probability_mat(df, background)
+
+            else:
+                assert False, 'THIS SHOULD NEVER HAPPEN'
+
+            out_df = transform_matrix(prob_df,
+                                      from_type='probability',
+                                      to_type=to_type,
+                                      background=background)
+
+    # Check if user wishes to center the matrix
+    if center:
+        assert to_type == 'weight', \
+            'Error: the option center=True is only compatible with ' + \
+            'to_type == "weight"'
+        out_df = center_matrix(out_df)
+
 
     # Validate and return
     out_df = validate_matrix(out_df)
@@ -159,7 +190,7 @@ def _probability_mat_to_weight_mat(df, background=None):
     df = validate_probability_mat(df)
 
     # Get background matrix
-    bg_df = get_background_mat(df, background)
+    bg_df = _get_background_mat(df, background)
 
     # Compute out_df
     out_df = df.copy()
@@ -179,7 +210,7 @@ def _weight_mat_to_probability_mat(df, background=None):
     df = validate_matrix(df)
 
     # Get background matrix
-    bg_df = get_background_mat(df, background)
+    bg_df = _get_background_mat(df, background)
 
     # Compute out_df
     out_df = df.copy()
@@ -203,7 +234,7 @@ def _probability_mat_to_information_mat(df, background=None):
     df = validate_probability_mat(df)
 
     # Get background matrix
-    bg_df = get_background_mat(df, background)
+    bg_df = _get_background_mat(df, background)
 
     # Compute out_df
     out_df = df.copy()
@@ -214,7 +245,7 @@ def _probability_mat_to_information_mat(df, background=None):
     out_df.loc[:, :] = fg_vals * info_vec[:, np.newaxis]
 
     # Validate and return
-    out_df = validate_matrix(out_df)
+    out_df = validate_information_mat(out_df)
     return out_df
 
 
@@ -284,7 +315,7 @@ def center_matrix(df):
     return out_df
 
 
-def get_background_mat(df, background):
+def _get_background_mat(df, background):
     """
     Creates a background matrix given a background specification. There
     are three possiblities:
@@ -328,32 +359,71 @@ def get_background_mat(df, background):
     return out_df
 
 
-def iupac_to_probability_mat(iupac_string):
+def iupac_to_matrix(iupac_seq, to_type='probability', **kwargs):
     """
-    Generates a probability matrix corresponding to an IUPAC string.
-    Supports only DNA IUPAC strings.
+    Generates a matrix corresponding to a (DNA) IUPAC string.
+
+    parameters
+    ----------
+    iupac_seq: (str)
+        An IUPAC sequence.
+
+    to_type: (str)
+        The type of matrix to convert to. Must be 'probability', 'weight',
+        or 'information'
+
+    **kwargs:
+        Additional arguments to send to transform_matrix, e.g. background
+        or center
+
+    returns
+    -------
+    out_df: (dataframe)
+        A matrix of the requested type.
     """
 
     # Create counts matrix based on IUPAC string
-    L = len(iupac_string)
+    L = len(iupac_seq)
     cols = list('ACGT')
-    counts_mat = pd.DataFrame(columns=cols).fillna(0)
-    for i, c in enumerate(list(iupac_string)):
+    index = list(range(L))
+    counts_mat = pd.DataFrame(data=0.0, columns=cols, index=index)
+    for i, c in enumerate(list(iupac_seq)):
         bs = iupac_dict[c]
         for b in bs:
             counts_mat.loc[i, b] = 1
 
-    # Convert counts matrix to probability matrix
-    out_df = normalize_matrix()
-
-    # Vaidate and return matrix
-    out_df = validate_matrix(out_df)
+    # Convert to requested type
+    out_df = transform_matrix(counts_mat,
+                              pseudocount=0,
+                              from_type='counts',
+                              to_type=to_type)
     return out_df
 
 
-def alignment_to_counts_mat(sequences, characters_to_ignore='.-'):
+def alignment_to_matrix(sequences,
+                        to_type='counts',
+                        characters_to_ignore='.-',
+                        **kwargs):
     """
-    Creates a counts matrix from a list of sequence
+    Generates matrix from a sequence alignment
+
+    parameters
+    ----------
+    sequences: (list of str)
+        An list of sequences, all of which must be the same length
+
+    to_type: (str)
+        The type of matrix to output. Must be 'counts', 'probability',
+        'weight', or 'information'
+
+    **kwargs:
+        Other arguments to pass to logomaker.transform_matrix(), e.g.
+        pseudocount
+
+    returns
+    -------
+    out_df: (dataframe)
+        A matrix of the requested type.
     """
 
     # Create array of characters at each position
@@ -367,14 +437,18 @@ def alignment_to_counts_mat(sequences, characters_to_ignore='.-'):
     # Remove characters to ignore
     columns = [c for c in unique_characters if not c in characters_to_ignore]
     index = list(range(L))
-    out_df = pd.DataFrame(data=0, columns=columns, index=index)
+    counts_df = pd.DataFrame(data=0, columns=columns, index=index)
 
     # Sum of the number of occurrances of each character at each position
     for c in columns:
-        out_df.loc[:, c] = (char_array == c).astype(float).sum(axis=0).ravel()
+        counts_df.loc[:, c] = \
+            (char_array == c).astype(float).sum(axis=0).ravel()
 
-    # Validate counts matrix and return
-    out_df = validate_matrix(out_df)
+    # Convert counts matrix to matrix of requested type
+    out_df = transform_matrix(counts_df,
+                              from_type='counts',
+                              to_type=to_type,
+                              **kwargs)
     return out_df
 
 
