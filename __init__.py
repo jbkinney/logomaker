@@ -14,46 +14,77 @@ from functools import wraps
 import sys
 import os
 
-# method that helps complete the implementation of
-# Controlled Error for logomaker.
-def logomaker_excepthook(type, value, traceback):
-    print(value)
 
+# Define error handling
+class ControlledError(Exception):
+
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return self.value
+
+
+'''
+
+*** Note ***
+The following implementation will not work with the decorator handle_errors.
+Using it without the handle error decorator shows the entire stacktrace in 
+jupyter, but not when running python directly, so I suggest we use the simpler
+implementation of Controlled Error.
+
+I suggest we remove this commented code after code review. 
+
+-AT 
+  
 
 # this message prints out a message
 # and stops execution and hides traceback.
 def ControlledError(message):
+
         sys.excepthook = logomaker_excepthook
         raise Exception(message)
 
+        
+# method that helps complete the implementation of
+# Controlled Error for logomaker.
+def logomaker_excepthook(type, value, traceback):
+    sys.tracebacklimit = 0
+    print(value)
+        
+'''
+
 
 def check(condition, message):
-    '''
+
+    """
     Checks a condition; raises a ControlledError with message if condition fails.
     :param condition:
     :param message:
     :return: None
-    '''
+    """
+
     if not condition:
         raise ControlledError(message)
 
-# Dummy class
+
+# Dummy class.
+# Need to justify leaving this in here. AT
 class Dummy():
     def __init__(self):
         pass
+
 
 def handle_errors(func):
     """
     Decorator function to handle logomaker errors
     """
 
-
     @wraps(func)
     def wrapped_func(*args, **kwargs):
 
         # Get should_fail debug flag
         should_fail = kwargs.pop('should_fail', None)
-
 
         try:
             # Execute function
@@ -121,20 +152,20 @@ def handle_errors(func):
                 obj.mistake = mistake
                 return obj
 
-
     return wrapped_func
 
 # Rename useful stuff from within Logomaker
-from logomaker.Logo import Logo
-from logomaker.Glyph import Glyph
-from logomaker.Glyph import list_font_families
 
-from logomaker.data import transform_matrix
-from logomaker.data import center_matrix
-from logomaker.data import normalize_matrix
-from logomaker.data import iupac_to_matrix
-from logomaker.data import alignment_to_matrix
+from logomaker.src.Logo import Logo
+from logomaker.src.Glyph import Glyph
+from logomaker.src.Glyph import list_font_families
 
-from logomaker.validate import validate_matrix
-from logomaker.validate import validate_probability_mat
-from logomaker.validate import validate_information_mat
+from logomaker.src.data import transform_matrix
+from logomaker.src.data import center_matrix
+from logomaker.src.data import normalize_matrix
+from logomaker.src.data import iupac_to_matrix
+from logomaker.src.data import alignment_to_matrix
+
+from logomaker.src.validate import validate_matrix
+from logomaker.src.validate import validate_probability_mat
+from logomaker.src.validate import validate_information_mat

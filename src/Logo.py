@@ -4,12 +4,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from matplotlib.colors import to_rgb, to_rgba
+import matplotlib.cm
 import pdb
 
 # Import stuff from logomaker
-from logomaker.Glyph import Glyph
-from logomaker import color as lm_color
-from logomaker.validate import validate_matrix, validate_probability_mat
+from logomaker.src.Glyph import Glyph
+from logomaker.src import color as lm_color
+from logomaker.src.validate import validate_matrix, validate_probability_mat
+import logomaker.src.validate as validate
+from logomaker import ControlledError, check, handle_errors
 
 chars_to_colors_dict = {
     tuple('ACGT'): 'classic',
@@ -68,6 +71,9 @@ class Logo:
         glyphs on either side of the x-axis will always be centered on the
         x-axis.
 
+    zorder: (int >=0)
+        The order in which things are drawn.
+
     figsize: (number, number):
         The default figure size for logos; only needed if ax is not supplied.
 
@@ -81,6 +87,7 @@ class Logo:
         Logo.highlight_sequence().
     """
 
+    @handle_errors
     def __init__(self,
                  df,
                  negate=False,
@@ -93,8 +100,20 @@ class Logo:
                  ax=None,
                  draw_now=True):
 
-        # Validate matrix and save it
-        self.df = validate_matrix(df)
+        # set class attributes
+        self.df = df
+        self.negate = negate
+        self.center = center
+        self.colors = colors
+        self.flip_below = flip_below
+        self.vsep = vsep
+        self.zorder = zorder
+        self.figsize = figsize
+        self.ax = ax
+        self.draw_now = draw_now
+
+        # perform input checks to validate attributes
+        self._input_checks()
 
         # Compute length
         self.L = len(self.df)
@@ -150,6 +169,92 @@ class Logo:
         if draw_now:
             self.draw()
 
+    def _input_checks(self):
+
+        """
+        check input parameters in the Logo constructor for correctness
+        """
+
+        # Validate dataframe
+        validate_matrix(self.df)
+
+        # check that negate is a boolean
+        check(isinstance(self.negate, bool),
+              'type(negate) = %s; in Logo must be of type bool ' % type(self.negate))
+
+        # check that center is a boolean
+        check(isinstance(self.center, bool),
+              'type(center) = %s; in Logo must be of type bool ' % type(self.center))
+
+        # check that color scheme is valid
+        if self.colors is not None:
+
+            # if color scheme is specified as a string, check that string value maps
+            # to a valid matplotlib color scheme
+
+            if type(self.colors) == str:
+
+                # get allowed list of matplotlib color schemes
+
+                valid_color_strings = list(matplotlib.cm.cmap_d.keys())
+                valid_color_strings.extend(['classic','grays', 'base_paring','hydrophobicity', 'chemistry', 'charge'])
+
+                check(self.colors in valid_color_strings,
+                      # 'colors = %s; must be in %s' % (self.colors, str(valid_color_strings)))
+                      'colors = %s; is an invalid color scheme. Valid choices include classic, chemistry, grays. '
+                      'A full list of valid color schemes can be found by '
+                      'printing list(matplotlib.cm.cmap_d.keys(). ' % self.colors)
+
+            # otherwise limit the allowed types to tuples, lists, dicts
+            else:
+                check(isinstance(self.colors,(tuple,list,dict)),
+                      'type(colors) = %s; in Logo must be of type (tuple,list,dict) ' % type(self.colors))
+
+                # check that RGB values are between 0 and 1 is
+                # colors is a list or tuple
+
+                if type(self.colors) == list or type(self.colors) == tuple:
+
+                    check(all(i <= 1.0 for i in self.colors),
+                          'Values of colors array must be between 0 and 1')
+
+                    check(all(i >= 0.0 for i in self.colors),
+                          'Values of colors array must be between 0 and 1')
+
+        # check that flip_below is a boolean
+        check(isinstance(self.flip_below, bool),
+            'type(flip_below) = %s; in Logo must be of type bool ' % type(self.flip_below))
+
+        # validate vsep
+        check(isinstance(self.vsep, (float, int)),
+              'type(vsep) = %s; in Logo must be of type or int ' % type(self.vsep))
+
+        check(self.vsep >= 0, "vsep = %d must be greater than 0 " % self.vsep)
+
+        # validate zorder
+        check(isinstance(self.zorder, int),
+              'type(zorder) = %s; in Logo must be of type or int ' % type(self.zorder))
+
+        check(self.zorder >= 0, "zorder = %d must be greater than 0 " % self.zorder)
+
+        # validate figsize
+        check(isinstance(self.figsize, (tuple, list)),
+              'type(figsize) = %s; in Logo must be of type (tuple,list) ' % type(self.figsize))
+
+        check(len(self.figsize)==2, 'The figsize array must have two elements')
+
+        check(all(i > 0 for i in self.figsize),
+              'Values of figsize array must be > 0')
+
+        # validate ax. Need to go over this in code review
+        #check(isinstance(self.ax,(None,matplotlib.axes._base._AxesBase)),
+              #'ax needs to be None or a valid matplotlib axis object')
+
+        # check that draw_now is a boolean
+        check(isinstance(self.draw_now, bool),
+              'type(draw_now) = %s; in Logo must be of type bool ' % type(self.draw_now))
+
+
     def style_glyphs(self, colors=None, draw_now=True, ax=None, **kwargs):
         """
         Modifies the properties of all glyphs in a logo.
@@ -203,7 +308,6 @@ class Logo:
         # Draw now if requested
         if draw_now:
             self.draw()
-
 
     def fade_glyphs_in_probability_logo(self,
                                         v_alpha0=0,
@@ -259,7 +363,6 @@ class Logo:
         # Draw now if requested
         if draw_now:
             self.draw()
-
 
     def style_glyphs_below(self,
                            shade=0.0,

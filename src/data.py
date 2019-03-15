@@ -4,7 +4,7 @@ import pandas as pd
 import pdb
 
 # from validate import validate_matrix, validate_probability_mat, iupac_dict
-from logomaker.validate import validate_matrix, \
+from logomaker.src.validate import validate_matrix, \
                                validate_probability_mat, \
                                validate_information_mat
 

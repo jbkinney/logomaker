@@ -2,8 +2,6 @@ from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgb
-import warnings
-import pdb
 
 # Create facecolor scheme dict
 three_zeros = np.zeros(3)
@@ -83,10 +81,11 @@ def expand_color_dict(color_dict):
 
 
 def get_color_dict(color_scheme, chars, alpha, shuffle_colors=False):
-    '''
+
+    """
     get color_dict: each key is 1 char, each value is a 4-vector of rgba values
     This is the main function that OldLogo interfaces with
-    '''
+    """
 
     # First check if color_scheme can be interpreted as a simple facecolor
     is_color = None
