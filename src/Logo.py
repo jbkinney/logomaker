@@ -61,6 +61,14 @@ class Logo:
              E.g., {'A': 'green','C': [ 0.,  0.,  1.], 'G': 'y',
              'T': [ 1.,  0.,  0.,  0.5]}
 
+    stack_order: (str)
+        Must be 'big_on_top', 'small_on_top', or 'fixed. If 'big_on_top',
+        stack glyphs away from x-axis in order of increasing absolute value.
+        If 'small_on_top', stack glyphs away from x-axis in order of
+        decreasing absolute value. If 'fixed', stack glyphs from top to bottom
+        in the order that characters appear in the data frame. If 'flipped',
+        stack glyphs in the opposite order as 'fixed'.
+
     flip_below: (bool)
         If True, glyphs below the x-axis (which correspond to negative
         values in the matrix) will be flipped upside down.
@@ -96,6 +104,7 @@ class Logo:
                  negate=False,
                  center=False,
                  colors=None,
+                 stack_order='big_on_top',
                  flip_below=True,
                  vsep=0.0,
                  zorder=0,
@@ -109,6 +118,7 @@ class Logo:
         self.negate = negate
         self.center = center
         self.colors = colors
+        self.stack_order = stack_order
         self.flip_below = flip_below
         self.vsep = vsep
         self.zorder = zorder
@@ -168,7 +178,7 @@ class Logo:
                                     alpha=1)
 
         # Compute characters.
-        self._compute_characters()
+        self._compute_glyphs()
 
         # Draw now if requested
         if draw_now:
@@ -225,6 +235,10 @@ class Logo:
 
                     check(all(i >= 0.0 for i in self.colors),
                           'Values of colors array must be between 0 and 1')
+
+        # check that stack_order is valid
+        check(self.stack_order in {'big_on_top', 'small_on_top', 'fixed', 'flipped'},
+              'stack_order = %s; must be "big_on_top", "small_on_top", "fixed", "flipped".' % self.stack_order)
 
         # check that flip_below is a boolean
         check(isinstance(self.flip_below, bool),
@@ -821,7 +835,7 @@ class Logo:
         if ax is not None:
             self.ax = ax
 
-    def _compute_characters(self):
+    def _compute_glyphs(self):
         """
         Specifies the placement and styling of all glyphs within the logo.
         Note that glyphs can later be changed after this is called but before
@@ -834,9 +848,28 @@ class Logo:
         # For each position
         for p in self.ps:
 
-            # Get sorted values and corresponding characters
+            # Get values at this position
             vs = np.array(self.df.loc[p, :])
-            ordered_indices = np.argsort(vs)
+
+            # Sort values and corresponding characters as desired
+            if self.stack_order == 'big_on_top':
+                ordered_indices = np.argsort(vs)
+
+            elif self.stack_order == 'small_on_top':
+                tmp_vs = np.zeros(len(vs))
+                tmp_vs[vs != 0] = 1/vs
+
+                ordered_indices = np.argsort(tmp_vs)
+            elif self.stack_order == 'fixed':
+                ordered_indices = np.array(range(len(vs)))[::-1]
+
+            elif self.stack_order == 'flipped':
+                ordered_indices = np.array(range(len(vs)))
+
+            else:
+                assert False, 'This should not be possible.'
+
+            # Reorder values and characters
             vs = vs[ordered_indices]
             cs = [str(c) for c in self.cs[ordered_indices]]
 
