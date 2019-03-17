@@ -85,6 +85,9 @@ class Logo:
         Set to False if you wish to change the properties of any glyphs
         after initial specification, e.g. by running
         Logo.highlight_sequence().
+
+    **kwargs:
+        Additional key word arguments to send to the Glyph constructor.
     """
 
     @handle_errors
@@ -98,7 +101,8 @@ class Logo:
                  zorder=0,
                  figsize=[10, 2.5],
                  ax=None,
-                 draw_now=True):
+                 draw_now=True,
+                 **kwargs):
 
         # set class attributes
         self.df = df
@@ -139,6 +143,7 @@ class Logo:
         self.vsep = vsep
         self.zorder = zorder
         self.figsize = tuple(figsize)
+        self.glyph_kwargs = kwargs
 
         # Set flag for whether Logo has been drawn
         self.has_been_drawn = False
@@ -859,7 +864,8 @@ class Logo:
                             color=this_color,
                             flip=flip,
                             draw_now=False,
-                            zorder=self.zorder)
+                            zorder=self.zorder,
+                            **self.glyph_kwargs)
 
                 # Add glyph to glyph_df
                 glyph_df.loc[p, c] = glyph
