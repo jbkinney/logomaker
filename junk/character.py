@@ -117,7 +117,7 @@ def put_char_in_box(ax,
     y1 = tmp_bbox.ymax + .5*vpad*tmp_bbox.height
     tmp_bbox = Bbox([[x0, y0], [x1, y1]])
 
-    # Compute horizontal stretch and shift needed to center char
+    # Compute horizontal stretch and shift needed to center_values char
     hstretch = min(bbox.width / tmp_bbox.width, max_hstretch)
     char_width = hstretch * tmp_bbox.width
     char_shift = (bbox.width - char_width) / 2.0

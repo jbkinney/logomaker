@@ -134,7 +134,7 @@ def make_logo(dataframe=None,
         Default None.
 
     axes_fontfamily: (str, list, None)
-        See font_family. Default to use for axes labels, axes \n
+        See font_name. Default to use for axes labels, axes \n
         tick labels, and title. Ignored if None. Default None.
 
     matrix_type: (str in set, None)
@@ -450,7 +450,7 @@ def make_logo(dataframe=None,
         as the 'alpha' argument to ax.axhline() if not None. \n
          Default None. \n
 
-    font_family (str, list, None):
+    font_name (str, list, None):
         The logo character font family name. Specifically, the value \n
         passed as the 'family' parameter when calling the FontProperties \n
         constructor. From matplotlib documentation: \n
@@ -1154,7 +1154,7 @@ def make_logo(dataframe=None,
     else:
 
         # Create properties
-        font_style_dict['font_properties'] = FontProperties(family=font_style_dict['font_family'],
+        font_style_dict['font_properties'] = FontProperties(family=font_style_dict['font_name'],
                                          weight=font_style_dict['font_weight'],
                                          fname=font_style_dict['font_file'],
                                          style=font_style_dict['font_style'])
@@ -1776,7 +1776,7 @@ def make_logo(dataframe=None,
     if scalebar_dict['scalebar_texthalignment'] is None:
         scalebar_dict['scalebar_texthalignment'] = 'right'
     if scalebar_dict['scalebar_textvalignment'] is None:
-        scalebar_dict['scalebar_textvalignment'] = 'center'
+        scalebar_dict['scalebar_textvalignment'] = 'center_values'
     if scalebar_dict['scalebar_textrotation'] is None:
         scalebar_dict['scalebar_textrotation'] = 90
 

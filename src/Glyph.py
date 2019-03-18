@@ -12,7 +12,7 @@ font_manager = FontManager()
 
 def list_font_families():
     """
-    Returns a list of valid font_family options for use, e.g., in Glyph or
+    Returns a list of valid font_name options for use, e.g., in Glyph or
     Logo constructors.
 
     parameters
@@ -21,7 +21,7 @@ def list_font_families():
 
     returns
     -------
-    List of valid font_family names. This will vary from system to system.
+    List of valid font_name names. This will vary from system to system.
 
     """
     fontnames_dict = dict([(f.name,f.fname) for f in font_manager.ttflist])
@@ -42,7 +42,7 @@ class Glyph:
         The axes object on which to draw the glyph.
 
     p: (number)
-        Axes x-coordinate of glyph center.
+        Axes x-coordinate of glyph center_values.
 
     c: (str)
         Character represeted by glyph.
@@ -263,7 +263,7 @@ class Glyph:
         tmp_bbox = tmp_path.get_extents()
         msc_bbox = msc_path.get_extents()
 
-        # Compute horizontal stretch and shift needed to center char
+        # Compute horizontal stretch and shift needed to center_values char
         hstretch_tmp = bbox.width / tmp_bbox.width
         hstretch_msc = bbox.width / msc_bbox.width
         hstretch = min(hstretch_tmp, hstretch_msc)

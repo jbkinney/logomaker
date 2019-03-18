@@ -193,13 +193,13 @@ class Logo:
         # Validate dataframe
         validate_matrix(self.df)
 
-        # check that negate is a boolean
+        # check that negate_values is a boolean
         check(isinstance(self.negate, bool),
-              'type(negate) = %s; must be of type bool ' % type(self.negate))
+              'type(negate_values) = %s; must be of type bool ' % type(self.negate))
 
-        # check that center is a boolean
+        # check that center_values is a boolean
         check(isinstance(self.center, bool),
-              'type(center) = %s; must be of type bool ' % type(self.center))
+              'type(center_values) = %s; must be of type bool ' % type(self.center))
 
         # check that color scheme is valid
         if self.colors is not None:

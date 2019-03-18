@@ -254,7 +254,7 @@ LOGOMAKER_TYPES = {'counts', 'probability', 'enrichment', 'information'}
 # # Names of parameters that specify fontsize
 # params_that_specify_FontProperties = {
 #     'font_file': 'fname',
-#     'font_family': 'family',
+#     'font_name': 'family',
 #     'font_weight': 'weight',
 #     'font_style': 'style',
 #
@@ -1137,7 +1137,7 @@ def _validate_user_set_dict(dict_name,dictionary_with_keys_vals):
         valid_dict_keys = [
             'font_properties',
             'font_file',
-            'font_family',
+            'font_name',
             'font_weight',
             'font_style',
         ]
@@ -1293,7 +1293,7 @@ def _populate_default_dict_value(dict_name,dictionary_with_keys_vals,dict_set_by
         default_font_style_values = {
             'font_properties':None,
             'font_file':None,
-            'font_family':('Arial Rounded MT Bold', 'Arial', 'sans'),
+            'font_name':('Arial Rounded MT Bold', 'Arial', 'sans'),
             'font_weight':'bold',
             'font_style':None,
         }

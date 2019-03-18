@@ -86,7 +86,7 @@ def index():
 character_colors : 'random'
 logo_type : 'probability'
 axes_type : 'classic'
-font_family : 'Arial'
+font_name : 'Arial'
 font_weight : 'heavy'
 use_tightlayout : True"""
 

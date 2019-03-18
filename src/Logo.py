@@ -33,15 +33,6 @@ class Logo:
         A matrix specifying character heights and positions. Note that
         positions index rows while characters index columns.
 
-    negate: (bool)
-        If True, all values in matrix are multiplied by -1. This can be
-        useful when illustrating negative energy values in an energy matrix.
-
-    center: (bool)
-        If True, the stack of characters at each position will be centered
-        around zero. This is accomplished by subtracting the mean value
-        in each row of the matrix from each element in that row.
-
     colors: (color scheme)
         Face color of logo characters. Default 'gray'. Here and in
         what follows a variable of type 'color' can take a variety of value
@@ -61,6 +52,10 @@ class Logo:
              E.g., {'A': 'green','C': [ 0.,  0.,  1.], 'G': 'y',
              'T': [ 1.,  0.,  0.,  0.5]}
 
+    font_name: (str)
+        The 'font_name' parameter to pass to FontProperties() when creating
+        Glyphs.
+
     stack_order: (str)
         Must be 'big_on_top', 'small_on_top', or 'fixed. If 'big_on_top',
         stack glyphs away from x-axis in order of increasing absolute value.
@@ -69,9 +64,27 @@ class Logo:
         in the order that characters appear in the data frame. If 'flipped',
         stack glyphs in the opposite order as 'fixed'.
 
+    negate_values: (bool)
+        If True, all values in matrix are multiplied by -1. This can be
+        useful when illustrating negative energy values in an energy matrix.
+
+    center_values: (bool)
+        If True, the stack of characters at each position will be centered
+        around zero. This is accomplished by subtracting the mean value
+        in each row of the matrix from each element in that row.
+
+    baseline_width: (float >= 0.0)
+        Width of the baseline.
+
     flip_below: (bool)
         If True, glyphs below the x-axis (which correspond to negative
         values in the matrix) will be flipped upside down.
+
+    shade_below: (float in [0,1])
+        The amount of shading underneath x-axis.
+
+    fade_below: (float in [0,1])
+        The amount of fading underneath x-axis.
 
     vsep: (float > 0)
         Amount of whitespace to leave between rendered glyphs. Unlike vpad,
@@ -101,25 +114,33 @@ class Logo:
     @handle_errors
     def __init__(self,
                  df,
-                 negate=False,
-                 center=False,
                  colors=None,
+                 font_name='sans',
                  stack_order='big_on_top',
+                 negate_values=False,
+                 center_values=False,
+                 baseline_width=0.5,
                  flip_below=True,
+                 shade_below=0.0,
+                 fade_below=0.0,
                  vsep=0.0,
                  zorder=0,
-                 figsize=[10, 2.5],
+                 figsize=(10, 2.5),
                  ax=None,
                  draw_now=True,
                  **kwargs):
 
         # set class attributes
         self.df = df
-        self.negate = negate
-        self.center = center
         self.colors = colors
+        self.font_name = font_name
         self.stack_order = stack_order
+        self.negate_values = negate_values
+        self.center_values = center_values
+        self.baseline_width = baseline_width
         self.flip_below = flip_below
+        self.shade_below = shade_below
+        self.fade_below = fade_below
         self.vsep = vsep
         self.zorder = zorder
         self.figsize = figsize
@@ -147,27 +168,27 @@ class Logo:
 
         # Save other attributes
         self.ax = ax
-        self.negate = bool(negate)
-        self.center = center
+        self.negate_values = bool(negate_values)
+        self.center_values = center_values
         self.flip_below = flip_below
         self.vsep = vsep
         self.zorder = zorder
         self.figsize = tuple(figsize)
         self.glyph_kwargs = kwargs
 
-        # Set flag for whether Logo has been drawn
-        self.has_been_drawn = False
-
-        # Negate values if requested
-        if self.negate:
-            self.df = -self.df
-
         # Note: Logo does NOT expect df to change after it is passed
         # to the constructor. But one can change character attributes
         # before drawing.
 
+        # Set flag for whether Logo has been drawn
+        self.has_been_drawn = False
+
+        # Negate values if requested
+        if self.negate_values:
+            self.df = -self.df
+
         # Fill NaN values of matrix_df with zero
-        if self.center:
+        if self.center_values:
             self.df.loc[:, :] = self.df.values - \
                                 self.df.values.mean(axis=1)[:, np.newaxis]
 
@@ -184,6 +205,11 @@ class Logo:
         if draw_now:
             self.draw()
 
+        # Style glyphs below x-axis
+        self.style_glyphs_below(shade=self.shade_below,
+                                fade=self.fade_below,
+                                draw_now=self.draw_now)
+
     def _input_checks(self):
 
         """
@@ -193,13 +219,13 @@ class Logo:
         # Validate dataframe
         validate_matrix(self.df)
 
-        # check that negate is a boolean
-        check(isinstance(self.negate, bool),
-              'type(negate) = %s; must be of type bool ' % type(self.negate))
+        # check that negate_values is a boolean
+        check(isinstance(self.negate_values, bool),
+              'type(negate_values) = %s; must be of type bool ' % type(self.negate_values))
 
-        # check that center is a boolean
-        check(isinstance(self.center, bool),
-              'type(center) = %s; must be of type bool ' % type(self.center))
+        # check that center_values is a boolean
+        check(isinstance(self.center_values, bool),
+              'type(center_values) = %s; must be of type bool ' % type(self.center_values))
 
         # check that color scheme is valid
         if self.colors is not None:
@@ -324,12 +350,11 @@ class Logo:
         # set attributes
         self.colors = colors
         self.draw_now = draw_now
-        self.ax = ax
-
-        self._input_checks()
 
         # Update ax if axes are provided by the user.
         self._update_ax(ax)
+
+        self._input_checks()
 
         # Reset colors if provided
         if colors is not None:
@@ -466,7 +491,9 @@ class Logo:
         self.fade = fade
         self.flip = flip
         self.draw_now = draw_now
-        self.ax = ax
+
+        # Update ax if axes are provided by the user.
+        self._update_ax(ax)
 
         # validate inputs
         self._input_checks()
@@ -481,8 +508,6 @@ class Logo:
         check(hasattr(self, 'ps'), 'positions entered into are None, please ensure'
                                    ' Logo ran correctly before running style_glyphs_below')
 
-        # Update ax if axes are provided by the user.
-        self._update_ax(ax)
 
         # Iterate over all positions and characters
         for p in self.ps:
@@ -592,7 +617,6 @@ class Logo:
 
         self.sequence = sequence
         self.draw_now = draw_now
-        self.ax = ax
 
         # validate input
         self._input_checks()
@@ -896,6 +920,9 @@ class Logo:
         # Flag that this logo has indeed been drawn
         self.has_been_drawn = True
 
+        # Draw baseline
+        self.draw_baseline(linewidth=self.baseline_width)
+
         # Set xlims
         xmin = min([g.p - .5*g.width for g in self.glyph_list])
         xmax = max([g.p + .5*g.width for g in self.glyph_list])
@@ -967,14 +994,15 @@ class Logo:
 
                 # Create glyph if height is finite
                 glyph = Glyph(p, c,
-                            ax=self.ax,
-                            floor=floor,
-                            ceiling=ceiling,
-                            color=this_color,
-                            flip=flip,
-                            draw_now=False,
-                            zorder=self.zorder,
-                            **self.glyph_kwargs)
+                              ax=self.ax,
+                              floor=floor,
+                              ceiling=ceiling,
+                              color=this_color,
+                              flip=flip,
+                              draw_now=False,
+                              zorder=self.zorder,
+                              font_family=self.font_name,
+                              **self.glyph_kwargs)
 
                 # Add glyph to glyph_df
                 glyph_df.loc[p, c] = glyph

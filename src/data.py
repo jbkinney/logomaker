@@ -90,7 +90,7 @@ def transform_matrix(df, from_type, to_type,
         probability matrix.
 
     center: (bool)
-        Whether to center the output matrix. Note: this only works when
+        Whether to center_values the output matrix. Note: this only works when
         to_type = 'weight', as centering a matrix doesn't make sense otherwise.
 
     returns
@@ -147,10 +147,10 @@ def transform_matrix(df, from_type, to_type,
                                       to_type=to_type,
                                       background=background)
 
-    # Check if user wishes to center the matrix
+    # Check if user wishes to center_values the matrix
     if center:
         assert to_type == 'weight', \
-            'Error: the option center=True is only compatible with ' + \
+            'Error: the option center_values=True is only compatible with ' + \
             'to_type == "weight"'
         out_df = center_matrix(out_df)
 
@@ -374,7 +374,7 @@ def iupac_to_matrix(iupac_seq, to_type='probability', **kwargs):
 
     **kwargs:
         Additional arguments to send to transform_matrix, e.g. background
-        or center
+        or center_values
 
     returns
     -------
