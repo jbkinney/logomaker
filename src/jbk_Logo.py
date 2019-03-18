@@ -195,11 +195,11 @@ class Logo:
 
         # check that negate is a boolean
         check(isinstance(self.negate, bool),
-              'type(negate) = %s; in Logo must be of type bool ' % type(self.negate))
+              'type(negate) = %s; must be of type bool ' % type(self.negate))
 
         # check that center is a boolean
         check(isinstance(self.center, bool),
-              'type(center) = %s; in Logo must be of type bool ' % type(self.center))
+              'type(center) = %s; must be of type bool ' % type(self.center))
 
         # check that color scheme is valid
         if self.colors is not None:
@@ -218,12 +218,12 @@ class Logo:
                       # 'colors = %s; must be in %s' % (self.colors, str(valid_color_strings)))
                       'colors = %s; is an invalid color scheme. Valid choices include classic, chemistry, grays. '
                       'A full list of valid color schemes can be found by '
-                      'printing list(matplotlib.cm.cmap_d.keys(). ' % self.colors)
+                      'printing list(matplotlib.cm.cmap_d.keys()). ' % self.colors)
 
             # otherwise limit the allowed types to tuples, lists, dicts
             else:
                 check(isinstance(self.colors,(tuple,list,dict)),
-                      'type(colors) = %s; in Logo must be of type (tuple,list,dict) ' % type(self.colors))
+                      'type(colors) = %s; must be of type (tuple,list,dict) ' % type(self.colors))
 
                 # check that RGB values are between 0 and 1 is
                 # colors is a list or tuple
@@ -242,23 +242,23 @@ class Logo:
 
         # check that flip_below is a boolean
         check(isinstance(self.flip_below, bool),
-            'type(flip_below) = %s; in Logo must be of type bool ' % type(self.flip_below))
+            'type(flip_below) = %s; must be of type bool ' % type(self.flip_below))
 
         # validate vsep
         check(isinstance(self.vsep, (float, int)),
-              'type(vsep) = %s; in Logo must be of type or int ' % type(self.vsep))
+              'type(vsep) = %s; must be of type or int ' % type(self.vsep))
 
         check(self.vsep >= 0, "vsep = %d must be greater than 0 " % self.vsep)
 
         # validate zorder
         check(isinstance(self.zorder, int),
-              'type(zorder) = %s; in Logo must be of type or int ' % type(self.zorder))
+              'type(zorder) = %s; must be of type or int ' % type(self.zorder))
 
         check(self.zorder >= 0, "zorder = %d must be greater than 0 " % self.zorder)
 
         # validate figsize
         check(isinstance(self.figsize, (tuple, list)),
-              'type(figsize) = %s; in Logo must be of type (tuple,list) ' % type(self.figsize))
+              'type(figsize) = %s; must be of type (tuple,list) ' % type(self.figsize))
 
         check(len(self.figsize)==2, 'The figsize array must have two elements')
 
@@ -271,9 +271,32 @@ class Logo:
 
         # check that draw_now is a boolean
         check(isinstance(self.draw_now, bool),
-              'type(draw_now) = %s; in Logo must be of type bool ' % type(self.draw_now))
+              'type(draw_now) = %s; must be of type bool ' % type(self.draw_now))
 
 
+
+        ### after this point, the function will check inputs that are not part of the constructor. ###
+        ### so checking the existence of an attribute will become necessary. ###
+
+        # validate fade
+        if(hasattr(self,'fade')):
+            check(isinstance(self.fade,(float,int)), 'type(fade) = %s must be of type float' % type(self.fade))
+
+            # ensure that fade is between 0 and 1
+            check(self.fade <= 1.0 and self.fade >= 0, 'fade must be between 0 and 1')
+
+        # validate shade
+        if (hasattr(self, 'shade')):
+            check(isinstance(self.shade, (float, int)), 'type(shade) = %s must be of type float' % type(self.shade))
+
+            # ensure that fade is between 0 and 1
+            check(self.shade <= 1.0 and self.shade >= 0, 'shade must be between 0 and 1')
+
+        if (hasattr(self, 'sequence')):
+            check(isinstance(self.sequence, str), 'type(sequence) = %s must be of type str' % type(self.sequence))
+
+
+    @handle_errors
     def style_glyphs(self, colors=None, draw_now=True, ax=None, **kwargs):
         """
         Modifies the properties of all glyphs in a logo.
@@ -285,7 +308,7 @@ class Logo:
             Color specification for glyphs. See logomaker.Logo for details.
 
         draw_now: (bool)
-            Whether to readraw modified logo on current Axes.
+            Whether to re-draw modified logo on current Axes.
 
         ax: (matplotlib Axes object)
             New axes, if any, on which to draw logo if draw_now=True.
@@ -298,12 +321,26 @@ class Logo:
         None
         """
 
-        # Update ax
+        # set attributes
+        self.colors = colors
+        self.draw_now = draw_now
+        self.ax = ax
+
+        self._input_checks()
+
+        # Update ax if axes are provided by the user.
         self._update_ax(ax)
 
         # Reset colors if provided
         if colors is not None:
             self.colors = colors
+
+            # the following case represents an error that may occur if a user accidentally runs
+            # style glyphs before running the logo constructor. The following check puts out a
+            # clean message, no need for stack-trace. hasattr checks if self has attribute cs.
+            check(hasattr(self,'cs'), 'Characters entered into style glyphs are None, please ensure'
+                                   ' Logo ran correctly before running style_glyphs')
+
             self.rgba_dict = lm_color.get_color_dict(
                                     color_scheme=self.colors,
                                     chars=self.cs,
@@ -354,7 +391,7 @@ class Logo:
         None
          """
 
-        # Update ax
+        # Update ax if axes are provided by the user.
         self._update_ax(ax)
 
         # Make sure matrix is a probability matrix
@@ -383,6 +420,7 @@ class Logo:
         if draw_now:
             self.draw()
 
+    @handle_errors
     def style_glyphs_below(self,
                            shade=0.0,
                            fade=0.0,
@@ -392,19 +430,28 @@ class Logo:
                            **kwargs):
 
         """
-        Modifies the properties of all glyphs in a logo.
+        Modifies the properties of all glyphs below the x-axis in a logo.
 
         parameter
         ---------
 
-        colors: (color scheme)
-            Color specification for glyphs. See logomaker.Logo for details.
+        shade: (float)
+            The amount of shading underneath x-axis. Range is [0,1]
 
-        draw_now: (bool)
-            Whether to readraw modified logo on current Axes.
+        fade: (float)
+            The amount of fading underneath x-axis .Range is [0,1]
+
+        flip: (bool)
+            If True, the glyph will be rendered flipped upside down.
 
         ax: (matplotlib Axes object)
-            New axes, if any, on which to draw logo if draw_now=True.
+            The axes object on which to draw the logo.
+
+        draw_now: (bool)
+            If True, the logo is rendered immediately after it is specified.
+            Set to False if you wish to change the properties of any glyphs
+            after initial specification, e.g. by running
+            Logo.highlight_sequence().
 
         **kwargs:
             Keyword arguments to pass to Glyph.set_attributes()
@@ -414,7 +461,27 @@ class Logo:
         None
         """
 
-        # Update ax
+        # set attributes
+        self.shade = shade
+        self.fade = fade
+        self.flip = flip
+        self.draw_now = draw_now
+        self.ax = ax
+
+        # validate inputs
+        self._input_checks()
+
+        # the following two checks ensure that the attributes cs and ps exist,
+        # this could throw an error in jupyter notebooks if a user ran this function
+        # with an incorrectly run Logo object.
+
+        check(hasattr(self, 'cs'), 'Characters entered into are None, please ensure'
+                                   ' Logo ran correctly before running style_glyphs_below')
+
+        check(hasattr(self, 'ps'), 'positions entered into are None, please ensure'
+                                   ' Logo ran correctly before running style_glyphs_below')
+
+        # Update ax if axes are provided by the user.
         self._update_ax(ax)
 
         # Iterate over all positions and characters
@@ -471,7 +538,7 @@ class Logo:
         None
         """
 
-        # Update ax
+        # Update ax if axes are provided by the user.
         self._update_ax(ax)
 
         assert p in self.glyph_df.index, \
@@ -484,10 +551,15 @@ class Logo:
         g = self.glyph_df.loc[p, c]
         g.set_attributes(**kwargs)
 
-        # Draw now
+        ### WARNING: SETTING THIS TO TRUE CAUSES A HUGE SLOWDOWN of order O(df) ###.
+        ### IN THE RNAP_41 example, it caused a slow down by a factor ~ 40!
+
+        draw_now = False
+
         if draw_now:
             self.draw()
 
+    @handle_errors
     def style_glyphs_in_sequence(self,
                                  sequence,
                                  draw_now=True,
@@ -518,17 +590,30 @@ class Logo:
         None
         """
 
-        # Update Axes
+        self.sequence = sequence
+        self.draw_now = draw_now
+        self.ax = ax
+
+        # validate input
+        self._input_checks()
+
+        # Update Axes if axes are provided by the user.
         self._update_ax(ax)
 
-        assert len(sequence) == self.L, \
-            'Error: sequence to highlight does not have same length as logo.'
+        check(len(self.sequence)==self.L,'Error: sequence to highlight does not have same length as logo.')
 
+<<<<<<< HEAD
+=======
+        # Make sure that all sequence characters are in self.cs
+        for c in self.sequence:
+            check(c in self.cs,'sequence contains invalid character %s' % c)
+
+>>>>>>> b1100138e2d7921338f86c7a46ee98fa419eaf36
         # For each position in the logo...
         for i, p in enumerate(self.glyph_df.index):
 
             # Get character to highlight
-            c = sequence[i]
+            c = self.sequence[i]
 
             # Modify the glyph corresponding character c at position p
             # Only modify if c is a valid character. If not, ignore position

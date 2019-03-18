@@ -89,7 +89,6 @@ def handle_errors(func):
         try:
             # Execute function
             result = func(*args, **kwargs)
-
             error = False
 
             # If function didn't raise error, process results
@@ -123,7 +122,11 @@ def handle_errors(func):
 
             # Otherwise, just print an error and don't return anything
             else:
-                print('Error: ', e.__str__())
+                print('Error in',func.__name__+':', e.__str__())
+
+                return
+                # to stop further execution of program on finding an error
+                #sys.exit()
 
         # If not in debug mode
         if should_fail is None:
