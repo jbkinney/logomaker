@@ -600,15 +600,9 @@ class Logo:
         # Update Axes if axes are provided by the user.
         self._update_ax(ax)
 
-        check(len(self.sequence)==self.L,'Error: sequence to highlight does not have same length as logo.')
+        check(len(self.sequence) == self.L,
+              'Error: sequence to highlight does not have same length as logo.')
 
-<<<<<<< HEAD
-=======
-        # Make sure that all sequence characters are in self.cs
-        for c in self.sequence:
-            check(c in self.cs,'sequence contains invalid character %s' % c)
-
->>>>>>> b1100138e2d7921338f86c7a46ee98fa419eaf36
         # For each position in the logo...
         for i, p in enumerate(self.glyph_df.index):
 
