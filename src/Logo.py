@@ -524,11 +524,6 @@ class Logo:
         assert len(sequence) == self.L, \
             'Error: sequence to highlight does not have same length as logo.'
 
-        # Make sure that all sequence characters are in self.cs
-        for c in sequence:
-            assert c in self.cs, \
-                'Error: sequence contains invalid character %s' % c
-
         # For each position in the logo...
         for i, p in enumerate(self.glyph_df.index):
 
@@ -536,7 +531,9 @@ class Logo:
             c = sequence[i]
 
             # Modify the glyph corresponding character c at position p
-            self.style_single_glyph(p, c, **kwargs)
+            # Only modify if c is a valid character. If not, ignore position
+            if c in self.cs:
+                self.style_single_glyph(p, c, **kwargs)
 
         # Draw now
         if draw_now:
