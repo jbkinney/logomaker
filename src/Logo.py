@@ -299,8 +299,6 @@ class Logo:
         check(isinstance(self.draw_now, bool),
               'type(draw_now) = %s; must be of type bool ' % type(self.draw_now))
 
-
-
         ### after this point, the function will check inputs that are not part of the constructor. ###
         ### so checking the existence of an attribute will become necessary. ###
 
@@ -320,6 +318,71 @@ class Logo:
 
         if (hasattr(self, 'sequence')):
             check(isinstance(self.sequence, str), 'type(sequence) = %s must be of type str' % type(self.sequence))
+
+        # validate p
+        if (hasattr(self, 'p')):
+            check(isinstance(self.p, int), 'type(p) = %s must be of type int' % type(self.p))
+
+        # validate c
+        if (hasattr(self, 'c')):
+            check(isinstance(self.c, str), 'type(c) = %s must be of type str' % type(self.c))
+
+        # validate spines
+        if(hasattr(self,'spines')):
+            check(isinstance(self.spines, (tuple, list)),
+                  'type(spines) = %s; must be of type (tuple,list) ' % type(self.spines))
+
+            # check if items of spines are valid if tuple
+            valid_spines_tuple = ('top', 'bottom', 'left', 'right')
+            if(isinstance(self.spines,tuple)):
+
+                # ensure elements of spines are valid:
+                # the following code checks if spines is a subset of a the valid spines choices.
+                check(set(self.spines) <= set(valid_spines_tuple),
+                      'choice of spine not valid, valid choices include: '+str(valid_spines_tuple))
+
+            # check if items of spines are valid if list
+            valid_spines_list = ['top', 'bottom', 'left', 'right']
+
+            # ensure elements of spines are valid:
+            # the following code checks if spines is a subset of a the valid spines choices.
+            if (isinstance(self.spines, list)):
+                check(set(self.spines) <= set(valid_spines_list),
+                      'choice of spine not valid, valid choices include:'+str(valid_spines_list))
+
+        # validate visible
+        if(hasattr(self,'visible')):
+            check(isinstance(self.visible,bool),
+                  'type(visible) = %s; must be of type bool ' % type(self.visible))
+
+        # validate linewidth
+        if(hasattr(self,'linewidth')):
+
+            check(isinstance(self.linewidth,(float,int)),
+                  'type(linewidth) = %s; must be of type float ' % type(self.linewidth))
+
+            check(self.linewidth>=0,'linewidth must be >= 0')
+
+        # validate bounds
+        if(hasattr(self,'bounds')):
+
+            if self.bounds is not None :
+                # check that bounds are of valid type
+                bounds_types = (list, tuple, np.ndarray)
+                check(isinstance(self.bounds, bounds_types),
+                      'type(bounds) = %s; must be one of %s' % (type(self.bounds), bounds_types))
+
+                # bounds has right length
+                check(len(self.bounds) == 2,
+                      'len(bounds) = %d; must be %d' %(len(self.bounds), 2))
+
+                # ensure that elements of bounds are numbers
+                check(isinstance(self.bounds[0],(float,int)) & isinstance(self.bounds[1],(float,int)),
+                      'bounds = %s; entries must be numbers' %repr(self.bounds))
+
+                # bounds entries must be sorted
+                check(self.bounds[0] < self.bounds[1],
+                      'bounds = %s; entries must be sorted' %repr(self.bounds))
 
 
     @handle_errors
@@ -508,7 +571,6 @@ class Logo:
         check(hasattr(self, 'ps'), 'positions entered into are None, please ensure'
                                    ' Logo ran correctly before running style_glyphs_below')
 
-
         # Iterate over all positions and characters
         for p in self.ps:
             for c in self.cs:
@@ -534,7 +596,8 @@ class Logo:
         if draw_now:
             self.draw()
 
-    def style_single_glyph(self, p, c, draw_now=True, ax=None, **kwargs):
+    @handle_errors
+    def style_single_glyph(self, p, c, draw_now=False, ax=None, **kwargs):
         """
         Modifies the properties of a component glyph in a logo.
 
@@ -563,24 +626,33 @@ class Logo:
         None
         """
 
+        # set attributes
+        self.p = p
+        self.c = c
+        self.draw_now = draw_now
+        self.ax = ax
+
+        # validate inputs
+        self._input_checks()
+
         # Update ax if axes are provided by the user.
         self._update_ax(ax)
 
-        assert p in self.glyph_df.index, \
-            'Error: p=%s is not a valid position' % p
+        check(self.p in self.glyph_df.index,'Error: p=%s is not a valid position' % p)
+        check(self.c in self.glyph_df.columns,'Error: c=%s is not a valid character' % c)
 
-        assert c in self.glyph_df.columns, \
-            'Error: c=%s is not a valid character' % c
+        #assert p in self.glyph_df.index, \
+        #    'Error: p=%s is not a valid position' % p
+
+        #assert c in self.glyph_df.columns, \
+        #    'Error: c=%s is not a valid character' % c
 
         # Get glyph from glyph_df
         g = self.glyph_df.loc[p, c]
         g.set_attributes(**kwargs)
 
-        ### WARNING: SETTING THIS TO TRUE CAUSES A HUGE SLOWDOWN of order O(df) ###.
-        ### IN THE RNAP_41 example, it caused a slow down by a factor ~ 40!
-
-        draw_now = False
-
+        # using true will draw the entire logo one glyph at a time.
+        # causes big slow down. I don't if it's good to keep this call here.
         if draw_now:
             self.draw()
 
@@ -831,6 +903,7 @@ class Logo:
         xticklabels = [fmt % p for p in xticks]
         self.ax.set_xticklabels(xticklabels, rotation=rotation, **kwargs)
 
+    @handle_errors
     def style_spines(self,
                      spines=('top', 'bottom', 'left', 'right'),
                      visible=True,
@@ -868,8 +941,21 @@ class Logo:
         None
         """
 
-        assert self.has_been_drawn, \
-            'Error: Cannot call this function until Log0 has been drawn.'
+        # set attributes
+        self.spines = spines
+        self.visible = visible
+        self.linewidth = linewidth
+        self.color = color
+        self.bounds = bounds
+
+        # validate inputs
+        self._input_checks()
+
+        if(hasattr(self,'has_been_drawn')):
+            check(self.has_been_drawn==True,'Error: Cannot call this function until Logo has been drawn.')
+
+        #assert self.has_been_drawn, \
+        #    'Error: Cannot call this function until Log0 has been drawn.'
 
         # Iterate over all spines
         for name, spine in self.ax.spines.items():
