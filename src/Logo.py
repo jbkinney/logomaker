@@ -384,6 +384,25 @@ class Logo:
                 check(self.bounds[0] < self.bounds[1],
                       'bounds = %s; entries must be sorted' %repr(self.bounds))
 
+        # validate anchor
+        if(hasattr(self,'anchor')):
+            check(isinstance(self.anchor,int),'type(anchor) = %s must be of type int' % type(self.anchor))
+
+        # validate spacing
+        if (hasattr(self, 'spacing')):
+            check(isinstance(self.spacing, int), 'type(spacing) = %s must be of type int' % type(self.spacing))
+
+            check(self.spacing>0, 'spacing must be > 0')
+
+        # validate fmt
+        if(hasattr(self,'fmt')):
+            check(isinstance(self.fmt,str),'type(fmt) = %s must be of type str' % type(self.fmt))
+
+        # validate rotation
+        if (hasattr(self, 'rotation')):
+            check(isinstance(self.rotation, (float, int)),
+                      'type(rotation) = %s; must be of type float or int ' % type(self.rotation))
+
 
     @handle_errors
     def style_glyphs(self, colors=None, draw_now=True, ax=None, **kwargs):
@@ -851,6 +870,7 @@ class Logo:
                         linewidth=linewidth,
                         **kwargs)
 
+    @handle_errors
     def style_xticks(self,
                      anchor=0,
                      spacing=1,
@@ -887,8 +907,20 @@ class Logo:
         None
         """
 
-        assert self.has_been_drawn, \
-            'Error: Cannot call this function until Log0 has been drawn.'
+        # set attributes
+        self.anchor = anchor
+        self.spacing = spacing
+        self.fmt = fmt
+        self.rotation = rotation
+
+        # validate input
+        self._input_checks()
+
+        if (hasattr(self, 'has_been_drawn')):
+            check(self.has_been_drawn == True, 'Error: Cannot call this function until Logo has been drawn.')
+
+        #assert self.has_been_drawn, \
+        #    'Error: Cannot call this function until Log0 has been drawn.'
 
         # Get list of positions, ps, that spans all those in matrix_df
         p_min = min(self.ps)
