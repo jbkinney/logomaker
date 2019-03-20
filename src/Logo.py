@@ -403,6 +403,49 @@ class Logo:
             check(isinstance(self.rotation, (float, int)),
                       'type(rotation) = %s; must be of type float or int ' % type(self.rotation))
 
+        # validate alpha0
+        if(hasattr(self,'v_alpha0')):
+            check(isinstance(self.v_alpha0, (float, int)),
+                  'type(v_alpha0) = %s must be a number' % type(self.v_alpha0))
+
+            # ensure that v_alpha0 is between 0 and 1
+            check(self.v_alpha0 <= 1.0 and self.v_alpha0 >= 0, 'v_alpha0 must be between 0 and 1')
+
+        # validate alpha1
+        if (hasattr(self, 'v_alpha1')):
+            check(isinstance(self.v_alpha1, (float, int)),
+                  'type(v_alpha1) = %s must be a number' % type(self.v_alpha1))
+
+            # ensure that v_alpha1 is between 0 and 1
+            check(self.v_alpha1 <= 1.0 and self.v_alpha1 >= 0, 'v_alpha1 must be between 0 and 1')
+
+        # validate pmin
+        if(hasattr(self,'pmin')):
+            check(isinstance(self.pmin, (float, int)),
+                  'type(pmin) = %s must be a number' % type(self.pmin))
+
+        # validate pmax
+        if (hasattr(self, 'pmax')):
+            check(isinstance(self.pmax, (float, int)),
+                  'type(pmax) = %s must be a number' % type(self.pmax))
+
+        # validate padding
+        if (hasattr(self, 'padding')):
+            check(isinstance(self.padding, (float, int)),
+                  'type(padding) = %s must be a number' % type(self.padding))
+
+            check(self.padding>0,'self.padding must be > -0.5')
+
+        # validate floor
+        if (hasattr(self, 'floor')):
+            check(isinstance(self.floor, (float, int)),
+                  'type(floor) = %s must be a number' % type(self.floor))
+
+        # validate ceiling
+        if (hasattr(self, 'ceiling')):
+            check(isinstance(self.ceiling, (float, int)),
+                  'type(ceiling) = %s must be a number' % type(self.ceiling))
+
 
     @handle_errors
     def style_glyphs(self, colors=None, draw_now=True, ax=None, **kwargs):
@@ -472,6 +515,7 @@ class Logo:
         if draw_now:
             self.draw()
 
+    @handle_errors
     def fade_glyphs_in_probability_logo(self,
                                         v_alpha0=0,
                                         v_alpha1=1,
@@ -497,6 +541,15 @@ class Logo:
         -------
         None
          """
+
+        # set attributes
+        self.v_alpha0 = v_alpha0
+        self.v_alpha1 = v_alpha1
+        self.draw_now = draw_now
+        self.ax = ax
+
+        # validate inputs
+        self._input_checks()
 
         # Update ax if axes are provided by the user.
         self._update_ax(ax)
@@ -660,12 +713,6 @@ class Logo:
         check(self.p in self.glyph_df.index,'Error: p=%s is not a valid position' % p)
         check(self.c in self.glyph_df.columns,'Error: c=%s is not a valid character' % c)
 
-        #assert p in self.glyph_df.index, \
-        #    'Error: p=%s is not a valid position' % p
-
-        #assert c in self.glyph_df.columns, \
-        #    'Error: c=%s is not a valid character' % c
-
         # Get glyph from glyph_df
         g = self.glyph_df.loc[p, c]
         g.set_attributes(**kwargs)
@@ -733,6 +780,7 @@ class Logo:
         if draw_now:
             self.draw()
 
+    @handle_errors
     def highlight_position(self, p, **kwargs):
 
         """
@@ -740,7 +788,7 @@ class Logo:
 
         parameters
         ----------
-        p: (number)
+        p: (int)
             Single position to highlight
 
         **kwargs:
@@ -751,11 +799,21 @@ class Logo:
         None
         """
 
-        assert self.has_been_drawn, \
-            'Error: Cannot call this function until Log0 has been drawn.'
+        # set attributes
+        self.p = p
+
+        # validate inputs
+        self._input_checks()
+
+        if (hasattr(self, 'has_been_drawn')):
+            check(self.has_been_drawn == True, 'Cannot call this function until Logo has been drawn.')
+
+        #assert self.has_been_drawn, \
+        #    'Error: Cannot call this function until Log0 has been drawn.'
 
         self.highlight_position_range(pmin=p, pmax=p, **kwargs)
 
+    @handle_errors
     def highlight_position_range(self, pmin, pmax,
                                  padding=0.0,
                                  color='yellow',
@@ -776,7 +834,7 @@ class Logo:
         pmax: (number)
             Highest position to highlight.
             
-        padding: (number >= -0,5)
+        padding: (number >= -0.5)
             Amount of padding on either side of highlighted positions to add.
             
         color: (matplotlib color)
@@ -799,8 +857,23 @@ class Logo:
         None
         """
 
-        assert self.has_been_drawn, \
-            'Error: Cannot call this function until Log0 has been drawn.'
+        # set attributes
+        self.pmin = pmin
+        self.pmax = pmax
+        self.padding = padding
+        self.color = color
+        self.edgecolor = edgecolor
+        self.floor = floor
+        self.ceiling = ceiling
+        self.zorder = zorder
+
+        # validate inputs
+
+        if (hasattr(self, 'has_been_drawn')):
+            check(self.has_been_drawn == True, 'Cannot call this function until Logo has been drawn.')
+
+        #assert self.has_been_drawn, \
+        #    'Error: Cannot call this function until Log0 has been drawn.'
 
         # If floor or ceiling have not been specified, using Axes ylims
         ymin, ymax = self.ax.get_ylim()
@@ -808,14 +881,21 @@ class Logo:
             floor = ymin
         if ceiling is None:
             ceiling = ymax
-        assert floor < ceiling, \
-            'Error: floor < ceiling not satisfied.'
+
+        #assert floor < ceiling, \
+        #    'Error: floor < ceiling not satisfied.'
+        check(floor < ceiling,'Error: floor < ceiling not satisfied.')
+
 
         # Set coordinates of rectangle
-        assert pmin <= pmax, \
-            'Error: pmin <= pmax not satisfied.'
-        assert padding >= -0.5, \
-            'Error: padding >= -0.5 not satisfied'
+        #assert pmin <= pmax, \
+        #    'Error: pmin <= pmax not satisfied.'
+        check(pmin <= pmax, 'pmin <= pmax not satisfied.')
+
+        #assert padding >= -0.5, \
+        #    'Error: padding >= -0.5 not satisfied'
+        check(padding >= -0.5,'Error: padding >= -0.5 not satisfied')
+
         x = pmin - .5 - padding
         y = floor
         width = pmax - pmin + 1 + 2*padding
@@ -919,9 +999,6 @@ class Logo:
         if (hasattr(self, 'has_been_drawn')):
             check(self.has_been_drawn == True, 'Error: Cannot call this function until Logo has been drawn.')
 
-        #assert self.has_been_drawn, \
-        #    'Error: Cannot call this function until Log0 has been drawn.'
-
         # Get list of positions, ps, that spans all those in matrix_df
         p_min = min(self.ps)
         p_max = max(self.ps)
@@ -985,9 +1062,6 @@ class Logo:
 
         if(hasattr(self,'has_been_drawn')):
             check(self.has_been_drawn==True,'Error: Cannot call this function until Logo has been drawn.')
-
-        #assert self.has_been_drawn, \
-        #    'Error: Cannot call this function until Log0 has been drawn.'
 
         # Iterate over all spines
         for name, spine in self.ax.spines.items():
