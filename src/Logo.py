@@ -438,13 +438,15 @@ class Logo:
 
         # validate floor
         if (hasattr(self, 'floor')):
-            check(isinstance(self.floor, (float, int)),
-                  'type(floor) = %s must be a number' % type(self.floor))
+            if(self.floor is not None):
+                check(isinstance(self.floor, (float, int)),
+                      'type(floor) = %s must be a number' % type(self.floor))
 
         # validate ceiling
         if (hasattr(self, 'ceiling')):
-            check(isinstance(self.ceiling, (float, int)),
-                  'type(ceiling) = %s must be a number' % type(self.ceiling))
+            if(self.ceiling is not None):
+                check(isinstance(self.ceiling, (float, int)),
+                      'type(ceiling) = %s must be a number' % type(self.ceiling))
 
 
     @handle_errors
@@ -868,6 +870,7 @@ class Logo:
         self.zorder = zorder
 
         # validate inputs
+        self._input_checks()
 
         if (hasattr(self, 'has_been_drawn')):
             check(self.has_been_drawn == True, 'Cannot call this function until Logo has been drawn.')
@@ -911,6 +914,7 @@ class Logo:
                           **kwargs)
         self.ax.add_patch(patch)
 
+    @handle_errors
     def draw_baseline(self,
                       zorder=-1,
                       color='black',
@@ -941,8 +945,19 @@ class Logo:
         None
         """
 
-        assert self.has_been_drawn, \
-            'Error: Cannot call this function until Log0 has been drawn.'
+        # set attributes
+        self.zorder = zorder
+        self.color = color
+        self.linewidth = linewidth
+
+        # validate inputs
+        self._input_checks()
+
+        if (hasattr(self, 'has_been_drawn')):
+            check(self.has_been_drawn == True, 'Cannot call this function until Logo has been drawn.')
+
+        #assert self.has_been_drawn, \
+        #    'Error: Cannot call this function until Log0 has been drawn.'
 
         # Render baseline
         self.ax.axhline(zorder=zorder,
