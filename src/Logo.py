@@ -280,7 +280,9 @@ class Logo:
         check(isinstance(self.zorder, int),
               'type(zorder) = %s; must be of type or int ' % type(self.zorder))
 
-        check(self.zorder >= 0, "zorder = %d must be greater than 0 " % self.zorder)
+        # the following check needs to be fixed based on whether the calling function
+        # is the constructor, draw_baseline, or style_glyphs_below.
+        #check(self.zorder >= 0, "zorder = %d must be greater than 0 " % self.zorder)
 
         # validate figsize
         check(isinstance(self.figsize, (tuple, list)),
@@ -434,7 +436,7 @@ class Logo:
             check(isinstance(self.padding, (float, int)),
                   'type(padding) = %s must be a number' % type(self.padding))
 
-            check(self.padding>0,'self.padding must be > -0.5')
+            check(self.padding>-0.5,'padding must be > -0.5')
 
         # validate floor
         if (hasattr(self, 'floor')):
