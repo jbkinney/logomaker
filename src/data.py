@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np
 import pandas as pd
 import pdb
+from logomaker import check, handle_errors
 
 # from validate import validate_matrix, validate_probability_mat, iupac_dict
 from logomaker.src.validate import validate_matrix, \
@@ -30,6 +31,7 @@ iupac_dict = {
 # Set constants
 SMALL = np.finfo(float).tiny
 
+@handle_errors
 def transform_matrix(df, from_type, to_type,
                      background=None,
                      pseudocount=1,
@@ -99,6 +101,32 @@ def transform_matrix(df, from_type, to_type,
         Transformed matrix
     """
 
+    # validate inputs
+
+    # Validate dataframe
+    validate_matrix(df)
+
+    # validate from_type
+    check(isinstance(from_type,str),'type(from_type) = %s must be of type str' % type(from_type))
+
+    # validate to_type
+    check(isinstance(from_type, str), 'type(from_type) = %s must be of type str' % type(from_type))
+
+    # validate background: check that it is a list or array
+    if(background is not None):
+        check(isinstance(background,(type([]),np.ndarray)),
+              'type(background) = %s must be of type list or array' % type(background))
+
+    # validate pseudocount: check that it is a number and > 0
+    check(isinstance(pseudocount, (int,float)), 'type(pseudocount) = %s must be a number' % type(pseudocount))
+    check(pseudocount >= 0, 'pseudocount must be >= 0')
+
+    # check that center_values is a boolean
+    check(isinstance(center, bool),
+          'type(center) = %s; must be of type bool ' % type(center))
+
+
+
     FROM_TYPES = {'counts', 'probability', 'weight', 'information'}
     TO_TYPES = {'probability', 'weight', 'information'}
 
@@ -110,11 +138,13 @@ def transform_matrix(df, from_type, to_type,
         out_df = df.copy()
 
     else:
-        assert from_type in FROM_TYPES, \
-            'Error: invalid from_type=%s' % from_type
+        #assert from_type in FROM_TYPES, \
+        #    'Error: invalid from_type=%s' % from_type
+        check(from_type in FROM_TYPES, 'invalid from_type=%s' % from_type)
 
-        assert to_type in TO_TYPES, \
-            'Error: invalid to_type="%s"' % from_type
+        #assert to_type in TO_TYPES, \
+        #    'Error: invalid to_type="%s"' % from_type
+        check(to_type in TO_TYPES, 'invalid to_type=%s' % to_type)
 
         # If converting from a probability matrix
         if from_type == 'probability':
@@ -149,9 +179,10 @@ def transform_matrix(df, from_type, to_type,
 
     # Check if user wishes to center_values the matrix
     if center:
-        assert to_type == 'weight', \
-            'Error: the option center_values=True is only compatible with ' + \
-            'to_type == "weight"'
+        #assert to_type == 'weight', \
+        #    'Error: the option center_values=True is only compatible with ' + \
+        #    'to_type == "weight"'
+        check(to_type=='weight', 'the parameter center_values=True is only compatible with to_type== "weight" ')
         out_df = center_matrix(out_df)
 
 
@@ -267,6 +298,7 @@ def _information_mat_to_probability_mat(df, background=None):
 
 
 # Normalize a data frame of probabilities
+@handle_errors
 def normalize_matrix(df):
     """
     Normalizes a matrix df to a probability matrix out_df
@@ -276,15 +308,20 @@ def normalize_matrix(df):
     df = validate_matrix(df)
 
     # Make sure all df values are zero
-    assert all(df.values.ravel() >= 0), \
-        'Error: Some data frame entries are negative.'
+    #assert all(df.values.ravel() >= 0), \
+    #    'Error: Some data frame entries are negative.'
+    check(all(df.values.ravel() >= 0),
+          'Error: Some data frame entries are negative.')
 
     # Check to see if values sum to one
     sums = df.sum(axis=1).values
 
     # If any sums are close to zero, abort
-    assert not any(np.isclose(sums, 0.0)), \
-        'Error: some columns in df sum to nearly zero.'
+    #assert not any(np.isclose(sums, 0.0)), \
+    #    'Error: some columns in df sum to nearly zero.'
+    check(not any(np.isclose(sums, 0.0)),
+          'Error: some columns in df sum to nearly zero.')
+
     out_df = df.copy()
     out_df.loc[:, :] = df.values / sums[:, np.newaxis]
 
@@ -292,9 +329,8 @@ def normalize_matrix(df):
     out_df = validate_probability_mat(out_df)
     return out_df
 
-
-
 # Normalize a data frame of probabilities
+@handle_errors
 def center_matrix(df):
     """
     Centers each row of a matrix about zero by subtracting out the mean.
@@ -358,7 +394,7 @@ def _get_background_mat(df, background):
     out_df = validate_probability_mat(out_df)
     return out_df
 
-
+@handle_errors
 def iupac_to_matrix(iupac_seq, to_type='probability', **kwargs):
     """
     Generates a matrix corresponding to a (DNA) IUPAC string.
@@ -382,6 +418,12 @@ def iupac_to_matrix(iupac_seq, to_type='probability', **kwargs):
         A matrix of the requested type.
     """
 
+    # validate inputs
+    check(isinstance(iupac_seq, str), 'type(iupac_seq) = %s must be of type str' % type(iupac_seq))
+    check(isinstance(to_type, str), 'type(to_type) = %s must be of type str' % type(to_type))
+    TO_TYPES = {'probability', 'weight', 'information'}
+    check(to_type in TO_TYPES, 'invalid to_type=%s' % to_type)
+
     # Create counts matrix based on IUPAC string
     L = len(iupac_seq)
     cols = list('ACGT')
@@ -399,7 +441,7 @@ def iupac_to_matrix(iupac_seq, to_type='probability', **kwargs):
                               to_type=to_type)
     return out_df
 
-
+@handle_errors
 def alignment_to_matrix(sequences,
                         to_type='counts',
                         characters_to_ignore='.-',
@@ -426,6 +468,14 @@ def alignment_to_matrix(sequences,
         A matrix of the requested type.
     """
 
+    # validate inputs
+
+    # the first check is not very efficient.
+    check(all(isinstance(str_index, str) for str_index in sequences),'sequences must be of type string')
+    check(isinstance(to_type, str), 'type(from_type) = %s must be of type str' % type(to_type))
+    TO_TYPES = {'counts','probability', 'weight', 'information'}
+    check(to_type in TO_TYPES, 'invalid to_type=%s' % to_type)
+
     # Create array of characters at each position
     char_array = np.array([np.array(list(seq)) for seq in sequences])
     L = char_array.shape[1]
@@ -450,6 +500,69 @@ def alignment_to_matrix(sequences,
                               to_type=to_type,
                               **kwargs)
     return out_df
+
+
+@handle_errors
+def saliency_to_matrix(sequence, saliency):
+
+    """
+    saliency_to_matrix takes a sequence string and a saliency \n
+    array and outputs a saliency dataframe. The saliency \n
+    dataframe is a C by L matrix (C is characters, L is sequence \n
+    length) where the elements of the matrix are hot-encoded \n
+    according to the saliency list. E.g. the element saliency_{c,l} \n
+    will be non-zero if character c occurs at position l, the value \n
+    of the element is equal to the value of the saliency list at that \n
+    position. All other elements are zero.
+
+    example usage:
+
+    saliency_mat = logomaker.saliency_to_matrix(sequence,saliency_values)
+    logomaker.Logo(saliency_mat)
+
+    parameters
+    ----------
+
+    sequence: (str)
+        sequence for which saliency logo will be drawn
+
+    saliency: (list)
+        array of saliency value. len(saliency) == sequence
+
+    returns
+    -------
+    saliency_matrix: (dataframe)
+        dataframe that contains saliency values \n
+        can be used directly with the Logo constructor
+
+    """
+
+    # validate inputs
+
+    # validate sequence
+    check(isinstance(sequence,str),'type(sequence) = %s must be of type str' % type(sequence))
+
+    # validate background: check that it is a list or array
+    check(isinstance(saliency,(type([]),np.ndarray)),
+          'type(saliency) = %s must be of type list' % type(saliency))
+
+    # check length of sequence and saliency are equal
+    check(len(sequence)==len(saliency),'length of sequence and saliency list must be equal.')
+
+    # in case the user provides an np.array, this method should still work
+    saliency = list(saliency)
+
+    # turn sequence into binary one-hot encoded matrix.
+    ohe_sequence = pd.get_dummies(pd.Series(list(sequence)))
+
+    # multiply saliency list with one-hot encoded sequence to get
+    # saliency matrix or dataframe
+    saliency_matrix = saliency * (ohe_sequence.T)
+
+    # the transpose here puts positions on the x-axis and characters
+    # on the y-axis, thus making it easy to use with the constructor.
+    return saliency_matrix.T
+
 
 
 # from Bio import SeqIO

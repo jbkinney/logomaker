@@ -160,6 +160,7 @@ def handle_errors(func):
 # Rename useful stuff from within Logomaker
 
 from logomaker.src.Logo import Logo
+
 from logomaker.src.Glyph import Glyph
 from logomaker.src.Glyph import list_font_families
 
@@ -168,6 +169,7 @@ from logomaker.src.data import center_matrix
 from logomaker.src.data import normalize_matrix
 from logomaker.src.data import iupac_to_matrix
 from logomaker.src.data import alignment_to_matrix
+from logomaker.src.data import saliency_to_matrix
 
 from logomaker.src.validate import validate_matrix
 from logomaker.src.validate import validate_probability_mat
