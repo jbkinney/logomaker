@@ -13,6 +13,7 @@ import pdb
 from functools import wraps
 import sys
 import os
+import traceback
 
 
 # Define error handling
@@ -124,9 +125,16 @@ def handle_errors(func):
             else:
                 print('Error in',func.__name__+':', e.__str__())
 
-                return
+
                 # to stop further execution of program on finding an error
-                #sys.exit()
+                # the following is a clean way to stop the program.
+                sys.exit()
+
+                # an alternate approach is:
+                # return
+                # but this will try to keep the program going once the
+                # error is reported. May be we could leave this on if
+                # the user selects a debug = True flag.
 
         # If not in debug mode
         if should_fail is None:

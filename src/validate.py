@@ -8,7 +8,7 @@ import pdb
 
 from six import string_types
 from matplotlib.colors import to_rgb, to_rgba
-from logomaker import ControlledError, check
+from logomaker import ControlledError, check, handle_errors
 
 
 #
@@ -243,6 +243,7 @@ def _validate_color(name, user, default):
     return value
 
 
+@handle_errors
 def validate_matrix(dataframe, allow_nan=False):
     """
     Runs checks to verify that df is indeed a motif dataframe.
@@ -251,6 +252,8 @@ def validate_matrix(dataframe, allow_nan=False):
 
     check(isinstance(dataframe,pd.DataFrame),
           'Input Error: dataframe needs to be a valid pandas dataframe, dataframe entered: '+str(type(dataframe)))
+
+    check(isinstance(allow_nan,bool),'allow_nan = %s must be of type bool'%type(allow_nan))
 
     # Copy and preserve logomaker_type
     dataframe = dataframe.copy()
@@ -312,6 +315,7 @@ def validate_matrix(dataframe, allow_nan=False):
     return dataframe
 
 
+@handle_errors
 def validate_probability_mat(matrix):
     """
     Verifies that the df is indeed a probability matrix dataframe.
@@ -323,15 +327,20 @@ def validate_probability_mat(matrix):
     matrix = validate_matrix(matrix)
 
     # Make sure all values are non-negative
-    assert (all(matrix.values.ravel() >= 0)), \
-        'Error: not all values in df are >=0.'
+    #assert (all(matrix.values.ravel() >= 0)), \
+    #    'Error: not all values in df are >=0.'
+
+    check(all(matrix.values.ravel() >= 0),
+        'Error: not all values in df are >=0.')
 
     # Check to see if values sum to one
     sums = matrix.sum(axis=1).values
 
     # If any sums are close to zero, abort
-    assert not any(np.isclose(sums, 0.0)), \
-        'Error: some columns in matrix sum to nearly zero.'
+    #assert not any(np.isclose(sums, 0.0)), \
+    #    'Error: some columns in matrix sum to nearly zero.'
+    check(not any(np.isclose(sums, 0.0)),
+        'Error: some columns in matrix sum to nearly zero.')
 
     # If any sums are not close to one, renormalize all sums
     if not all(np.isclose(sums, 1.0)):
@@ -342,7 +351,7 @@ def validate_probability_mat(matrix):
     # Return data frame to user
     return matrix
 
-
+@handle_errors
 def validate_information_mat(matrix):
     """
     Verifies that the df is indeed an information matrix dataframe.
@@ -353,8 +362,10 @@ def validate_information_mat(matrix):
     matrix = validate_matrix(matrix)
 
     # Validate df values as info values
-    assert (all(matrix.values.ravel() >= 0)), \
-        'Error: not all values in df are >=0.'
+    #assert (all(matrix.values.ravel() >= 0)), \
+    #    'Error: not all values in df are >=0.'
+    check(all(matrix.values.ravel() >= 0),
+            'Error: not all values in df are >=0.')
 
     # Return data frame to user
     return matrix
