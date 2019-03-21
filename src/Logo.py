@@ -450,6 +450,12 @@ class Logo:
                 check(isinstance(self.ceiling, (float, int)),
                       'type(ceiling) = %s must be a number' % type(self.ceiling))
 
+        # validate saliency
+        if (hasattr(self, 'saliency')):
+            check(isinstance(self.saliency, type([])),
+                  'type(saliency) = %s must be a list' % type(self.saliency))
+
+
 
     @handle_errors
     def style_glyphs(self, colors=None, draw_now=True, ax=None, **kwargs):
@@ -1224,3 +1230,59 @@ class Logo:
         self.glyph_list = [g for g in self.glyph_df.values.ravel()
                            if isinstance(g, Glyph)]
 
+    @handle_errors
+    def saliency_to_matrix(self, sequence, saliency, draw_now = True, ax = None):
+
+        """
+        saliency_to_matrix takes a sequence string and a saliency \n
+        array and outputs a saliency dataframe. The saliency \n
+        dataframe is a C by L matrix (C is characters, L is sequence \n
+        length) where the elements of the matrix are hot-encoded \n
+        according to the saliency list. E.g. the element saliency_{c,l} \n
+        will be non-zero if character c occurs at position l, the value \n
+        of the element is equal to the value of the saliency list at that \n
+        position. All other elements are zero.
+
+        parameters
+        ----------
+
+        sequence: (str)
+            sequence for which saliency logo will be drawn
+
+        saliency: (list)
+            array of saliency value. len(saliency) == sequence
+
+        draw_now: (bool)
+            if true, draws the saliency matrix as a logo upon execution
+
+        returns
+        -------
+        saliency_df: (dataframe)
+            dataframe that contains saliency values \n
+            can be used directly with the Logo constructor
+
+        """
+
+        # set attributes
+        self.sequence = sequence
+        self.saliency = saliency
+
+        # in case the user provides an np.array, this method should still work
+        self.saliency = list(self.saliency)
+
+        # validate inputs
+        self._input_checks()
+
+        # check length of sequence and saliency are equal
+        check(len(sequence)==len(saliency),'length of sequence and saliency list must be equal.')
+
+        # turn sequence into binary one-hot encoded matrix.
+        ohe_sequence = pd.get_dummies(pd.Series(list(sequence)))
+
+        # multiply saliency list with one-hot encoded sequence to get
+        # saliency matrix or dataframe
+        saliency_df = saliency * (ohe_sequence.T)
+
+        # the transpose here puts positions on the x-axis and characters
+        # on the y-axis, thus making it easy to use with the constructor.
+        return saliency_df.T
