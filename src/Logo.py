@@ -115,7 +115,8 @@ class Logo:
     def __init__(self,
                  df,
                  colors=None,
-                 font_name='sans',
+                 # font_name='sans', # this does not exist in list_font_families()
+                 font_name = 'DejaVu Sans',
                  stack_order='big_on_top',
                  negate_values=False,
                  center_values=False,
@@ -272,7 +273,7 @@ class Logo:
 
         # validate vsep
         check(isinstance(self.vsep, (float, int)),
-              'type(vsep) = %s; must be of type or int ' % type(self.vsep))
+              'type(vsep) = %s; must be of type float or int ' % type(self.vsep))
 
         check(self.vsep >= 0, "vsep = %d must be greater than 0 " % self.vsep)
 

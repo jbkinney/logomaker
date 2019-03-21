@@ -2,9 +2,12 @@ from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch
 from matplotlib.transforms import Affine2D, Bbox
 from matplotlib.font_manager import FontManager, FontProperties
-from matplotlib.colors import to_rgb
+from matplotlib.colors import to_rgb, cnames
 import matplotlib.pyplot as plt
 import pdb
+from logomaker import check, handle_errors
+import matplotlib.cm
+import numpy as np
 
 # Create global font manager instance. This takes a second or two
 font_manager = FontManager()
@@ -74,7 +77,7 @@ class Glyph:
         Run logomaker.get_font_families() for list of (some but not all) valid
         options on your system.
 
-    font_weight: (str)
+    font_weight: (str, int)
         The font weight to use when rendering the glyph. Specifically, this is
         the value passed as the 'weight' parameter in the FontProperties
         constructor. From matplotlib documentation: "weight: A numeric
@@ -116,7 +119,7 @@ class Glyph:
         after initial specification.
 
     """
-
+    @handle_errors
     def __init__(self,
                  p,
                  c,
@@ -125,7 +128,8 @@ class Glyph:
                  ceiling=None,
                  width=0.95,
                  vpad=0.00,
-                 font_family='sans',
+                 #font_family='sans',      # this does not exist in list_font_families()
+                 font_family='DejaVu Sans',
                  font_weight='bold',
                  color='gray',
                  edgecolor='black',
@@ -138,7 +142,8 @@ class Glyph:
                  draw_now=True):
 
         # Do basic checks
-        assert width > 0, 'Error: Must have width > 0'
+        #assert width > 0, 'Error: Must have width > 0'
+        check(width > 0, 'Must have width > 0')
 
         # Set attributes
         self.p = p
@@ -158,6 +163,8 @@ class Glyph:
         self.font_family = font_family
         self.font_weight = font_weight
         self.ax = ax
+
+        self._input_checks()
 
         # Draw now if requested
         if draw_now:
@@ -293,3 +300,132 @@ class Glyph:
 
         # Return patch
         return patch
+
+    def _input_checks(self):
+
+        """
+        check input parameters in the Logo constructor for correctness
+        """
+        # check that flip is a boolean
+        check(isinstance(self.flip, (bool,np.bool_)),
+              'type(flip) = %s; must be of type bool ' % type(self.flip))
+
+        # check that mirror is a boolean
+        check(isinstance(self.mirror, bool),
+              'type(mirror) = %s; must be of type bool ' % type(self.mirror))
+
+        check(isinstance(self.edgewidth, (float, int)),
+              'type(edgewidth) = %s must be a number' % type(self.edgewidth))
+
+        check(self.edgewidth >= 0, ' edgewidth must be >= 0')
+
+        # validate floor
+        if(self.floor is not None):
+            check(isinstance(self.floor, (float, int)),
+                  'type(floor) = %s must be a number' % type(self.floor))
+
+        # validate ceiling
+        if(self.ceiling is not None):
+            check(isinstance(self.ceiling, (float, int)),
+                  'type(ceiling) = %s must be a number' % type(self.ceiling))
+
+
+        # validate alpha
+        check(isinstance(self.alpha, (float, int)),
+              'type(alpha) = %s must be a number' % type(self.alpha))
+
+        # ensure that alpha is between 0 and 1
+        check(self.alpha <= 1.0 and self.alpha >= 0, 'alpha must be between 0 and 1')
+
+        # check that flip is a boolean
+        check(isinstance(self.dont_stretch_more_than, str),
+              'type(dont_stretch_more_than) = %s; must be of type str ' % type(self.dont_stretch_more_than))
+
+        # check that color scheme is valid
+        valid_color_strings = list(matplotlib.cm.cmap_d.keys())
+        valid_color_strings.extend(['classic', 'grays', 'base_paring', 'hydrophobicity', 'chemistry', 'charge'])
+
+        if self.color is not None:
+
+            # if color scheme is specified as a string, check that string value maps
+            # to a valid matplotlib color scheme
+
+            if type(self.color) == str:
+
+                # get allowed list of matplotlib color schemes
+                check(self.color in valid_color_strings,
+                      # 'colors = %s; must be in %s' % (self.colors, str(valid_color_strings)))
+                      'colors = %s; is an invalid color scheme. Valid choices include classic, chemistry, grays. '
+                      'A full list of valid color schemes can be found by '
+                      'printing list(matplotlib.cm.cmap_d.keys()). ' % self.color)
+
+            # otherwise limit the allowed types to tuples, lists, dicts
+            else:
+                check(isinstance(self.color,(tuple,list,dict)),
+                      'type(colors) = %s; must be of type (tuple,list,dict) ' % type(self.color))
+
+                # check that RGB values are between 0 and 1 is
+                # colors is a list or tuple
+
+                if type(self.color) == list or type(self.color) == tuple:
+
+                    check(all(i <= 1.0 for i in self.color),
+                          'Values of colors array must be between 0 and 1')
+
+                    check(all(i >= 0.0 for i in self.color),
+                          'Values of colors array must be between 0 and 1')
+
+        # validate edgecolor
+        check(self.edgecolor in list(matplotlib.colors.cnames.keys()),
+              # 'colors = %s; must be in %s' % (self.colors, str(valid_color_strings)))
+              'edgecolor = %s; is an invalid color scheme. Valid choices include blue, black, silver. '
+              'A full list of valid color schemes can be found by '
+              'printing list(matplotlib.colors.cnames.keys()). ' % self.edgecolor)
+
+        # validate width
+        check(isinstance(self.width, (float, int)),
+              'type(width) = %s; must be of type float or int ' % type(self.width))
+
+        check(self.width >= 0, "width = %d must be greater than 0 " % self.width)
+
+        # validate vpad
+        check(isinstance(self.vpad, (float, int)),
+              'type(vpad) = %s; must be of type float or int ' % type(self.vpad))
+
+        check(self.vpad >= 0, "vpad = %d must be greater than 0 " % self.vpad)
+
+        # validate p
+        check(isinstance(int(self.p), int), 'type(p) = %s must be of type int' % type(self.p))
+
+        # validate c
+        check(isinstance(self.c, str), 'type(c) = %s must be of type str' % type(self.c))
+
+        # validate zorder
+        if(self.zorder is not None):
+            check(isinstance(self.zorder, int),
+                  'type(zorder) = %s; must be of type or int ' % type(self.zorder))
+
+        # validate font_family
+        check(isinstance(self.font_family, str),
+              'type(font_family) = %s must be of type str' % type(self.font_family))
+
+        check(self.font_family in list_font_families(),
+              'Invalid choice for font_family. For a list of valid choices, please call logomaker.list_font_families().')
+
+        check(isinstance(self.font_weight,(str,int)), 'type(font_weight) = %s  should either be a string or an int'%(type(self.font_weight)))
+
+        if(type(self.font_weight)==str):
+            valid_font_weight_strings = [ 'ultralight', 'light','normal', 'regular', 'book',
+                                          'medium', 'roman', 'semibold', 'demibold', 'demi',
+                                          'bold', 'heavy', 'extra bold', 'black']
+            check(self.font_weight in valid_font_weight_strings, 'font must be one of %s'%valid_font_weight_strings)
+
+        elif(type(self.font_weight)==int):
+            check(self.font_weight>=0 and self.font_weight<=1000, 'font_weight must be in range [0,1000]')
+
+
+
+            # the following check needs to be fixed based on whether the calling function
+        # is the constructor, draw_baseline, or style_glyphs_below.
+        #check(self.zorder >= 0, "zorder = %d must be greater than 0 " % self.zorder)
+
