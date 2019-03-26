@@ -1,13 +1,12 @@
 from __future__ import division
 import numpy as np
 import pandas as pd
-import pdb
-from logomaker import check, handle_errors
 
-# from validate import validate_matrix, validate_probability_mat, iupac_dict
+# Logomaker imports
+from logomaker import check, handle_errors
 from logomaker.src.validate import validate_matrix, \
-                               validate_probability_mat, \
-                               validate_information_mat
+                                   validate_probability_mat, \
+                                   validate_information_mat
 
 # Specifies IUPAC string transformations
 iupac_dict = {
@@ -30,42 +29,64 @@ iupac_dict = {
 
 # Set constants
 SMALL = np.finfo(float).tiny
+MATRIX_TYPES = {'counts', 'probability', 'weight', 'information'}
+
 
 @handle_errors
-def transform_matrix(df, from_type, to_type,
+def transform_matrix(df,
+                     center_values=False,
+                     normalize_values=False,
+                     from_type=None,
+                     to_type=None,
                      background=None,
-                     pseudocount=1,
-                     center=False):
+                     pseudocount=1):
     """
-    Transforms a matrix of one type into a matrix of another type.
+    Performs transformations on a matrix. There are three types of
+    transformations that can be performed:
 
-    i = position
-    c, d = character
+    1. Center values:
+        Subtracts the mean from each row in df. This is common for weight
+        matrices or energy matrices. To do this, set center_values=True.
 
-    l = pseudocount
-    C = number of characters
+    2. Normalize values:
+        Divides each row by the sum of the row. This is needed for probability
+        matrices. To do this, set normalize_values=True.
 
-    N_ic = counts matrix element
-    P_ic = probability matrix element
-    Q_ic = background probability matrix element
-    W_ic = weight matrix element
-    I_ic = information matrix element
+    3. From/To transformations:
+        Transforms from one type of matrix (e.g. 'counts') to another type
+        of matrix (e.g. 'information'). To do this, set from_type and to_type
+        arguments.
 
-    counts -> probability:
-        P_ic = (N_ic + l)/(N_i + C*l), N_i = sum_c(N_ic)
+    Here are the mathematical formulas invoked by From/To transformations:
 
-    probability -> weight:
-        W_ic = log_2(P_ic / Q_ic)
+        from_type='counts' ->  to_type='probability':
+            P_ic = (N_ic + l)/(N_i + C*l), N_i = sum_c(N_ic)
 
-    weight -> probability:
-        P_ic = Q_ic * 2^(W_ic)
+        from_type='probability' -> to_type='weight':
+            W_ic = log_2(P_ic / Q_ic)
 
-    probability -> information:
-        I_ic = P_ic * sum_d(P_id * log2(P_id / W_id))
+        from_type='weight' -> to_type='probability':
+            P_ic = Q_ic * 2^(W_ic)
 
-    information -> probability:
-        P_ic = I_ic / sum_d(I_id)
+        from_type='probability' -> to_type='information':
+            I_ic = P_ic * sum_d(P_id * log2(P_id / W_id))
 
+        from_type='information' -> to_type='probability':
+            P_ic = I_ic / sum_d(I_id)
+
+        notation:
+            i = position
+            c, d = character
+            l = pseudocount
+            C = number of characters
+            N_ic = counts matrix element
+            P_ic = probability matrix element
+            Q_ic = background probability matrix element
+            W_ic = weight matrix element
+            I_ic = information matrix element
+
+    Using these five 1-step transformations, 2-step transformations
+    are also enabled, e.g., from_type='counts' -> to_type='information'.
 
     parameters
     ----------
@@ -73,13 +94,21 @@ def transform_matrix(df, from_type, to_type,
     df: (dataframe)
         The matrix to be transformed.
 
+    center_values: (bool)
+        Whether to center matrix values, i.e., subtract the mean from each
+        row.
+
+    normalize_values: (bool)
+        Whether to normalize each row, i.e., divide each row by
+        the sum of that row.
+
     from_type: (str)
         Type of input matrix. Must be one of 'counts', 'probability',
         'weight', or 'information'.
 
     to_type: (str)
         Type of output matrix. Must be one of 'probability', 'weight', or
-        'information'. Can NOT be 'counts'.
+        'information'. Can be 'counts' ONLY if from_type is 'counts' too.
 
     background: (array, or df)
         Specification of background probabilities. If array, should be the
@@ -88,12 +117,8 @@ def transform_matrix(df, from_type, to_type,
         shape as df.
 
     pseudocount: (number >= 0)
-        Pseudocount to use when transforming from a count matrix to a
+        Pseudocount to use when transforming from a counts matrix to a
         probability matrix.
-
-    center: (bool)
-        Whether to center_values the output matrix. Note: this only works when
-        to_type = 'weight', as centering a matrix doesn't make sense otherwise.
 
     returns
     -------
@@ -101,50 +126,78 @@ def transform_matrix(df, from_type, to_type,
         Transformed matrix
     """
 
-    # validate inputs
-
-    # Validate dataframe
-    validate_matrix(df)
-
-    # validate from_type
-    check(isinstance(from_type, str),
-          'type(from_type) = %s must be of type str' % type(from_type))
-
-    # validate to_type
-    check(isinstance(from_type, str),
-          'type(from_type) = %s must be of type str' % type(from_type))
-
-    # validate background: check that it is a list or array
-    if(background is not None):
-        check(isinstance(background, (type([]), np.ndarray)),
-              'type(background) = %s must be of type list or array' % type(background))
-
-    # validate pseudocount: check that it is a number and > 0
-    check(isinstance(pseudocount, (int, float)),
-          'type(pseudocount) = %s must be a number' % type(pseudocount))
-    check(pseudocount >= 0, 'pseudocount must be >= 0')
-
-    # check that center_values is a boolean
-    check(isinstance(center, bool),
-          'type(center) = %s; must be of type bool ' % type(center))
-
-    FROM_TYPES = {'counts', 'probability', 'weight', 'information'}
-    TO_TYPES = {'probability', 'weight', 'information'}
-
-    # Check that matrix is valid
+    # validate matrix dataframe
     df = validate_matrix(df)
 
-    # If to_type == from_type, just return matrix
-    if from_type == to_type:
+    # validate center_values
+    check(isinstance(center_values, bool),
+          'type(center_values) = %s must be of type bool' %
+          type(center_values))
+
+    # validate normalize_values
+    check(isinstance(normalize_values, bool),
+          'type(normalize_values) = %s must be of type bool' %
+          type(normalize_values))
+
+    # validate from_type
+    check((from_type in MATRIX_TYPES) or (from_type is None),
+          'from_type = %s must be None or in %s' %
+          (from_type, MATRIX_TYPES))
+
+    # validate to_type
+    check((to_type in MATRIX_TYPES) or (to_type is None),
+          'to_type = %s must be None or in %s' %
+          (to_type, MATRIX_TYPES))
+
+    # validate background
+    check(isinstance(background, (type([]), np.ndarray)) or
+          (background is None),
+          'type(background) = %s must be None or of type list or array' %
+          type(background))
+
+    # validate pseudocount
+    check(isinstance(pseudocount, (int, float)),
+          'type(pseudocount) = %s must be a number' % type(pseudocount))
+    check(pseudocount >= 0,
+          'pseudocount=%s must be >= 0' % pseudocount)
+
+    # If centering values, do that
+    if center_values is True:
+        check((from_type is None) and (to_type is None),
+              "If center_values is True, both from_type and to_type" 
+              "must be None. Here, from_type=%s, to_type=%s" %
+              (from_type, to_type))
+
+        # Do centering
+        out_df = _center_matrix(df)
+
+    # Otherwise, if normalizing values, do that
+    elif normalize_values is True:
+        check((from_type is None) and (to_type is None),
+              "If normalize_values is True, both from_type and to_type" 
+              "must be None. Here, from_type=%s, to_type=%s" %
+              (from_type, to_type))
+
+        # Do centering
+        out_df = _normalize_matrix(df)
+
+    # otherwise, if to_type == from_type, just return matrix
+    # Note, this is the only way that to_type='counts' is valid
+    elif from_type == to_type:
         out_df = df.copy()
 
-    # Otherwise, if converting from one type of matrix to another
+    # Otherwise, we're converting from one type of matrix to another. Do this.
     else:
-        # check from_type is valid
-        check(from_type in FROM_TYPES, 'invalid from_type=%s' % from_type)
+        # Check that from_type and to_type are not None
+        check((from_type is not None) and (to_type is not None),
+              'Unless center_values is True or normalize_values is True,'
+              'Neither from_type (=%s) nor to_type (=%s) can be None.' %
+              (from_type, to_type))
 
-        # check to_type is valid
-        check(to_type in TO_TYPES, 'invalid to_type=%s' % to_type)
+        # Check that to_type != 'counts'
+        check(to_type != 'counts', "Can only have to_type='counts' if "
+                                   "from_type='counts'. Here, however, "
+                                   "from_type='%s'" % from_type)
 
         # If converting from a probability matrix
         if from_type == 'probability':
@@ -159,45 +212,43 @@ def transform_matrix(df, from_type, to_type,
 
             # This should never execute
             else:
-                assert False, 'THIS SHOULD NEVER HAPPEN'
+                assert False, 'THIS SHOULD NEVER EXECUTE'
 
         # Otherwise, convert to probability matrix, then call function again
         else:
 
-            # If converting from a counts matrix
+            # If converting from a counts matrix,
+            # convert to probability matrix first
             if from_type == 'counts':
                 prob_df = _counts_mat_to_probability_mat(df, pseudocount)
 
-            # If converting from a weight matrix
+            # If converting from a weight matrix,
+            # convert to probability matrix first
             elif from_type == 'weight':
                 prob_df = _weight_mat_to_probability_mat(df, background)
 
-            # If converting from an information matrix
+            # If converting from an information matrix,
+            # convert to probability matrix first
             elif from_type == 'information':
                 prob_df = _information_mat_to_probability_mat(df, background)
 
             # This should never execute
             else:
-                assert False, 'THIS SHOULD NEVER HAPPEN'
+                assert False, 'THIS SHOULD NEVER EXECUTE'
 
+            # Now that we have the probability matrix,
+            # onvert to user-specified to_type
             out_df = transform_matrix(prob_df,
                                       from_type='probability',
                                       to_type=to_type,
                                       background=background)
 
-    # Check if user wishes to center_values the matrix
-    if center:
-        #assert to_type == 'weight', \
-        #    'Error: the option center_values=True is only compatible with ' + \
-        #    'to_type == "weight"'
-        check(to_type=='weight', 'the parameter center_values=True is only compatible with to_type== "weight" ')
-        out_df = center_matrix(out_df)
-
-
     # Validate and return
     out_df = validate_matrix(out_df)
     return out_df
 
+
+################### END OF CODE REVIEW ON 19.03.26 #############################
 
 def _counts_mat_to_probability_mat(df, pseudocount=1.0):
     """
@@ -213,7 +264,7 @@ def _counts_mat_to_probability_mat(df, pseudocount=1.0):
     out_df = df.copy()
     vals = df.values + pseudocount
     out_df.loc[:, :] = vals / vals.sum(axis=1)[:, np.newaxis]
-    out_df = normalize_matrix(out_df)
+    out_df = _normalize_matrix(out_df)
 
     # Validate and return
     out_df = validate_probability_mat(out_df)
@@ -256,14 +307,13 @@ def _weight_mat_to_probability_mat(df, background=None):
     out_df.loc[:, :] = bg_df.values * np.power(2, df.values)
 
     # Normalize matrix. Needed if matrix is centered.
-    out_df = normalize_matrix(out_df)
+    out_df = _normalize_matrix(out_df)
 
     # Validate and return
     out_df = validate_probability_mat(out_df)
     return out_df
 
 
-# Needed only for display purposes
 def _probability_mat_to_information_mat(df, background=None):
     """
     Converts a probability matrix to an information matrix
@@ -288,7 +338,6 @@ def _probability_mat_to_information_mat(df, background=None):
     return out_df
 
 
-# Needed only for display purposes
 def _information_mat_to_probability_mat(df, background=None):
     """
     Converts a probability matrix to an information matrix
@@ -298,16 +347,14 @@ def _information_mat_to_probability_mat(df, background=None):
     df = validate_matrix(df)
 
     # Just need to normalize matrix
-    out_df = normalize_matrix(df)
+    out_df = _normalize_matrix(df)
 
     # Validate and return
     out_df = validate_probability_mat(out_df)
     return out_df
 
 
-# Normalize a data frame of probabilities
-@handle_errors
-def normalize_matrix(df):
+def _normalize_matrix(df):
     """
     Normalizes a matrix df to a probability matrix out_df
     """
@@ -337,9 +384,8 @@ def normalize_matrix(df):
     out_df = validate_probability_mat(out_df)
     return out_df
 
-# Normalize a data frame of probabilities
-@handle_errors
-def center_matrix(df):
+
+def _center_matrix(df):
     """
     Centers each row of a matrix about zero by subtracting out the mean.
     """
@@ -386,7 +432,7 @@ def _get_background_mat(df, background):
         assert len(background) == num_cols, \
             'Error: df and background have mismatched dimensions.'
         out_df.loc[:, :] = background[np.newaxis, :]
-        out_df = normalize_matrix(out_df)
+        out_df = _normalize_matrix(out_df)
 
     # If background is a dataframe
     elif isinstance(background, pd.core.frame.DataFrame):
@@ -396,7 +442,7 @@ def _get_background_mat(df, background):
         assert all(df.columns == background.columns), \
             'Error: df and bg_mat have different columns.'
         out_df = background.copy()
-        out_df = normalize_matrix(out_df)
+        out_df = _normalize_matrix(out_df)
 
     # validate as probability matrix
     out_df = validate_probability_mat(out_df)
@@ -429,8 +475,7 @@ def iupac_to_matrix(iupac_seq, to_type='probability', **kwargs):
     # validate inputs
     check(isinstance(iupac_seq, str), 'type(iupac_seq) = %s must be of type str' % type(iupac_seq))
     check(isinstance(to_type, str), 'type(to_type) = %s must be of type str' % type(to_type))
-    TO_TYPES = {'probability', 'weight', 'information'}
-    check(to_type in TO_TYPES, 'invalid to_type=%s' % to_type)
+    check(to_type in MATRIX_TYPES, 'invalid to_type=%s' % to_type)
 
     # Create counts matrix based on IUPAC string
     L = len(iupac_seq)
@@ -570,120 +615,3 @@ def saliency_to_matrix(sequence, saliency):
     # the transpose here puts positions on the x-axis and characters
     # on the y-axis, thus making it easy to use with the constructor.
     return saliency_matrix.T
-
-
-
-# from Bio import SeqIO
-# def load_alignment(fasta_file=None,
-#                    csv_file=None,
-#                    seq_col=None,
-#                    ct_col=None,
-#                    csv_kwargs={},
-#                    sequences=None,
-#                    sequence_counts=None,
-#                    sequence_type=None,
-#                    characters=None,
-#                    positions=None,
-#                    ignore_characters='.-',
-#                    occurance_threshold=0):
-#     # If loading file name
-#     if fasta_file is not None:
-#
-#         # Load sequences using SeqIO
-#         sequences = [str(record.seq) for record in \
-#                      SeqIO.parse(fasta_file, "fasta")]
-#
-#     # If loading from a CSV file
-#     elif csv_file is not None:
-#
-#         # Make sure that seq_col is specified
-#         assert seq_col is not None, \
-#             'Error: seq_col is None. If csv_file is specified, seq_col must' \
-#             + ' also be specified'
-#
-#         # Load csv file as a dataframe
-#         df = pd.read_csv(csv_file, **csv_kwargs)
-#         # df = df.fillna(csv_fillna)
-#         df = df.fillna(csv_file)
-#
-#         # Make sure that seq_col is in df
-#         assert seq_col in df.columns, \
-#             ('Error: seq_col %s is not in the columns %s read from '
-#              + 'csv_file %s') % (seq_col, df.columns, csv_file)
-#
-#         # Get sequences
-#         sequences = df[seq_col].values
-#
-#         # Optionally set sequence_counts
-#         if ct_col is not None:
-#             # Make sure that seq_col is in df
-#             assert seq_col in df.columns, \
-#                 ('Error: ct_col %s is not None, but neither is it in the '
-#                  + 'columns %s loaded from csv_file'
-#                  + ' file %s') % (ct_col, df.columns, csv_file)
-#
-#             # Load sequences counts
-#             sequence_counts = df[ct_col].values
-#
-#     # Make sure that, whatever was passed, sequences is set
-#     assert sequences is not None, \
-#         'Error: either fasta_file or sequences must not be None.'
-#
-#     # Get seq length
-#     L = len(sequences[0])
-#     # print('debugging:')
-#     # print(type(sequences))
-#     # print(L)
-#     # print(np.shape(sequences))
-#     assert all([len(seq) == L for seq in sequences]), \
-#         'Error: not all sequences have length %d.' % L
-#
-#     # Get counts list
-#     if sequence_counts is None:
-#         assert len(sequences) > 0, 'Error: sequences is empty'
-#         counts_array = np.ones(len(sequences))
-#     else:
-#         assert len(sequence_counts) == len(sequences), \
-#             'Error: sequence_counts is not the same length as sequences'
-#         counts_array = np.array(sequence_counts)
-#
-#     # If positions is not specified by user, make it
-#     if positions is not None:
-#         assert len(positions) == L, 'Error: positions, if passed, must be ' + \
-#                                     'same length as sequences.'
-#     else:
-#         positions = range(L)
-#
-#     # Create counts matrix
-#     counts_mat = pd.DataFrame(index=positions).fillna(0)
-#
-#     # Create array of characters at each position
-#     char_array = np.array([np.array(list(seq)) for seq in sequences])
-#
-#     # Get list of unique characters
-#     unique_characters = np.unique(char_array.ravel())
-#     unique_characters.sort()
-#
-#     # Sum of the number of occurances of each character at each position
-#     for c in unique_characters:
-#         v = (char_array == c).astype(float)
-#         v *= counts_array[:, np.newaxis]
-#         counts_mat.loc[:, c] = v.sum(axis=0).ravel()
-#
-#     # Filter columns
-#     counts_mat = filter_columns(counts_mat,
-#                                 sequence_type=sequence_type,
-#                                 characters=characters,
-#                                 ignore_characters=ignore_characters)
-#
-#     # Remove rows with too few counts
-#     position_counts = counts_mat.values.sum(axis=1)
-#     max_counts = position_counts.max()
-#     positions_to_keep = position_counts >= occurance_threshold * max_counts
-#     counts_mat = counts_mat.loc[positions_to_keep, :]
-#
-#     # Name index
-#     counts_mat.index.name = 'pos'
-#
-#     return counts_mat
-
