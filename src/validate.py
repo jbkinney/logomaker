@@ -8,7 +8,7 @@ import pdb
 
 from six import string_types
 from matplotlib.colors import to_rgb, to_rgba
-from logomaker import ControlledError, check, handle_errors
+from logomaker import LogomakerError, check, handle_errors
 
 
 #
@@ -251,7 +251,7 @@ def validate_matrix(dataframe, allow_nan=False):
     """
 
     check(isinstance(dataframe,pd.DataFrame),
-          'Input Error: dataframe needs to be a valid pandas dataframe, dataframe entered: '+str(type(dataframe)))
+          'dataframe needs to be a valid pandas dataframe, dataframe entered: '+str(type(dataframe)))
 
     check(isinstance(allow_nan,bool),'allow_nan = %s must be of type bool'%type(allow_nan))
 
@@ -260,11 +260,11 @@ def validate_matrix(dataframe, allow_nan=False):
 
     if not allow_nan:
         # Make sure all entries are finite numbers
-        check(np.isfinite(dataframe.values).all(),'Input Error: some matrix elements are not finite.' + 'Set allow_nan=True to allow.')
+        check(np.isfinite(dataframe.values).all(),'some matrix elements are not finite.' + 'Set allow_nan=True to allow.')
 
     # Make sure the matrix has a finite number of rows and columns
-    check(dataframe.shape[0] >= 1, 'Input Error: matrix has zero rows.')
-    check(dataframe.shape[1] >= 1, 'Input Error: matrix has zero columns.')
+    check(dataframe.shape[0] >= 1, 'matrix has zero rows.')
+    check(dataframe.shape[1] >= 1, 'matrix has zero columns.')
 
     # Remove columns whose names aren't strings exactly 1 character long.
     # Warn user when doing so
@@ -283,17 +283,17 @@ def validate_matrix(dataframe, allow_nan=False):
             continue
 
         # Convert column name to simple string if possible
-        check(isinstance(col_name, string_types), 'Error: column name %s is not a string' % col_name)
+        check(isinstance(col_name, string_types), 'column name %s is not a string' % col_name)
         new_col_name = str(col_name)
 
         # If column name is not a single chracter, try extracting single character
         # after an underscore
         if len(new_col_name) != 1:
             new_col_name = new_col_name.split('_')[-1]
-            check((len(new_col_name)==1),'Error: could not extract single character from colum name %s'%col_name)
+            check((len(new_col_name)==1),'could not extract single character from colum name %s'%col_name)
 
         # Make sure that colun name is not a whitespace character
-        check(re.match('\S',new_col_name),'Error: column name "%s" is a whitespace charcter.'%repr(col_name))
+        check(re.match('\S',new_col_name),'column name "%s" is a whitespace charcter.'%repr(col_name))
 
         # Set revised column name
         dataframe.rename(columns={col_name:new_col_name}, inplace=True)

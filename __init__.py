@@ -2,26 +2,8 @@ from __future__ import division
 from functools import wraps
 import sys
 
-# Classes / functions imported with logomaker
-from logomaker.src.Logo import Logo
-from logomaker.src.Glyph import Glyph
-from logomaker.src.Glyph import list_font_families
-from logomaker.src.data import transform_matrix
-from logomaker.src.data import iupac_to_matrix
-from logomaker.src.data import alignment_to_matrix
-from logomaker.src.data import saliency_to_matrix
-from logomaker.src.validate import validate_matrix
 
-# TODO: fold these two functions into transform_matrix
-from logomaker.src.data import center_matrix
-from logomaker.src.data import normalize_matrix
-
-# TODO: fold these into validate_matrix
-from logomaker.src.validate import validate_probability_mat
-from logomaker.src.validate import validate_information_mat
-
-
-class ControlledError(Exception):
+class LogomakerError(Exception):
     """
     Class used by Logomaker to handle errors.
 
@@ -30,7 +12,7 @@ class ControlledError(Exception):
 
     message: (str)
         The message passed to check(). This only gets passed to the
-        ControlledError constructor when the condition passed to check() is
+        LogomakerError constructor when the condition passed to check() is
         False.
     """
 
@@ -41,10 +23,19 @@ class ControlledError(Exception):
         return self.message
 
 
+class DebugResult:
+    """
+    Container class for debugging results.
+    """
+    def __init__(self, result, mistake):
+        self.result = result
+        self.mistake = mistake
+
+
 def check(condition, message):
 
     """
-    Checks a condition; raises a ControlledError with message if condition
+    Checks a condition; raises a LogomakerError with message if condition
     evaluates to False
 
     parameters
@@ -63,7 +54,7 @@ def check(condition, message):
     """
 
     if not condition:
-        raise ControlledError(message)
+        raise LogomakerError(message)
 
 
 def handle_errors(func):
@@ -125,7 +116,7 @@ def handle_errors(func):
             else:
                 pass
 
-        except ControlledError as e:
+        except LogomakerError as e:
 
             # If running functional test and expect to fail
             if should_fail is True:
@@ -141,10 +132,9 @@ def handle_errors(func):
 
             # Otherwise, print error (but not stack trace) and halt execution
             else:
-                print('Error in', func.__name__+':', e.__str__())
-
-                # Stop execution
-                sys.exit()
+                # print('Error in', func.__name__+':', e.__str__())
+                # Raise error
+                raise e
 
         # If not in debug mode, and no error was detected above,
         if should_fail is None:
@@ -155,8 +145,36 @@ def handle_errors(func):
         # Otherwise, if in debug mode
         else:
 
-            # Return result and mistake status
-            return result, mistake
+            # If func is a constructor,
+            # extract self from args[0],
+            # and set mistake attribute
+            if func.__name__ == "__init__":
+                args[0].mistake = mistake
+                return None
+
+            # Otherwise, return result and mistake status as attributes
+            # of container class object
+            else:
+                return DebugResult(result, mistake)
 
     # Return the wrapped function to the user
     return wrapped_func
+
+
+# Classes / functions imported with logomaker
+from logomaker.src.Logo import Logo
+from logomaker.src.Glyph import Glyph
+from logomaker.src.Glyph import list_font_families
+from logomaker.src.data import transform_matrix
+from logomaker.src.data import iupac_to_matrix
+from logomaker.src.data import alignment_to_matrix
+from logomaker.src.data import saliency_to_matrix
+from logomaker.src.validate import validate_matrix
+
+# TODO: fold these two functions into transform_matrix
+from logomaker.src.data import center_matrix
+from logomaker.src.data import normalize_matrix
+
+# TODO: fold these into validate_matrix
+from logomaker.src.validate import validate_probability_mat
+from logomaker.src.validate import validate_information_mat
