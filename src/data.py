@@ -107,25 +107,26 @@ def transform_matrix(df, from_type, to_type,
     validate_matrix(df)
 
     # validate from_type
-    check(isinstance(from_type,str),'type(from_type) = %s must be of type str' % type(from_type))
+    check(isinstance(from_type, str),
+          'type(from_type) = %s must be of type str' % type(from_type))
 
     # validate to_type
-    check(isinstance(from_type, str), 'type(from_type) = %s must be of type str' % type(from_type))
+    check(isinstance(from_type, str),
+          'type(from_type) = %s must be of type str' % type(from_type))
 
     # validate background: check that it is a list or array
     if(background is not None):
-        check(isinstance(background,(type([]),np.ndarray)),
+        check(isinstance(background, (type([]), np.ndarray)),
               'type(background) = %s must be of type list or array' % type(background))
 
     # validate pseudocount: check that it is a number and > 0
-    check(isinstance(pseudocount, (int,float)), 'type(pseudocount) = %s must be a number' % type(pseudocount))
+    check(isinstance(pseudocount, (int, float)),
+          'type(pseudocount) = %s must be a number' % type(pseudocount))
     check(pseudocount >= 0, 'pseudocount must be >= 0')
 
     # check that center_values is a boolean
     check(isinstance(center, bool),
           'type(center) = %s; must be of type bool ' % type(center))
-
-
 
     FROM_TYPES = {'counts', 'probability', 'weight', 'information'}
     TO_TYPES = {'probability', 'weight', 'information'}
@@ -137,23 +138,28 @@ def transform_matrix(df, from_type, to_type,
     if from_type == to_type:
         out_df = df.copy()
 
+    # Otherwise, if converting from one type of matrix to another
     else:
-        #assert from_type in FROM_TYPES, \
-        #    'Error: invalid from_type=%s' % from_type
+        # check from_type is valid
         check(from_type in FROM_TYPES, 'invalid from_type=%s' % from_type)
 
-        #assert to_type in TO_TYPES, \
-        #    'Error: invalid to_type="%s"' % from_type
+        # check to_type is valid
         check(to_type in TO_TYPES, 'invalid to_type=%s' % to_type)
 
         # If converting from a probability matrix
         if from_type == 'probability':
 
+            # ... to a weight matrix
             if to_type == 'weight':
                 out_df = _probability_mat_to_weight_mat(df, background)
 
+            # ... to an information matrix
             elif to_type == 'information':
                 out_df = _probability_mat_to_information_mat(df, background)
+
+            # This should never execute
+            else:
+                assert False, 'THIS SHOULD NEVER HAPPEN'
 
         # Otherwise, convert to probability matrix, then call function again
         else:
@@ -166,9 +172,11 @@ def transform_matrix(df, from_type, to_type,
             elif from_type == 'weight':
                 prob_df = _weight_mat_to_probability_mat(df, background)
 
+            # If converting from an information matrix
             elif from_type == 'information':
                 prob_df = _information_mat_to_probability_mat(df, background)
 
+            # This should never execute
             else:
                 assert False, 'THIS SHOULD NEVER HAPPEN'
 
@@ -511,8 +519,8 @@ def saliency_to_matrix(sequence, saliency):
     dataframe is a C by L matrix (C is characters, L is sequence \n
     length) where the elements of the matrix are hot-encoded \n
     according to the saliency list. E.g. the element saliency_{c,l} \n
-    will be non-zero if character c occurs at position l, the value \n
-    of the element is equal to the value of the saliency list at that \n
+    will be non-zero if character c occurs at position l, the message \n
+    of the element is equal to the message of the saliency list at that \n
     position. All other elements are zero.
 
     example usage:
@@ -527,7 +535,7 @@ def saliency_to_matrix(sequence, saliency):
         sequence for which saliency logo will be drawn
 
     saliency: (list)
-        array of saliency value. len(saliency) == sequence
+        array of saliency message. len(saliency) == sequence
 
     returns
     -------

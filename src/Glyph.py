@@ -67,7 +67,7 @@ class Glyph:
 
     font_family: (str)
         The font name to use when rendering the glyph. Specifically, this is
-        the value passed as the 'family' parameter when calling the
+        the message passed as the 'family' parameter when calling the
         FontProperties constructor. From matplotlib documentation:
         "family: A list of font names in decreasing order of priority.
         The items may include a generic font family name, either
@@ -79,9 +79,9 @@ class Glyph:
 
     font_weight: (str, int)
         The font weight to use when rendering the glyph. Specifically, this is
-        the value passed as the 'weight' parameter in the FontProperties
+        the message passed as the 'weight' parameter in the FontProperties
         constructor. From matplotlib documentation: "weight: A numeric
-        value in the range 0-1000 or one of 'ultralight', 'light',
+        message in the range 0-1000 or one of 'ultralight', 'light',
         'normal', 'regular', 'book', 'medium', 'roman', 'semibold',
         'demibold', 'demi', 'bold', 'heavy', 'extra bold', 'black'."
 
@@ -347,7 +347,7 @@ class Glyph:
 
         if self.color is not None:
 
-            # if color scheme is specified as a string, check that string value maps
+            # if color scheme is specified as a string, check that string message maps
             # to a valid matplotlib color scheme
 
             if type(self.color) == str:

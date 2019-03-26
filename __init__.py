@@ -1,184 +1,162 @@
 from __future__ import division
-import numpy as np
-import pandas as pd
-import ast
-import inspect
-import re
-import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties, FontManager
-from matplotlib.transforms import Bbox
-from matplotlib.colors import to_rgba
-import matplotlib as mpl
-import pdb
 from functools import wraps
 import sys
-import os
-import traceback
+
+# Classes / functions imported with logomaker
+from logomaker.src.Logo import Logo
+from logomaker.src.Glyph import Glyph
+from logomaker.src.Glyph import list_font_families
+from logomaker.src.data import transform_matrix
+from logomaker.src.data import iupac_to_matrix
+from logomaker.src.data import alignment_to_matrix
+from logomaker.src.data import saliency_to_matrix
+from logomaker.src.validate import validate_matrix
+
+# TODO: fold these two functions into transform_matrix
+from logomaker.src.data import center_matrix
+from logomaker.src.data import normalize_matrix
+
+# TODO: fold these into validate_matrix
+from logomaker.src.validate import validate_probability_mat
+from logomaker.src.validate import validate_information_mat
 
 
-# Define error handling
 class ControlledError(Exception):
+    """
+    Class used by Logomaker to handle errors.
 
-    def __init__(self, value):
-        self.value = value
+    parameters
+    ----------
+
+    message: (str)
+        The message passed to check(). This only gets passed to the
+        ControlledError constructor when the condition passed to check() is
+        False.
+    """
+
+    def __init__(self, message):
+        self.message = message
 
     def __str__(self):
-        return self.value
-
-
-'''
-
-*** Note ***
-The following implementation will not work with the decorator handle_errors.
-Using it without the handle error decorator shows the entire stacktrace in 
-jupyter, but not when running python directly, so I suggest we use the simpler
-implementation of Controlled Error.
-
-I suggest we remove this commented code after code review. 
-
--AT 
-  
-
-# this message prints out a message
-# and stops execution and hides traceback.
-def ControlledError(message):
-
-        sys.excepthook = logomaker_excepthook
-        raise Exception(message)
-
-        
-# method that helps complete the implementation of
-# Controlled Error for logomaker.
-def logomaker_excepthook(type, value, traceback):
-    sys.tracebacklimit = 0
-    print(value)
-        
-'''
+        return self.message
 
 
 def check(condition, message):
 
     """
-    Checks a condition; raises a ControlledError with message if condition fails.
-    :param condition:
-    :param message:
-    :return: None
+    Checks a condition; raises a ControlledError with message if condition
+    evaluates to False
+
+    parameters
+    ----------
+
+    condition: (bool)
+        A condition that, if false, halts Logomaker execution and raises a
+        clean error to user
+
+    message: (str)
+        The string to show user if condition is False.
+
+    returns
+    -------
+    None
     """
 
     if not condition:
         raise ControlledError(message)
 
 
-# Dummy class.
-# Need to justify leaving this in here. AT
-class Dummy():
-    def __init__(self):
-        pass
-
-
 def handle_errors(func):
     """
-    Decorator function to handle logomaker errors
+    Decorator function to handle Logomaker errors.
+
+    This decorator allows the user to pass the keyword argument
+    'should_fail' to any wrapped function.
+
+    If should_fail is None (or is not set by user), the function executes
+    normally, and can be called as
+
+        result = func(*args, **kwargs)
+
+    In particular, Python execution will halt if any errors are raised.
+
+    However, if the user specifies should_fail=True or should_fail=False, then
+    Python will not halt even in the presence of an error. Moreover, the
+    function will return a tuple, e.g.,
+
+        result, mistake = func(*args, should_fail=True, **kwargs)
+
+    with mistake flagging whether or not the function failed or succeeded
+    as expected.
     """
 
-    @wraps(func)
+    @wraps(func)  # So wrapped_func has the same docstring, etc., as func
     def wrapped_func(*args, **kwargs):
 
-        # Get should_fail debug flag
+        # Get should_fail debug flag AND remove should_fail from kwargs dict.
+        # Need to use pop method so that 'should_fail' variable is not passed
+        # to func() within try/except below
         should_fail = kwargs.pop('should_fail', None)
+
+        # Otherwise, user passed something other than a bool for
+        # should_fail, which isn't valid.
+        check(should_fail in (True, False, None),
+              'FATAL: should_fail = %s is not bool or None' % should_fail)
+
+        # Default values for returned variables
+        result = None
+        mistake = None
 
         try:
             # Execute function
             result = func(*args, **kwargs)
-            error = False
 
-            # If function didn't raise error, process results
+            # If running functional test and expect to fail
             if should_fail is True:
                 print('MISTAKE: Succeeded but should have failed.')
                 mistake = True
 
+            # If running functional test and expect to pass
             elif should_fail is False:
                 print('Success, as expected.')
                 mistake = False
 
-            elif should_fail is None:
-                mistake = False
-
+            # If user did not pass should_fail then nothing more to do.
             else:
-                print('FATAL: should_fail = %s is not bool or None' %
-                      should_fail)
-                sys.exit(1)
+                pass
 
-        except (ControlledError) as e:
+        except ControlledError as e:
 
-            error = True
-
+            # If running functional test and expect to fail
             if should_fail is True:
-                print('Error, as expected: ', e.__str__())
+                print('Error, as expected: ',
+                      e.__str__())
                 mistake = False
 
+            # If running functional test and expect to pass
             elif should_fail is False:
-                print('MISTAKE: Failed but should have succeeded: ', e.__str__())
+                print('MISTAKE: Failed but should have succeeded: ',
+                      e.__str__())
                 mistake = True
 
-            # Otherwise, just print an error and don't return anything
+            # Otherwise, print error (but not stack trace) and halt execution
             else:
-                print('Error in',func.__name__+':', e.__str__())
+                print('Error in', func.__name__+':', e.__str__())
 
-
-                # to stop further execution of program on finding an error
-                # the following is a clean way to stop the program.
+                # Stop execution
                 sys.exit()
 
-                # an alternate approach is:
-                # return
-                # but this will try to keep the program going once the
-                # error is reported. May be we could leave this on if
-                # the user selects a debug = True flag.
-
-        # If not in debug mode
+        # If not in debug mode, and no error was detected above,
         if should_fail is None:
 
-            # If error, exit
-            if error:
-                # sys.exit(1)
-                return
-
-            # Otherwise, just return normal result
-            else:
-                return result
+            # Just return result
+            return result
 
         # Otherwise, if in debug mode
         else:
 
-            # If this is a constructor, set 'mistake' attribute of self
-            if func.__name__ == '__init__':
-                assert len(args) > 0
-                args[0].mistake = mistake
-                return None
+            # Return result and mistake status
+            return result, mistake
 
-            # Otherwise, create dummy object with mistake attribute
-            else:
-                obj = Dummy()
-                obj.mistake = mistake
-                return obj
-
+    # Return the wrapped function to the user
     return wrapped_func
-
-# Rename useful stuff from within Logomaker
-
-from logomaker.src.Logo import Logo
-
-from logomaker.src.Glyph import Glyph
-from logomaker.src.Glyph import list_font_families
-
-from logomaker.src.data import transform_matrix
-from logomaker.src.data import center_matrix
-from logomaker.src.data import normalize_matrix
-from logomaker.src.data import iupac_to_matrix
-from logomaker.src.data import alignment_to_matrix
-from logomaker.src.data import saliency_to_matrix
-
-from logomaker.src.validate import validate_matrix
-from logomaker.src.validate import validate_probability_mat
-from logomaker.src.validate import validate_information_mat

@@ -35,7 +35,7 @@ class Logo:
 
     colors: (color scheme)
         Face color of logo characters. Default 'gray'. Here and in
-        what follows a variable of type 'color' can take a variety of value
+        what follows a variable of type 'color' can take a variety of message
         types.
          - (str) A Logomaker color scheme in which the color is determined
              by the specific character being drawn. Options are,
@@ -58,9 +58,9 @@ class Logo:
 
     stack_order: (str)
         Must be 'big_on_top', 'small_on_top', or 'fixed. If 'big_on_top',
-        stack glyphs away from x-axis in order of increasing absolute value.
+        stack glyphs away from x-axis in order of increasing absolute message.
         If 'small_on_top', stack glyphs away from x-axis in order of
-        decreasing absolute value. If 'fixed', stack glyphs from top to bottom
+        decreasing absolute message. If 'fixed', stack glyphs from top to bottom
         in the order that characters appear in the data frame. If 'flipped',
         stack glyphs in the opposite order as 'fixed'.
 
@@ -70,7 +70,7 @@ class Logo:
 
     center_values: (bool)
         If True, the stack of characters at each position will be centered
-        around zero. This is accomplished by subtracting the mean value
+        around zero. This is accomplished by subtracting the mean message
         in each row of the matrix from each element in that row.
 
     baseline_width: (float >= 0.0)
@@ -231,7 +231,7 @@ class Logo:
         # check that color scheme is valid
         if self.colors is not None:
 
-            # if color scheme is specified as a string, check that string value maps
+            # if color scheme is specified as a string, check that string message maps
             # to a valid matplotlib color scheme
 
             if type(self.colors) == str:
@@ -534,7 +534,7 @@ class Logo:
                                         ax=None):
 
         """
-        Fades glyphs in probability logo according to value
+        Fades glyphs in probability logo according to message
 
         parameter
         ---------
@@ -572,7 +572,7 @@ class Logo:
         for p in self.ps:
             for c in self.cs:
 
-                # Grab both glyph and value
+                # Grab both glyph and message
                 v = self.df.loc[p, c]
                 g = self.glyph_df.loc[p, c]
 
@@ -658,7 +658,7 @@ class Logo:
         for p in self.ps:
             for c in self.cs:
 
-                # If matrix value is < 0
+                # If matrix message is < 0
                 v = self.df.loc[p, c]
                 if v < 0:
 

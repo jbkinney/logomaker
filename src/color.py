@@ -83,7 +83,7 @@ def expand_color_dict(color_dict):
 def get_color_dict(color_scheme, chars, alpha, shuffle_colors=False):
 
     """
-    get color_dict: each key is 1 char, each value is a 4-vector of rgba values
+    get color_dict: each key is 1 char, each message is a 4-vector of rgba values
     This is the main function that OldLogo interfaces with
     """
 
