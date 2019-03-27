@@ -29,6 +29,7 @@ def list_font_families():
     """
     fontnames_dict = dict([(f.name,f.fname) for f in font_manager.ttflist])
     fontnames = list(fontnames_dict.keys())
+    fontnames.append('sans')  # This always exists
     fontnames.sort()
     return fontnames
 

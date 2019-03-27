@@ -80,6 +80,12 @@ class Logo:
         If True, glyphs below the x-axis (which correspond to negative
         values in the matrix) will be flipped upside down.
 
+    fade_probabilities: (bool)
+        If True, the glyphs in each stack will then be assigned an alpha value
+        equal to their height. Note: this option only makes sense if df is a
+        probability matrix. For additional customization, use
+        Logo.fade_glyphs_in_probability_logo().
+
     shade_below: (float in [0,1])
         The amount of shading underneath x-axis.
 
@@ -91,6 +97,11 @@ class Logo:
         vsep is NOT relative to glyph height. The vsep-sized margin between
         glyphs on either side of the x-axis will always be centered on the
         x-axis.
+
+    show_spines: (bool)
+        Whether should be shown on all four sides of the logo. If set to either
+        True or false, will automatically set draw_now=True.
+        For additional customization of spines, use Logo.style_spines().
 
     zorder: (int >=0)
         The order in which things are drawn.
@@ -115,8 +126,7 @@ class Logo:
     def __init__(self,
                  df,
                  colors=None,
-                 # font_name='sans', # this does not exist in list_font_families()
-                 font_name = 'DejaVu Sans',
+                 font_name='sans',
                  stack_order='big_on_top',
                  negate_values=False,
                  center_values=False,
@@ -124,7 +134,9 @@ class Logo:
                  flip_below=True,
                  shade_below=0.0,
                  fade_below=0.0,
+                 fade_probabilities=False,
                  vsep=0.0,
+                 show_spines=None,
                  zorder=0,
                  figsize=(10, 2.5),
                  ax=None,
@@ -132,7 +144,7 @@ class Logo:
                  **kwargs):
 
         # set class attributes
-        self.df = df
+        self.df = df.copy()
         self.colors = colors
         self.font_name = font_name
         self.stack_order = stack_order
@@ -142,11 +154,16 @@ class Logo:
         self.flip_below = flip_below
         self.shade_below = shade_below
         self.fade_below = fade_below
+        self.fade_probabilities = fade_probabilities
         self.vsep = vsep
+        self.show_spines = show_spines
         self.zorder = zorder
         self.figsize = figsize
         self.ax = ax
         self.draw_now = draw_now
+
+        # Register logo as NOT having been drawn
+        self.has_been_drawn = False
 
         # perform input checks to validate attributes
         self._input_checks()
@@ -164,8 +181,12 @@ class Logo:
         # Set colors by identifying default or otherwise setting to gray
         if colors is None:
             key = tuple(self.cs)
-            colors = chars_to_colors_dict.get(key,'gray')
+            colors = chars_to_colors_dict.get(key, 'gray')
         self.colors = colors
+
+        # If fade_probabilities is True, make df a probability matrix
+        if fade_probabilities:
+            self.df = validate_probability_mat(self.df)
 
         # Save other attributes
         self.ax = ax
@@ -202,14 +223,29 @@ class Logo:
         # Compute characters.
         self._compute_glyphs()
 
-        # Draw now if requested
-        if draw_now:
-            self.draw()
-
         # Style glyphs below x-axis
         self.style_glyphs_below(shade=self.shade_below,
                                 fade=self.fade_below,
-                                draw_now=self.draw_now)
+                                draw_now=False,
+                                ax=self.ax)
+
+        # Fade glyphs by value if requested
+        if self.fade_probabilities:
+            self.fade_glyphs_in_probability_logo(v_alpha0=0,
+                                                 v_alpha1=1,
+                                                 draw_now=False)
+
+        # Either show or hide spines based on self.show_spines
+        # Note: if show_spines is not None, logo must be drawn now.
+        if self.show_spines is not None:
+            self.style_spines(visible=self.show_spines)
+
+        # Draw now if requested
+        if self.draw_now:
+            self.draw()
+
+
+
 
     def _input_checks(self):
 
@@ -816,8 +852,9 @@ class Logo:
         # validate inputs
         self._input_checks()
 
-        if (hasattr(self, 'has_been_drawn')):
-            check(self.has_been_drawn == True, 'Cannot call this function until Logo has been drawn.')
+        # If not yet drawn, draw
+        if not self.has_been_drawn:
+            self.draw()
 
         #assert self.has_been_drawn, \
         #    'Error: Cannot call this function until Log0 has been drawn.'
@@ -1084,8 +1121,9 @@ class Logo:
         # validate inputs
         self._input_checks()
 
-        if(hasattr(self,'has_been_drawn')):
-            check(self.has_been_drawn==True,'Error: Cannot call this function until Logo has been drawn.')
+        # Draw if logo has not yet been drawn
+        if not self.has_been_drawn:
+            self.draw()
 
         # Iterate over all spines
         for name, spine in self.ax.spines.items():
