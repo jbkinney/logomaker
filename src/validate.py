@@ -250,8 +250,11 @@ def validate_matrix(dataframe, allow_nan=False):
     Returns a cleaned-up version of df if possible
     """
 
-    check(isinstance(dataframe,pd.DataFrame),
-          'dataframe needs to be a valid pandas dataframe, dataframe entered: '+str(type(dataframe)))
+    check(isinstance(dataframe, pd.DataFrame),
+          'dataframe needs to be a valid pandas dataframe, dataframe entered: ' + str(type(dataframe)))
+
+    # Create copy of dataframe so that don't overwrite the user's data
+    dataframe = dataframe.copy()
 
     check(isinstance(allow_nan,bool),'allow_nan = %s must be of type bool'%type(allow_nan))
 

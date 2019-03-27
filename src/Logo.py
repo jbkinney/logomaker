@@ -64,10 +64,6 @@ class Logo:
         in the order that characters appear in the data frame. If 'flipped',
         stack glyphs in the opposite order as 'fixed'.
 
-    negate_values: (bool)
-        If True, all values in matrix are multiplied by -1. This can be
-        useful when illustrating negative energy values in an energy matrix.
-
     center_values: (bool)
         If True, the stack of characters at each position will be centered
         around zero. This is accomplished by subtracting the mean message
@@ -128,7 +124,6 @@ class Logo:
                  colors=None,
                  font_name='sans',
                  stack_order='big_on_top',
-                 negate_values=False,
                  center_values=False,
                  baseline_width=0.5,
                  flip_below=True,
@@ -144,11 +139,10 @@ class Logo:
                  **kwargs):
 
         # set class attributes
-        self.df = df.copy()
+        self.df = df
         self.colors = colors
         self.font_name = font_name
         self.stack_order = stack_order
-        self.negate_values = negate_values
         self.center_values = center_values
         self.baseline_width = baseline_width
         self.flip_below = flip_below
@@ -190,7 +184,6 @@ class Logo:
 
         # Save other attributes
         self.ax = ax
-        self.negate_values = bool(negate_values)
         self.center_values = center_values
         self.flip_below = flip_below
         self.vsep = vsep
@@ -204,10 +197,6 @@ class Logo:
 
         # Set flag for whether Logo has been drawn
         self.has_been_drawn = False
-
-        # Negate values if requested
-        if self.negate_values:
-            self.df = -self.df
 
         # Fill NaN values of matrix_df with zero
         if self.center_values:
@@ -254,11 +243,7 @@ class Logo:
         """
 
         # Validate dataframe
-        validate_matrix(self.df)
-
-        # check that negate_values is a boolean
-        check(isinstance(self.negate_values, bool),
-              'type(negate_values) = %s; must be of type bool ' % type(self.negate_values))
+        self.df = validate_matrix(self.df)
 
         # check that center_values is a boolean
         check(isinstance(self.center_values, bool),
@@ -1214,7 +1199,8 @@ class Logo:
 
             elif self.stack_order == 'small_on_top':
                 tmp_vs = np.zeros(len(vs))
-                tmp_vs[vs != 0] = 1/vs
+                indices = (vs != 0)
+                tmp_vs[indices] = 1.0/vs[indices]
 
                 ordered_indices = np.argsort(tmp_vs)
             elif self.stack_order == 'fixed':

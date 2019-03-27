@@ -140,7 +140,7 @@ def test_logomaker_Logo():
     # test parameter stack_order
     # TODO: 'small_on_top' is failing
     test_parameter_values(func=logomaker.Logo, var_name='stack_order', fail_list=['incorrect argument', 0.0, None],
-                          success_list=['big_on_top', 'fixed', 'flipped'],df=good_rnap_df)
+                          success_list=['small_on_top', 'big_on_top', 'fixed', 'flipped'], df=good_rnap_df)
 
 
 test_logomaker_Logo()
