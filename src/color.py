@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgb
 
+from logomaker.src.error_handling import check, handle_errors
+
 # Create facecolor scheme dict
 three_zeros = np.zeros(3)
 three_ones = np.ones(3)

@@ -12,7 +12,7 @@ from logomaker.src.Glyph import Glyph
 from logomaker.src import color as lm_color
 from logomaker.src.validate import validate_matrix, validate_probability_mat
 import logomaker.src.validate as validate
-from logomaker import LogomakerError, check, handle_errors
+from logomaker.src.error_handling import check, handle_errors
 
 chars_to_colors_dict = {
     tuple('ACGT'): 'classic',
@@ -215,14 +215,14 @@ class Logo:
         # Style glyphs below x-axis
         self.style_glyphs_below(shade=self.shade_below,
                                 fade=self.fade_below,
-                                draw_now=False,
+                                draw_now=self.draw_now,
                                 ax=self.ax)
 
         # Fade glyphs by value if requested
         if self.fade_probabilities:
             self.fade_glyphs_in_probability_logo(v_alpha0=0,
                                                  v_alpha1=1,
-                                                 draw_now=False)
+                                                 draw_now=self.draw_now)
 
         # Either show or hide spines based on self.show_spines
         # Note: if show_spines is not None, logo must be drawn now.
@@ -232,9 +232,6 @@ class Logo:
         # Draw now if requested
         if self.draw_now:
             self.draw()
-
-
-
 
     def _input_checks(self):
 
@@ -578,7 +575,6 @@ class Logo:
         self.v_alpha0 = v_alpha0
         self.v_alpha1 = v_alpha1
         self.draw_now = draw_now
-        self.ax = ax
 
         # validate inputs
         self._input_checks()

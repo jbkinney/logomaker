@@ -5,7 +5,7 @@ from matplotlib.font_manager import FontManager, FontProperties
 from matplotlib.colors import to_rgb, cnames
 import matplotlib.pyplot as plt
 import pdb
-from logomaker import check, handle_errors
+from logomaker.src.error_handling import check, handle_errors
 import matplotlib.cm
 import numpy as np
 
