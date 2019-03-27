@@ -1,0 +1,34 @@
+Testing Logo() parameter df ...
+Test # 0: Error, as expected:  dataframe needs to be a valid pandas dataframe, dataframe entered: <class 'list'>
+Test # 1: Error, as expected:  dataframe needs to be a valid pandas dataframe, dataframe entered: <class 'str'>
+Test # 2: Success, as expected.
+Test # 3: Success, as expected.
+Tests passed: 4. Tests failed: 0.
+
+Testing Logo() parameter colors ...
+Test # 4: Error, as expected:  colors = x; is an invalid color scheme. Valid choices include classic, chemistry, grays. A full list of valid color schemes can be found by printing list(matplotlib.cm.cmap_d.keys()). 
+Test # 5: Error, as expected:  colors = bad_color_name; is an invalid color scheme. Valid choices include classic, chemistry, grays. A full list of valid color schemes can be found by printing list(matplotlib.cm.cmap_d.keys()). 
+Test # 6: Error, as expected:  type(colors) = <class 'int'>; must be of type (tuple,list,dict) 
+Test # 7: Success, as expected.
+Test # 8: Success, as expected.
+Test # 9: Success, as expected.
+Test # 10: Success, as expected.
+Tests passed: 11. Tests failed: 0.
+
+Testing Logo() parameter font_name ...
+Test # 11: Error, as expected:  Invalid choice for font_family. For a list of valid choices, please call logomaker.list_font_families().
+Test # 12: Error, as expected:  Invalid choice for font_family. For a list of valid choices, please call logomaker.list_font_families().
+Test # 13: Error, as expected:  type(font_family) = <class 'pandas.core.frame.DataFrame'> must be of type str
+Test # 14: Success, as expected.
+Test # 15: Success, as expected.
+Test # 16: Success, as expected.
+Tests passed: 17. Tests failed: 0.
+
+Testing Logo() parameter stack_order ...
+Test # 17: Error, as expected:  stack_order = incorrect argument; must be "big_on_top", "small_on_top", "fixed", "flipped".
+Test # 18: Error, as expected:  stack_order = 0.0; must be "big_on_top", "small_on_top", "fixed", "flipped".
+Test # 19: Error, as expected:  stack_order = None; must be "big_on_top", "small_on_top", "fixed", "flipped".
+Test # 20: Success, as expected.
+Test # 21: Success, as expected.
+Test # 22: Success, as expected.
+Tests passed: 23. Tests failed: 0.
