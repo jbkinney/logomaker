@@ -355,33 +355,33 @@ class Glyph:
 
                 # get allowed list of matplotlib color schemes
                 check(self.color in valid_color_strings,
-                      # 'colors = %s; must be in %s' % (self.colors, str(valid_color_strings)))
-                      'colors = %s; is an invalid color scheme. Valid choices include classic, chemistry, grays. '
+                      # 'color_scheme = %s; must be in %s' % (self.color_scheme, str(valid_color_strings)))
+                      'color_scheme = %s; is an invalid color scheme. Valid choices include classic, chemistry, grays. '
                       'A full list of valid color schemes can be found by '
                       'printing list(matplotlib.cm.cmap_d.keys()). ' % self.color)
 
             # otherwise limit the allowed types to tuples, lists, dicts
             else:
                 check(isinstance(self.color,(tuple,list,dict)),
-                      'type(colors) = %s; must be of type (tuple,list,dict) ' % type(self.color))
+                      'type(color_scheme) = %s; must be of type (tuple,list,dict) ' % type(self.color))
 
                 # check that RGB values are between 0 and 1 is
-                # colors is a list or tuple
+                # color_scheme is a list or tuple
 
                 if type(self.color) == list or type(self.color) == tuple:
 
                     check(all(i <= 1.0 for i in self.color),
-                          'Values of colors array must be between 0 and 1')
+                          'Values of color_scheme array must be between 0 and 1')
 
                     check(all(i >= 0.0 for i in self.color),
-                          'Values of colors array must be between 0 and 1')
+                          'Values of color_scheme array must be between 0 and 1')
 
         # validate edgecolor
         check(self.edgecolor in list(matplotlib.colors.cnames.keys()),
-              # 'colors = %s; must be in %s' % (self.colors, str(valid_color_strings)))
+              # 'color_scheme = %s; must be in %s' % (self.color_scheme, str(valid_color_strings)))
               'edgecolor = %s; is an invalid color scheme. Valid choices include blue, black, silver. '
               'A full list of valid color schemes can be found by '
-              'printing list(matplotlib.colors.cnames.keys()). ' % self.edgecolor)
+              'printing list(matplotlib.color_scheme.cnames.keys()). ' % self.edgecolor)
 
         # validate width
         check(isinstance(self.width, (float, int)),

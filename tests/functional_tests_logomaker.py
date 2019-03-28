@@ -127,9 +127,9 @@ def test_logomaker_Logo():
     test_parameter_values(func=logomaker.Logo, var_name='df',fail_list=[bool_fail_list,bad_df1],
                           success_list=[good_rnap_df,random_df])
 
-    # test parameter colors
-    test_parameter_values(func=logomaker.Logo, var_name='colors', fail_list=['x','bad_color_name',3],
-                          success_list=['classic', 'grays', 'Blues','RdBu'],
+    # test parameter color_scheme
+    test_parameter_values(func=logomaker.Logo, var_name='color_scheme', fail_list=['x','bad_color_name',3],
+                          success_list=['classic', 'grays', 'hydrophobicity', 'chemistry'],
                           df=good_rnap_df)
 
     # test parameter font names

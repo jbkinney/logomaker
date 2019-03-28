@@ -523,13 +523,6 @@ def alignment_to_matrix(sequences,
     # Define valid types
     valid_types = MATRIX_TYPES.copy()
 
-    # TODO: fix the following issue regarding removal of counts from valid_types in matrix.py:
-    # The default choice for to_type is 'counts', if the user uses the default value,
-    # this method throws an error because the following line removes 'counts' from the valid_types
-    # set. We either need to not remove counts or update the default value.
-
-    #valid_types.remove('counts')
-
     # Check that to_type is valid
     check(to_type in valid_types,
           'to_type=%s; must be in %s' % (to_type, valid_types))
