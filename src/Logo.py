@@ -85,7 +85,7 @@ class Logo:
     fade_below: (float in [0,1])
         The amount of fading underneath x-axis.
 
-    vsep: (float > 0)
+    vsep: (float >= 0)
         Amount of whitespace to leave between rendered glyphs. Unlike vpad,
         vsep is NOT relative to glyph height. The vsep-sized margin between
         glyphs on either side of the x-axis will always be centered on the
@@ -278,6 +278,14 @@ class Logo:
         #             check(all(i >= 0.0 for i in self.color_scheme),
         #                   'Values of color_scheme array must be between 0 and 1')
 
+        # check baseline_width is a number
+        check(isinstance(self.baseline_width,(int,float)),
+              'type(baseline_width) = %s must be of type number' %(type(self.baseline_width)))
+
+        # check baseline_width >= 0.0
+        check(self.baseline_width >= 0.0,
+              'baseline_width = %s must be >= 0.0' % (self.baseline_width))
+
         # check that stack_order is valid
         check(self.stack_order in {'big_on_top', 'small_on_top', 'fixed', 'flipped'},
               'stack_order = %s; must be "big_on_top", "small_on_top", "fixed", "flipped".' % self.stack_order)
@@ -286,11 +294,33 @@ class Logo:
         check(isinstance(self.flip_below, bool),
             'type(flip_below) = %s; must be of type bool ' % type(self.flip_below))
 
+        # validate shade_below
+        check(isinstance(self.shade_below, (float, int)),
+              'type(shade_below) = %s must be of type float' % type(self.shade_below))
+
+        # ensure that shade_below is between 0 and 1
+        check(0.0 <= self.shade_below <= 1.0, 'shade_below must be between 0 and 1')
+
+        # validate fade_below
+        check(isinstance(self.fade_below, (float, int)),
+              'type(fade_below) = %s must be of type float' % type(self.fade_below))
+
+        # ensure that fade_below is between 0 and 1
+        check(0.0 <= self.fade_below <= 1.0, 'fade_below must be between 0 and 1')
+
+        # ensure fade_probabilities is of type bool
+        check(isinstance(self.fade_probabilities, bool),
+              'type(fade_probabilities) = %s; must be of type bool ' % type(self.fade_probabilities))
+
         # validate vsep
         check(isinstance(self.vsep, (float, int)),
               'type(vsep) = %s; must be of type float or int ' % type(self.vsep))
 
         check(self.vsep >= 0, "vsep = %d must be greater than 0 " % self.vsep)
+
+        # validate show_spines is a bool if its not none
+        if self.show_spines is not None:
+            check(isinstance(self.show_spines,bool), 'type(show_spines) = %s must be of type bool'%self.show_spines)
 
         # validate zorder
         check(isinstance(self.zorder, int),
@@ -298,13 +328,16 @@ class Logo:
 
         # the following check needs to be fixed based on whether the calling function
         # is the constructor, draw_baseline, or style_glyphs_below.
-        #check(self.zorder >= 0, "zorder = %d must be greater than 0 " % self.zorder)
+        # check(self.zorder >= 0, "zorder = %d must be greater than 0 " % self.zorder)
 
         # validate figsize
         check(isinstance(self.figsize, (tuple, list)),
               'type(figsize) = %s; must be of type (tuple,list) ' % type(self.figsize))
 
-        check(len(self.figsize)==2, 'The figsize array must have two elements')
+        check(len(self.figsize) == 2, 'The figsize array must have two elements')
+
+        check(all([isinstance(n, (int,float)) for n in self.figsize]),
+              'all elements of figsize array must be of type int')
 
         check(all(i > 0 for i in self.figsize),
               'Values of figsize array must be > 0')
