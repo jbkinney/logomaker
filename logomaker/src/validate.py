@@ -84,56 +84,75 @@ def validate_matrix(df, allow_nan=False):
 
 
 @handle_errors
-def validate_probability_mat(matrix):
+def validate_probability_mat(df):
     """
-    Verifies that the df is indeed a probability matrix dataframe.
-    Renormalizes df with Warning if it is not already normalized.
-    Throws an error of df cannot be reliably normalized.
+    Verifies that the input dataframe df indeed represents a
+    probability matrix. Renormalizes df with a text warning if it is not
+    already normalized. Throws an error if df cannot be reliably normalized.
+
+    parameters
+    ----------
+
+    df: (dataframe)
+        A pandas dataframe where each row represents an (integer) position
+        and each column represents to a (single) character.
+
+    returns
+    -------
+    prob_df: (dataframe)
+        A cleaned-up and normalized version of df (if possible).
     """
 
-    # Validate as motif
-    matrix = validate_matrix(matrix)
+    # Validate as a matrix. Make sure this contains no NaN values
+    prob_df = validate_matrix(df, allow_nan=False)
 
     # Make sure all values are non-negative
-    #assert (all(matrix.values.ravel() >= 0)), \
-    #    'Error: not all values in df are >=0.'
-
-    check(all(matrix.values.ravel() >= 0),
-        'Error: not all values in df are >=0.')
+    check(all(prob_df.values.ravel() >= 0),
+          'not all values in df are >=0.')
 
     # Check to see if values sum to one
-    sums = matrix.sum(axis=1).values
+    sums = prob_df.sum(axis=1).values
 
     # If any sums are close to zero, abort
-    #assert not any(np.isclose(sums, 0.0)), \
-    #    'Error: some columns in matrix sum to nearly zero.'
     check(not any(np.isclose(sums, 0.0)),
-        'Error: some columns in matrix sum to nearly zero.')
+          'some columns in prob_df sum to nearly zero.')
 
     # If any sums are not close to one, renormalize all sums
     if not all(np.isclose(sums, 1.0)):
-        print('Warning: Row sums in probability matrix are not close to 1. ' +
+        print('in validate_probability_mat(): '
+              'Row sums in df are not close to 1. '
               'Reormalizing rows...')
-        matrix.loc[:, :] = matrix.values / sums[:, np.newaxis]
+        prob_df.loc[:, :] = prob_df.values / sums[:, np.newaxis]
 
-    # Return data frame to user
-    return matrix
+    # Return validated probability matrix to user
+    return prob_df
+
 
 @handle_errors
-def validate_information_mat(matrix):
+def validate_information_mat(df):
     """
-    Verifies that the df is indeed an information matrix dataframe.
-    Returns a cleaned-up version of df if possible
+    Verifies that the input dataframe df indeed represents an
+    information matrix.
+
+    parameters
+    ----------
+
+    df: (dataframe)
+        A pandas dataframe where each row represents an (integer) position
+        and each column represents to a (single) character.
+
+    returns
+    -------
+    info_df: (dataframe)
+        A cleaned-up version of df (if possible).
     """
 
-    # Validate as motif
-    matrix = validate_matrix(matrix)
+    # Validate as a matrix. Make sure this contains no NaN values
+    info_df = validate_matrix(df, allow_nan=False)
 
-    # Validate df values as info values
-    #assert (all(matrix.values.ravel() >= 0)), \
-    #    'Error: not all values in df are >=0.'
-    check(all(matrix.values.ravel() >= 0),
-            'Error: not all values in df are >=0.')
+    # Validate all values in info_matrix are nonnegative
+    check(all(info_df.values.ravel() >= 0),
+          'not all values in df are >=0.')
 
-    # Return data frame to user
-    return matrix
+    # Return validated information matrix to user
+    return info_df
