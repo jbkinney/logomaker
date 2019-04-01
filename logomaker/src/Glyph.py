@@ -2,9 +2,9 @@ from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch
 from matplotlib.transforms import Affine2D, Bbox
 from matplotlib.font_manager import FontManager, FontProperties
-from matplotlib.colors import to_rgb, cnames
+from matplotlib.colors import to_rgb
 import matplotlib.pyplot as plt
-import pdb
+from matplotlib.axes import Axes
 from logomaker.src.error_handling import check, handle_errors
 import matplotlib.cm
 import numpy as np
@@ -13,9 +13,9 @@ import numpy as np
 font_manager = FontManager()
 
 
-def list_font_families():
+def list_font_names():
     """
-    Returns a list of valid font_name options for use, e.g., in Glyph or
+    Returns a list of valid font_name options for use in Glyph or
     Logo constructors.
 
     parameters
@@ -24,10 +24,11 @@ def list_font_families():
 
     returns
     -------
-    List of valid font_name names. This will vary from system to system.
+    fontnames: (list)
+        List of valid font_name names. This will vary from system to system.
 
     """
-    fontnames_dict = dict([(f.name,f.fname) for f in font_manager.ttflist])
+    fontnames_dict = dict([(f.name, f.fname) for f in font_manager.ttflist])
     fontnames = list(fontnames_dict.keys())
     fontnames.append('sans')  # This always exists
     fontnames.sort()
@@ -37,100 +38,95 @@ def list_font_families():
 class Glyph:
     """
     A Glyph represents a character, drawn on a specified axes at a specified
-    position, rendered using specified styling such as color and font.
+    position, rendered using specified styling such as color and font_name.
 
     attributes
     ----------
 
-    ax: (matplotlib Axes object)
-        The axes object on which to draw the glyph.
-
     p: (number)
-        Axes x-coordinate of glyph center_values.
+        x-coordinate value on which to center the Glyph.
 
     c: (str)
-        Character represeted by glyph.
+        The character represented by the Glyph.
 
-    floor: (float)
-        Axes y-coordinate of glyph bottom. Must be < ceiling
+    floor: (number)
+        y-coordinate value where the bottom of the Glyph extends to.
+        Must be < ceiling.
 
-    ceiling: (float)
-        Axes y-coordinate of glyph top. Must be > floor.
+    ceiling: (number)
+        y-coordinate value where the top of the Glyph extends to.
+        Must be > floor.
 
-    width: (float > 0)
-        Axes x-span of glyph.
+    ax: (matplotlib Axes object)
+        The axes object on which to draw the Glyph.
 
-    vpad: (float in [0,1])
-        Amount of whitespace to leave within the glyph bounding box above
-        and below the rendered glyph itself. Specifically, in a glyph with
+    width: (number > 0)
+        x-coordinate span of the Glyph.
+
+    vpad: (number in [0,1])
+        Amount of whitespace to leave within the Glyph bounding box above
+        and below the actual Glyph. Specifically, in a glyph with
         height h = ceiling-floor, a margin of size h*vpad/2 will be left blank
         both above and below the rendered character.
 
-    font_family: (str)
-        The font name to use when rendering the glyph. Specifically, this is
-        the message passed as the 'family' parameter when calling the
-        FontProperties constructor. From matplotlib documentation:
-        "family: A list of font names in decreasing order of priority.
-        The items may include a generic font family name, either
-        'serif', 'sans-serif', 'cursive', 'fantasy', or 'monospace'.
-        In that case, the actual font to be used will be looked up from
-        the associated rcParam in matplotlibrc."
-        Run logomaker.get_font_families() for list of (some but not all) valid
-        options on your system.
+    font_name: (str)
+        The name of the font to use when rendering the Glyph. This is
+        the value passed as the 'family' parameter when calling the
+        matplotlib.font_manager.FontProperties constructor.
 
-    font_weight: (str, int)
-        The font weight to use when rendering the glyph. Specifically, this is
-        the message passed as the 'weight' parameter in the FontProperties
-        constructor. From matplotlib documentation: "weight: A numeric
-        message in the range 0-1000 or one of 'ultralight', 'light',
+    font_weight: (str or number)
+        The font weight to use when rendering the Glyph. Specifically, this is
+        the value passed as the 'weight' parameter in the
+        matplotlib.font_manager.FontProperties constructor.
+        From matplotlib documentation: "weight: A numeric
+        value in the range 0-1000 or one of 'ultralight', 'light',
         'normal', 'regular', 'book', 'medium', 'roman', 'semibold',
         'demibold', 'demi', 'bold', 'heavy', 'extra bold', 'black'."
 
     color: (matplotlib color)
-        Color to use for the face of the glyph.
+        Color to use for Glyph face.
 
     edgecolor: (matplotlib color)
-        Color to use for edges of the glyph.
+        Color to use for Glyph edge.
 
-    edgewidth: (float > 0)
-        Width to use for edges of all glyphs in logo.
+    edgewidth: (number >= 0)
+        Width of Glyph edge.
 
     dont_stretch_more_than: (str)
         This parameter limits the amount that a character will be
-        horizontally stretched when rendering tue glyph. Specifying an
+        horizontally stretched when rendering the Glyph. Specifying a
         wide character such as 'W' corresponds to less potential stretching,
         while specifying a narrow character such as '.' corresponds to more
         stretching.
 
     flip: (bool)
-        If True, the glyph will be rendered flipped upside down.
+        If True, the Glyph will be rendered upside down.
 
     mirror: (bool)
-        If True, a mirror image of the glyph will be rendered.
+        If True, a mirror image of the Glyph will be rendered.
 
     zorder: (number)
-        Placement of glyph within the Axes z-stack.
+        Placement of Glyph within the z-stack of ax.
 
-    alpha: (float in [0,1])
-        Opacity of the rendered glyph.
+    alpha: (number in [0,1])
+        Opacity of the rendered Glyph.
 
     draw_now: (bool)
-        If True, the glyph is rendered immediately after it is specified.
-        Set to False if you might wish to change the properties of this glyph
-        after initial specification.
-
+        If True, the Glyph is rendered immediately after it is specified.
+        Set to False if you wish to change the properties of this Glyph
+        after initial specification and before rendering.
     """
+
     @handle_errors
     def __init__(self,
                  p,
                  c,
-                 ax=None,
                  floor=None,
                  ceiling=None,
+                 ax=None,
                  width=0.95,
                  vpad=0.00,
-                 #font_family='sans',      # this does not exist in list_font_families()
-                 font_family='DejaVu Sans',
+                 font_name='sans',
                  font_weight='bold',
                  color='gray',
                  edgecolor='black',
@@ -142,17 +138,14 @@ class Glyph:
                  alpha=1,
                  draw_now=True):
 
-        # Do basic checks
-        #assert width > 0, 'Error: Must have width > 0'
-        check(width > 0, 'Must have width > 0')
-
         # Set attributes
         self.p = p
+        self.c = c
         self.floor = floor
         self.ceiling = ceiling
+        self.ax = ax
         self.width = width
         self.vpad = vpad
-        self.c = c
         self.flip = flip
         self.mirror = mirror
         self.zorder = zorder
@@ -161,10 +154,10 @@ class Glyph:
         self.color = to_rgb(color)
         self.edgecolor = edgecolor
         self.edgewidth = edgewidth
-        self.font_family = font_family
+        self.font_name = font_name
         self.font_weight = font_weight
-        self.ax = ax
 
+        # Check inputs
         self._input_checks()
 
         # Draw now if requested
@@ -179,11 +172,14 @@ class Glyph:
         ----------
         **kwargs:
             Attributes and their values.
-
         """
         for key, value in kwargs.items():
+
+            # If key corresponds to a color, convert to rgb
             if key in ('color', 'edgecolor'):
                 value = to_rgb(value)
+
+            # Save variable name
             self.__dict__[key] = value
 
     def draw(self, ax=None):
@@ -199,7 +195,6 @@ class Glyph:
         returns
         -------
         None.
-
         """
 
         # Make patch
@@ -207,9 +202,13 @@ class Glyph:
 
         # If user passed ax, use that
         if ax is not None:
+
+            # Check to make sure ax is a matplotlib Axes object
+            check(isinstance(ax, Axes),
+                  'ax is not a matplotlib Axes object')
             self.ax = ax
 
-        # If ax is not set, set to gca
+        # If ax is not set, set to current axes object
         if self.ax is None:
             self.ax = plt.gca()
 
@@ -219,8 +218,9 @@ class Glyph:
 
     def _make_patch(self):
         """
-        Makes patch corresponding to char. Does NOT
-        add this patch to an axes object, though; that is done by draw().
+        Returns an appropriately scaled patch object corresponding to
+        the Glyph. Note: Does not add this patch to an axes object;
+        that is done by draw().
         """
 
         # Set height
@@ -230,30 +230,28 @@ class Glyph:
         if height == 0.0:
             return None
 
-        # Set xmin
-        try:
-            xmin = self.p - self.width / 2
-        except:
-            pdb.set_trace()
+        # Set bounding box for character,
+        # leaving requested amount of padding above and below the character
+        char_xmin = self.p - self.width / 2.0
+        char_ymin = self.floor + self.vpad * height / 2.0
+        char_width = self.width
+        char_height = height - self.vpad * height
+        bbox = Bbox.from_bounds(char_xmin,
+                                char_ymin,
+                                char_width,
+                                char_height)
 
-        # Compute vpad
-        vpad = self.vpad * height
-
-        # Create bounding box, leaving requested amount of padding
-        bbox = Bbox.from_bounds(xmin,
-                                self.floor+vpad/2,
-                                self.width,
-                                height-vpad)
-
-        # Set font properties
-        font_properties = FontProperties(family=self.font_family,
+        # Set font properties of Glyph
+        font_properties = FontProperties(family=self.font_name,
                                          weight=self.font_weight)
 
-        # Create raw path
+        # Create a path for Glyph that does not yet have the correct
+        # position or scaling
         tmp_path = TextPath((0, 0), self.c, size=1,
                             prop=font_properties)
 
-        # Create path for max_stretched_character
+        # Create create a corresponding path for a glyph representing
+        # the max stretched character
         msc_path = TextPath((0, 0), self.dont_stretch_more_than, size=1,
                             prop=font_properties)
 
@@ -271,27 +269,39 @@ class Glyph:
         tmp_bbox = tmp_path.get_extents()
         msc_bbox = msc_path.get_extents()
 
-        # Compute horizontal stretch and shift needed to center_values char
+        # Compute horizontal stretch factor needed for tmp_path
         hstretch_tmp = bbox.width / tmp_bbox.width
+
+        # Compute horizontal stretch factor needed for msc_path
         hstretch_msc = bbox.width / msc_bbox.width
+
+        # Choose the MINIMUM of these two horizontal stretch factors.
+        # This prevents very narrow characters, such as 'I', from being
+        # stretched too much.
         hstretch = min(hstretch_tmp, hstretch_msc)
+
+        # Compute the new character width, accounting for the
+        # limit placed on the stretching factor
         char_width = hstretch * tmp_bbox.width
+
+        # Compute how much to horizontally shift the character path
         char_shift = (bbox.width - char_width) / 2.0
 
-        # Compute vertical stretch
+        # Compute vertical stetch factor needed for tmp_path
         vstretch = bbox.height / tmp_bbox.height
 
-        # THIS IS THE KEY TRANSFORMATION
-        # 1. Translate char path so that lower left corner is at origin
-        # 2. Scale char path to desired width and height
-        # 3. Translate char path to desired position
+        # THESE ARE THE ESSENTIAL TRANSFORMATIONS
+        # 1. First, translate char path so that lower left corner is at origin
+        # 2. Then scale char path to desired width and height
+        # 3. Finally, translate char path to desired position
+        # char_path is the resulting path used for the Glyph
         transformation = Affine2D() \
             .translate(tx=-tmp_bbox.xmin, ty=-tmp_bbox.ymin) \
             .scale(sx=hstretch, sy=vstretch) \
             .translate(tx=bbox.xmin + char_shift, ty=bbox.ymin)
         char_path = transformation.transform_path(tmp_path)
 
-        # Compute char patch
+        # Convert char_path to a patch, which can now be drawn on demand
         patch = PathPatch(char_path,
                           facecolor=self.color,
                           zorder=self.zorder,
@@ -299,7 +309,7 @@ class Glyph:
                           edgecolor=self.edgecolor,
                           linewidth=self.edgewidth)
 
-        # Return patch
+        # Return patch representing the Glyph
         return patch
 
     def _input_checks(self):
@@ -307,40 +317,75 @@ class Glyph:
         """
         check input parameters in the Logo constructor for correctness
         """
-        # check that flip is a boolean
-        check(isinstance(self.flip, (bool,np.bool_)),
-              'type(flip) = %s; must be of type bool ' % type(self.flip))
 
-        # check that mirror is a boolean
-        check(isinstance(self.mirror, bool),
-              'type(mirror) = %s; must be of type bool ' % type(self.mirror))
+        # check c is of type str
+        check(isinstance(self.c, str),
+              'type(c) = %s; must be of type str ' %
+              type(self.c))
 
-        check(isinstance(self.edgewidth, (float, int)),
-              'type(edgewidth) = %s must be a number' % type(self.edgewidth))
-
-        check(self.edgewidth >= 0, ' edgewidth must be >= 0')
+        # validate p
+        check(isinstance(int(self.p), (float, int)),
+              'type(p) = %s must be a number' % type(self.p))
 
         # validate floor
-        if(self.floor is not None):
-            check(isinstance(self.floor, (float, int)),
-                  'type(floor) = %s must be a number' % type(self.floor))
+        check(isinstance(self.floor, (float, int)),
+              'type(floor) = %s must be a number' % type(self.floor))
+        self.floor = float(self.floor)
 
         # validate ceiling
-        if(self.ceiling is not None):
-            check(isinstance(self.ceiling, (float, int)),
-                  'type(ceiling) = %s must be a number' % type(self.ceiling))
+        check(isinstance(self.ceiling, (float, int)),
+              'type(ceiling) = %s must be a number' % type(self.ceiling))
+        self.ceiling = float(self.ceiling)
 
+        # Check floor < ceiling
+        check(self.floor < self.ceiling,
+              'must have floor < ceiling. Currently, '
+              'floor=%f, ceiling=%f' % (self.floor, self.ceiling))
 
-        # validate alpha
-        check(isinstance(self.alpha, (float, int)),
-              'type(alpha) = %s must be a number' % type(self.alpha))
-
-        # ensure that alpha is between 0 and 1
-        check(self.alpha <= 1.0 and self.alpha >= 0, 'alpha must be between 0 and 1')
+        # Check ax
+        check((self.ax is None) or isinstance(self.ax, Axes),
+              'ax must be either a matplotlib Axes object or None.')
 
         # check that flip is a boolean
+        check(isinstance(self.flip, (bool, np.bool_)),
+              'type(flip) = %s; must be of type bool ' % type(self.flip))
+        self.flip = bool(self.flip)
+
+        # check that mirror is a boolean
+        check(isinstance(self.mirror, (bool, np.bool_)),
+              'type(mirror) = %s; must be of type bool ' % type(self.mirror))
+        self.mirror = bool(self.mirror)
+
+        # Check that edgewidth is a number
+        check(isinstance(self.edgewidth, (float, int)),
+              'type(edgewidth) = %s must be a number' % type(self.edgewidth))
+        self.edgewidth = float(self.edgewidth)
+
+        # Check that edgewidth is nonnegative
+        check(self.edgewidth >= 0,
+              ' edgewidth must be >= 0; is %f' % self.edgewidth)
+
+        # Check alpha is a number
+        check(isinstance(self.alpha, (float, int)),
+              'type(alpha) = %s must be a number' % type(self.alpha))
+        self.alpha = float(self.alpha)
+
+        # Check 0 <= alpha <= 1.0
+        check(0 <= self.alpha <= 1.0,
+              'alpha must be between 0.0 and 1.0 (inclusive)')
+
+        # check dont_stretch_more_than is of type str
         check(isinstance(self.dont_stretch_more_than, str),
-              'type(dont_stretch_more_than) = %s; must be of type str ' % type(self.dont_stretch_more_than))
+              'type(dont_stretch_more_than) = %s; must be of type str ' %
+              type(self.dont_stretch_more_than))
+
+        # check that dont_stretch_more_than is a single character
+        check(len(self.dont_stretch_more_than)==1,
+              'dont_stretch_more_than must have length 1; '
+              'currently len(dont_stretch_more_than)=%d' %
+              len(self.dont_stretch_more_than))
+
+        ################# END OF CODE REVIEW ###########################
 
         # check that color scheme is valid
         valid_color_strings = list(matplotlib.cm.cmap_d.keys())
@@ -395,23 +440,17 @@ class Glyph:
 
         check(self.vpad >= 0, "vpad = %d must be greater than 0 " % self.vpad)
 
-        # validate p
-        check(isinstance(int(self.p), int), 'type(p) = %s must be of type int' % type(self.p))
-
-        # validate c
-        check(isinstance(self.c, str), 'type(c) = %s must be of type str' % type(self.c))
-
         # validate zorder
         if(self.zorder is not None):
             check(isinstance(self.zorder, int),
                   'type(zorder) = %s; must be of type or int ' % type(self.zorder))
 
-        # validate font_family
-        check(isinstance(self.font_family, str),
-              'type(font_family) = %s must be of type str' % type(self.font_family))
+        # validate font_name
+        check(isinstance(self.font_name, str),
+              'type(font_name) = %s must be of type str' % type(self.font_name))
 
-        check(self.font_family in list_font_families(),
-              'Invalid choice for font_family. For a list of valid choices, please call logomaker.list_font_families().')
+        check(self.font_name in list_font_names(),
+              'Invalid choice for font_name. For a list of valid choices, please call logomaker.list_font_names().')
 
         check(isinstance(self.font_weight,(str,int)), 'type(font_weight) = %s  should either be a string or an int'%(type(self.font_weight)))
 
@@ -423,10 +462,4 @@ class Glyph:
 
         elif(type(self.font_weight)==int):
             check(self.font_weight>=0 and self.font_weight<=1000, 'font_weight must be in range [0,1000]')
-
-
-
-            # the following check needs to be fixed based on whether the calling function
-        # is the constructor, draw_baseline, or style_glyphs_below.
-        #check(self.zorder >= 0, "zorder = %d must be greater than 0 " % self.zorder)
 

@@ -1265,7 +1265,7 @@ class Logo:
                               flip=flip,
                               draw_now=False,
                               zorder=self.zorder,
-                              font_family=self.font_name,
+                              font_name=self.font_name,
                               **self.glyph_kwargs)
 
                 # Add glyph to glyph_df

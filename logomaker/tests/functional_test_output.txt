@@ -16,8 +16,8 @@ Test # 10: Expected success.
 Tests passed: 11. Tests failed: 0.
 
 Testing Logo() parameter font_name ...
-Test # 11: Expected error: Invalid choice for font_family. For a list of valid choices, please call logomaker.list_font_families().
-Test # 12: Expected error: Invalid choice for font_family. For a list of valid choices, please call logomaker.list_font_families().
+Test # 11: Expected error: Invalid choice for font_family. For a list of valid choices, please call logomaker.list_font_names().
+Test # 12: Expected error: Invalid choice for font_family. For a list of valid choices, please call logomaker.list_font_names().
 Test # 13: Expected error: type(font_family) = <class 'pandas.core.frame.DataFrame'> must be of type str
 Test # 14: Expected success.
 Test # 15: Expected success.
