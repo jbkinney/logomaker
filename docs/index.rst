@@ -14,7 +14,7 @@ Logomaker: a Python API for creating publication quality sequence logos
    :alt: Najafi recreated
    :align: right
 
-Logomaker is a Python application programming interface (API) for generating publication-quality sequence logos.
+Logomaker is an awesome Python application programming interface (API) for generating publication-quality sequence logos.
 Sequence logos are a popular way of representing a variety of sequence-function relationships.
 Currently available Python applications for making sequence logos are optimized only for specific
 experiments, and thus are limited in their usage.Logomaker can generate
