@@ -10,4 +10,7 @@ pip install logomaker
 ```
 
 ## Documentation
+
+[![Documentation Status](https://readthedocs.org/projects/logomaker/badge/?version=latest)](https://logomaker.readthedocs.io/en/latest/?badge=latest)
+
 https://logomaker.readthedocs.io

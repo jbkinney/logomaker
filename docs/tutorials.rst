@@ -1,18 +1,84 @@
 Tutorials
 =========
 
+Make an counts logo
+~~~~~~~~~~~~~~~~~~~
+::
+
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    %matplotlib inline
+    plt.ion()
+
+    import logomaker
+
+    # Load CRP binding site sequences
+    with open('../data/crp_sites.fasta','r') as f:
+        seqs = [l.strip() for l in f.readlines() if '>' not in l and len(l.strip())>0]
+
+    # Preview sequences
+    print('There are %d sequences, all of length %d'%(len(seqs), len(seqs[0])))
+    seqs[:5]
+
+There are 358 sequences, all of length 26:
+
+|
+    'ATAAGCAGGATTTAGCTCACACTTAT'
+|
+    'AAAAATGTGATACCAATCACAGAATA'
+|
+    'ATATTGGTGATCCATAAAACAATATT'
+|
+    'ATATTGGTGAGGAACTTAACAATATT'
+|
+    'GATTATTTGCACGGCGTCACACTTTG'
+
+
+::
+
+    # Alignment -> Counts matrix
+    counts_df = logomaker.alignment_to_matrix(seqs)
+    logo = logomaker.Logo(counts_df)
+
+
+.. image:: _static/tutorial_images/counts_logo.png
+
+
+Transform to a probability logo
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+    counts_df = logomaker.alignment_to_matrix(seqs, to_type='probability')
+
+    logo = logomaker.Logo(counts_df,
+                          color_scheme='purple',
+                          fade_probabilities=True,
+                          show_spines=False,
+                          font_name='Impact')
+
+
+.. image:: _static/tutorial_images/probability_logo.png
+
+
+Make and information logo
+~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+    # Counts matrix -> Information matrix
+    info_mat = logomaker.transform_matrix(counts_mat,
+                                         background=background,
+                                         from_type='counts',
+                                         to_type='information')
+    logomaker.Logo(info_mat)
+
+
+.. image:: _static/tutorial_images/info_mat.png
 
 Make an enrichment logo
 ~~~~~~~~~~~~~~~~~~~~~~~~
 ::
-
-    in_file = 'crp_sites.fasta'
-    with open(in_file, 'r') as f:
-        text = f.read()
-        lines = text.split('\n')
-        seqs = [l.strip().upper() for l in lines if '#' not in l and '>' not in l and len(l.strip())>0]
-
-    print('We have %d WW domain seqs'%len(seqs))
 
     # Convert seuqenes to weight matrix
     weight_df = logomaker.alignment_to_matrix(seqs, to_type='weight', center_weights=True)
@@ -61,3 +127,5 @@ Make an enrichment logo
     print('Done! Output written to %s.'%out_file)
 
 .. image:: _static/tutorial_images/Example_CRP.png
+
+
