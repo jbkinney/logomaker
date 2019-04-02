@@ -121,8 +121,8 @@ class Glyph:
     def __init__(self,
                  p,
                  c,
-                 floor=None,
-                 ceiling=None,
+                 floor,
+                 ceiling,
                  ax=None,
                  width=0.95,
                  vpad=0.00,
@@ -338,8 +338,8 @@ class Glyph:
         self.ceiling = float(self.ceiling)
 
         # Check floor < ceiling
-        check(self.floor < self.ceiling,
-              'must have floor < ceiling. Currently, '
+        check(self.floor <= self.ceiling,
+              'must have floor <= ceiling. Currently, '
               'floor=%f, ceiling=%f' % (self.floor, self.ceiling))
 
         # Check ax
