@@ -6,7 +6,7 @@ from matplotlib.colors import to_rgb
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from logomaker.src.error_handling import check, handle_errors
-from logomaker.src.colors import _get_rgb
+from logomaker.src.colors import get_rgb
 import numpy as np
 
 # Create global font manager instance. This takes a second or two
@@ -385,10 +385,10 @@ class Glyph:
                   'font_weight must be in range [0,1000]')
 
         # check color safely
-        self.color = _get_rgb(self.color)
+        self.color = get_rgb(self.color)
 
         # validate edgecolor safely
-        self.edgecolor = _get_rgb(self.edgecolor)
+        self.edgecolor = get_rgb(self.edgecolor)
 
         # Check that edgewidth is a number
         check(isinstance(self.edgewidth, (float, int)),

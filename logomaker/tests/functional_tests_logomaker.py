@@ -139,7 +139,7 @@ def test_logomaker_Logo():
 
     # test parameter stack_order
     test_parameter_values(func=logomaker.Logo, var_name='stack_order', fail_list=['incorrect argument', 0.0, None],
-                          success_list=['small_on_top', 'big_on_top', 'fixed', 'flipped'],
+                          success_list=['small_on_top', 'big_on_top', 'fixed'],
                           df=good_rnap_df,draw_now=False)
 
     # test parameter center_values

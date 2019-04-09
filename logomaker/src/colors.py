@@ -6,6 +6,13 @@ from matplotlib.colors import to_rgb
 from logomaker.src.error_handling import check
 from logomaker.src.matrix import ALPHABET_DICT
 
+# Sets default color schemes specified sets of characters
+CHARS_TO_COLORS_DICT = {
+    tuple('ACGT'): 'classic',
+    tuple('ACGU'): 'classic',
+    tuple('ACDEFGHIKLMNPQRSTVWY'): 'hydrophobicity',
+}
+
 # COLOR_SCHEME_DICT provides a default set of logo colorschemes
 # that can be passed to the 'color_scheme' argument of Logo()
 three_ones = np.ones(3)
@@ -101,7 +108,7 @@ def _expand_color_dict(color_dict):
     return new_dict
 
 
-def _get_rgb(color_spec):
+def get_rgb(color_spec):
     """
     Safely returns an RGB np.ndarray given a valid color specification
     """
@@ -135,7 +142,7 @@ def _get_rgb(color_spec):
     return rgb
 
 
-def _get_color_dict(color_scheme, chars):
+def get_color_dict(color_scheme, chars):
     """
     Return a color_dict constructed from a user-specified color_scheme and
     a list of characters
@@ -148,15 +155,25 @@ def _get_color_dict(color_scheme, chars):
     # Check that chars has length of at least 1
     check(len(chars) >= 1, 'chars must have length >= 1')
 
+    # Sort characters
+    chars = list(chars)
+    chars.sort()
+
     # Check that all entries in chars are strings of length 1
     for i, c in enumerate(chars):
         check(isinstance(c, str) and len(c)==1,
               'entry number %d in chars is %s; ' % (i, repr(c)) +
               'must instead be a single character')
 
-    # If color_scheme is a string, it must either be a valid key in
+    # if color_scheme is None, choose default based on chars
+    if color_scheme is None:
+        key = tuple(chars)
+        color_scheme = CHARS_TO_COLORS_DICT.get(key, 'gray')
+        color_dict = get_color_dict(color_scheme, chars)
+
+    # otherwise, if color_scheme is a string, it must either be a valid key in
     # COLOR_SCHEME_DICT or a named matplotlib color
-    if isinstance(color_scheme, str):
+    elif isinstance(color_scheme, str):
 
         # If a valid key, get the color scheme dict and expand
         if color_scheme in COLOR_SCHEME_DICT.keys():
