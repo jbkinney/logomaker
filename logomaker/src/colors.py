@@ -59,7 +59,6 @@ COLOR_SCHEME_DICT = {
     },
 }
 
-
 def list_color_schemes():
     """
     Provides user with a list of valid color_schemes built into Logomaker.
@@ -100,6 +99,40 @@ def _expand_color_dict(color_dict):
             new_dict[char.upper()] = value
             new_dict[char.lower()] = value
     return new_dict
+
+
+def _get_rgb(color_spec):
+    """
+    Safely returns an RGB np.ndarray given a valid color specification
+    """
+
+    # If color specification is a string
+    if isinstance(color_spec, str):
+        try:
+            rgb = np.array(to_rgb(color_spec))
+
+        # This will trigger if to_rgb does not recognize color_spec.
+        # In this case, raise an error to user.
+        except:
+            check(False, 'invalid choice: color_spec=%s' % color_spec)
+
+    # Otherwise, if color_specification is array-like, it should
+    # specify RGB values; convert to np.ndarray
+    elif isinstance(color_spec, (list, tuple, np.ndarray)):
+
+        # color_spec must have length 3 to be RGB
+        check(len(color_spec) == 3,
+              'color_scheme, if array, must be of length 3.')
+
+        # color_spec must only contain numbers between 0 and 1
+        check(all(0 <= x <= 1 for x in color_spec),
+              'Values of color_spec must be between 0 and 1 inclusive.')
+
+        # Cast color_spec as RGB
+        rgb = np.array(color_spec)
+
+    # Return RGB as an np.ndarray
+    return rgb
 
 
 def _get_color_dict(color_scheme, chars):
