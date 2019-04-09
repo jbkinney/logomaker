@@ -647,7 +647,7 @@ class Logo:
               'type(c) = %s must be of type str' % type(c))
 
         # validate that c has length 1
-        check(len(c)==1,
+        check(len(c) == 1,
               'c = %s; must have length 1.' % repr(c))
 
         # check c is a valid character
@@ -798,6 +798,10 @@ class Logo:
         color: (matplotlib color)
             Color to use for highlight. Can be a named matplotlib color or
             an RGB array.
+
+        edgecolor: (matplotlib color)
+            Color to use for highlight box edges. Can be a named matplotlib
+            color or an RGB array.
             
         floor: (None number)
             Lowest y-axis extent of highlight box. If None, is set to
