@@ -336,68 +336,40 @@ class Logo:
         check(isinstance(self.draw_now, bool),
               'type(draw_now) = %s; must be of type bool ' % type(self.draw_now))
 
-        ### after this point, the function will check inputs that are not part of the constructor. ###
-        ### so checking the existence of an attribute will become necessary. ###
-
-        # validate fade
-        if(hasattr(self,'fade')):
-            check(isinstance(self.fade,(float,int)), 'type(fade) = %s must be of type float' % type(self.fade))
-
-            # ensure that fade is between 0 and 1
-            check(self.fade <= 1.0 and self.fade >= 0, 'fade must be between 0 and 1')
-
-        # validate shade
-        if (hasattr(self, 'shade')):
-            check(isinstance(self.shade, (float, int)), 'type(shade) = %s must be of type float' % type(self.shade))
-
-            # ensure that fade is between 0 and 1
-            check(self.shade <= 1.0 and self.shade >= 0, 'shade must be between 0 and 1')
-
-        # validate alpha0
-        if(hasattr(self,'v_alpha0')):
-            check(isinstance(self.v_alpha0, (float, int)),
-                  'type(v_alpha0) = %s must be a number' % type(self.v_alpha0))
-
-            # ensure that v_alpha0 is between 0 and 1
-            check(self.v_alpha0 <= 1.0 and self.v_alpha0 >= 0, 'v_alpha0 must be between 0 and 1')
-
-        # validate alpha1
-        if (hasattr(self, 'v_alpha1')):
-            check(isinstance(self.v_alpha1, (float, int)),
-                  'type(v_alpha1) = %s must be a number' % type(self.v_alpha1))
-
-            # ensure that v_alpha1 is between 0 and 1
-            check(self.v_alpha1 <= 1.0 and self.v_alpha1 >= 0, 'v_alpha1 must be between 0 and 1')
-
-
-
-
-
-
-
-        # validate saliency
-        #if (hasattr(self, 'saliency')):
-        #    check(isinstance(self.saliency, type([])),
-        #          'type(saliency) = %s must be a list' % type(self.saliency))
-
-
+    ##### CODE REVIEW: CONTINUE HERE GOING UP
 
     @handle_errors
-    def style_glyphs(self, colors=None, draw_now=True, ax=None, **kwargs):
+    def style_glyphs(self,
+                     color_scheme=None,
+                     draw_now=True,
+                     ax=None,
+                     **kwargs):
         """
-        Modifies the properties of all glyphs in a logo.
+        Modifies the properties of all characters in a Logo.
 
-        parameter
-        ---------
+        parameters
+        ----------
 
-        color_scheme: (color scheme)
-            Color specification for glyphs. See logomaker.Logo for details.
+        color_scheme: (str, dict, or array with length 3)
+            Specification of logo colors. Default is 'gray'. Can take a variety of
+            forms.
+             - (str) A built-in Logomaker color scheme in which the color of each
+             character is determined that character's identity. Options are,
+                 + For DNA/RNA: 'classic', 'grays', or 'base_paring'.
+                 + For protein: 'hydrophobicity', 'chemistry', or 'charge'.
+             - (str) A built-in matplotlib color name such as 'k' or 'tomato'
+             - (list) An RGB array, i.e., 3 floats with values in the interval [0,1]
+             - (dict) A dictionary that maps characters to colors, E.g.,
+                {'A': 'blue',
+                 'C': 'yellow',
+                 'G': 'green',
+                 'T': 'red'}
 
         draw_now: (bool)
-            Whether to re-draw modified logo on current Axes.
+            Whether to re-draw modified logo on current Axes object.
 
         ax: (matplotlib Axes object)
-            New axes, if any, on which to draw logo if draw_now=True.
+            New Axes object, if any, on which to draw the Logo.
 
         **kwargs:
             Keyword arguments to pass to Glyph.set_attributes()
@@ -407,98 +379,120 @@ class Logo:
         None
         """
 
-        # set attributes
-        self.color_scheme = colors
-        self.draw_now = draw_now
+        # validate color_scheme and get dict representation;
+        # set as self.rgb_dict, i.e., change the Logo's self-identified
+        # color scheme
+        if color_scheme is not None:
+            self.color_scheme = color_scheme
+            self.rgb_dict = get_color_dict(self.color_scheme, self.cs)
 
-        # Update ax if axes are provided by the user.
+        # check that draw_now is a boolean
+        check(isinstance(draw_now, bool),
+              'type(draw_now) = %s; must be of type bool ' %
+              type(draw_now))
+
+        # check ax
+        check((ax is None) or isinstance(ax, Axes),
+              'ax must be either a matplotlib Axes object or None.')
+
+        # update ax if axes are provided by the user
         self._update_ax(ax)
 
-        self._input_checks()
+        # update glyph-specific attributes if they are passed as kwargs
+        for key in ['zorder', 'vpad', 'font_name']:
+            if key in kwargs.keys():
+                self.__dict__[key] = kwargs[key]
 
-        # Reset color_scheme if provided
-        if colors is not None:
-            self.color_scheme = colors
-
-            # the following case represents an error that may occur if a user accidentally runs
-            # style glyphs before running the logo constructor. The following check puts out a
-            # clean message, no need for stack-trace. hasattr checks if self has attribute cs.
-            check(hasattr(self,'cs'), 'Characters entered into style glyphs are None, please ensure'
-                                   ' Logo ran correctly before running style_glyphs')
-
-            self.rgb_dict = lm_color.get_color_dict(
-                                    color_scheme=self.color_scheme,
-                                    chars=self.cs)
-
-        # Record zorder if this is provided
-        if 'zorder' in kwargs.keys():
-            self.zorder = kwargs['zorder']
-
-        # Modify all glyphs
+        # modify all glyphs
         for g in self.glyph_list:
 
-            # Set each glyph attribute
+            # add color to kwargs dict, but only if user is updating color
+            if color_scheme is not None:
+                kwargs['color'] = self.rgb_dict[g.c]
+
+            # set each glyph attribute
             g.set_attributes(**kwargs)
 
-            # If color_scheme is not None, this should override
-            if colors is not None:
-                this_color = self.rgb_dict[g.c]
-                g.set_attributes(color=this_color)
-
-        # Draw now if requested
+        # draw now if requested
         if draw_now:
             self.draw()
 
     @handle_errors
     def fade_glyphs_in_probability_logo(self,
-                                        v_alpha0=0,
-                                        v_alpha1=1,
+                                        v_alpha0=0.0,
+                                        v_alpha1=1.0,
                                         draw_now=True,
                                         ax=None):
 
         """
-        Fades glyphs in probability logo according to message
+        Fades glyphs in probability logo according to value.
 
-        parameter
-        ---------
+        parameters
+        ----------
 
-        v_alpha0 / v_alpha1: (number in [0,1])
-            Matrix values marking alpha=0 and alpha=1
+        v_alpha0, v_alpha1: (number in [0,1])
+            Matrix values marking values that are rendered using
+            alpha=0 and alpha=1, respectively. These values must satisfy
+            v_alpha0 < v_alpha1.
 
         draw_now: (bool)
-            Whether to readraw modified logo on current Axes.
+            Whether to readraw modified Logo.
 
         ax: (matplotlib Axes object)
-            New axes, if any, on which to draw logo if draw_now=True.
+            New Axes object, if any, on which to draw the Logo.
 
         returns
         -------
         None
          """
 
-        # set attributes
-        self.v_alpha0 = v_alpha0
-        self.v_alpha1 = v_alpha1
-        self.draw_now = draw_now
+        # validate alpha0
+        check(isinstance(v_alpha0, (float, int)),
+              'type(v_alpha0) = %s must be a number' %
+              type(v_alpha0))
 
-        # validate inputs
-        self._input_checks()
+        # ensure that v_alpha0 is between 0 and 1
+        check(0.0 <= v_alpha0 <= 1.0,
+              'v_alpha0 must be between 0 and 1; value is %f.' % v_alpha0)
 
-        # Update ax if axes are provided by the user.
+        # validate alpha1
+        check(isinstance(v_alpha1, (float, int)),
+              'type(v_alpha1) = %s must be a number' %
+              type(v_alpha1))
+
+        # ensure that v_alpha1 is between 0 and 1
+        check(0.0 <= v_alpha1 <= 1.0,
+              'v_alpha1 must be between 0 and 1; value is %f' % v_alpha1)
+
+        # check that v_alpha0 < v_alpha1
+        check(v_alpha0 < v_alpha1,
+              'must have v_alpha0 < v_alpha1;'
+              'here, v_alpha0 = %f and v_alpha1 = %f' % (v_alpha0, v_alpha1))
+
+        # check that draw_now is a boolean
+        check(isinstance(draw_now, bool),
+              'type(draw_now) = %s; must be of type bool ' %
+              type(draw_now))
+
+        # check ax
+        check((ax is None) or isinstance(ax, Axes),
+              'ax must be either a matplotlib Axes object or None.')
+
+        # update ax if axes are provided by the user
         self._update_ax(ax)
 
-        # Make sure matrix is a probability matrix
+        # make sure matrix is a probability matrix
         self.df = validate_probability_mat(self.df)
 
-        # Iterate over all positions and characters
+        # iterate over all positions and characters
         for p in self.ps:
             for c in self.cs:
 
-                # Grab both glyph and message
+                # grab both glyph and value
                 v = self.df.loc[p, c]
                 g = self.glyph_df.loc[p, c]
 
-                # Compute new alpha
+                # compute new alpha
                 if v <= v_alpha0:
                     alpha = 0
                 elif v >= v_alpha1:
@@ -523,85 +517,94 @@ class Logo:
                            **kwargs):
 
         """
-        Modifies the properties of all glyphs below the x-axis in a logo.
+        Modifies the properties of all characters drawn below the x-axis.
 
-        parameter
-        ---------
+        parameters
+        ----------
 
-        shade: (float)
-            The amount of shading underneath x-axis. Range is [0,1]
+        shade: (number in [0,1])
+            The amount to shade characters below the x-axis.
 
-        fade: (float)
-            The amount of fading underneath x-axis .Range is [0,1]
+        fade: (number in [0,1])
+            The amount to fade characters below the x-axis.
 
         flip: (bool)
-            If True, the glyph will be rendered flipped upside down.
+            If True, characters below the x-axis will be flipped upside down.
 
         ax: (matplotlib Axes object)
-            The axes object on which to draw the logo.
+            The Axes object on which to draw the logo.
 
         draw_now: (bool)
-            If True, the logo is rendered immediately after it is specified.
-            Set to False if you wish to change the properties of any glyphs
-            after initial specification, e.g. by running
-            Logo.highlight_sequence().
+            Whether to readraw modified Logo.
 
         **kwargs:
-            Keyword arguments to pass to Glyph.set_attributes()
+            Keyword arguments to pass to Glyph.set_attributes(), but only
+            for characters below the x-axis.
 
         returns
         -------
         None
         """
 
-        # set attributes
-        self.shade = shade
-        self.fade = fade
-        self.flip = flip
-        self.draw_now = draw_now
+        # validate shade
+        check(isinstance(shade, (float, int)),
+              'type(shade) = %s must be a number' %
+              type(shade))
 
-        # Update ax if axes are provided by the user.
+        # ensure that v_alpha0 is between 0 and 1
+        check(0.0 <= shade <= 1.0,
+              'shade must be between 0 and 1; value is %f.' % shade)
+
+        # validate fade
+        check(isinstance(fade, (float, int)),
+              'type(fade) = %s must be a number' %
+              type(fade))
+
+        # ensure that fade is between 0 and 1
+        check(0.0 <= fade <= 1.0,
+              'fade must be between 0 and 1; value is %f' % fade)
+
+        # check that flip is a boolean
+        check(isinstance(flip, bool),
+              'type(flip) = %s; must be of type bool ' %
+              type(flip))
+
+        # check ax
+        check((ax is None) or isinstance(ax, Axes),
+              'ax must be either a matplotlib Axes object or None.')
+
+        # update ax if axes are provided by the user
         self._update_ax(ax)
 
-        # validate inputs
-        self._input_checks()
+        # check that draw_now is a boolean
+        check(isinstance(draw_now, bool),
+              'type(draw_now) = %s; must be of type bool ' %
+              type(draw_now))
 
-        # the following two checks ensure that the attributes cs and ps exist,
-        # this could throw an error in jupyter notebooks if a user ran this function
-        # with an incorrectly run Logo object.
-
-        check(hasattr(self, 'cs'), 'Characters entered into are None, please ensure'
-                                   ' Logo ran correctly before running style_glyphs_below')
-
-        check(hasattr(self, 'ps'), 'positions entered into are None, please ensure'
-                                   ' Logo ran correctly before running style_glyphs_below')
-
-        # Iterate over all positions and characters
+        # iterate over all positions and characters
         for p in self.ps:
             for c in self.cs:
 
-                # If matrix message is < 0
+                # check if matrix value is < 0
                 v = self.df.loc[p, c]
                 if v < 0:
 
-                    #  Get glyph
+                    # get glyph
                     g = self.glyph_df.loc[p, c]
 
-                    # Modify color and alpha
+                    # modify color and alpha
                     color = np.array(g.color) * (1.0 - shade)
                     alpha = g.alpha * (1.0 - fade)
 
-                    # Set glyph attributes
+                    # set glyph attributes
                     g.set_attributes(color=color,
                                      alpha=alpha,
                                      flip=flip,
                                      **kwargs)
 
-        # Draw now if requested
+        # draw now if requested
         if draw_now:
             self.draw()
-
-##### CODE REVIEW: CONTINUE HERE GOING UP
 
     @handle_errors
     def style_single_glyph(self, p, c, draw_now=True, ax=None, **kwargs):
