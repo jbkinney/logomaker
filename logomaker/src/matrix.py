@@ -465,6 +465,7 @@ def _get_background_mat(df, background):
 
 @handle_errors
 def alignment_to_matrix(sequences,
+                        counts=None,
                         to_type='counts',
                         characters_to_ignore='.-',
                         center_weights=False,
@@ -476,6 +477,11 @@ def alignment_to_matrix(sequences,
     ----------
     sequences: (list of strings)
         A list of sequences, all of which must be the same length
+
+    counts: (None or list of numbers)
+        If not None, must be a list of numbers the same length os sequences,
+        containing the (nonnegative) number of times that each sequence was
+        observed. If None, defaults to 1.
 
     to_type: (str)
         The type of matrix to output. Must be 'counts', 'probability',
@@ -500,8 +506,8 @@ def alignment_to_matrix(sequences,
     # validate inputs
 
     # Make sure sequences is list-like
-    check(isinstance(sequences, (list, tuple, set, np.ndarray, pd.Series)),
-          'sequences must be a list, tuple, set, np.ndarray, or pd.Series.')
+    check(isinstance(sequences, (list, tuple, np.ndarray, pd.Series)),
+          'sequences must be a list, tuple, np.ndarray, or pd.Series.')
     sequences = list(sequences)
 
     # Make sure sequences has at least 1 element
@@ -517,6 +523,20 @@ def alignment_to_matrix(sequences,
     # Make sure all sequences are the same length
     check(all([len(s) == L for s in sequences]),
           'all elements of sequences must have the same length.')
+
+    # validate counts as list-like
+    check(isinstance(counts, (list, tuple, np.ndarray, pd.Series)) or
+          (counts is None),
+          'counts must be None or a list, tuple, np.ndarray, or pd.Series.')
+
+    # make sure counts has the same length as sequences
+    if counts is None:
+        counts = np.ones(len(sequences))
+    else:
+        check(len(counts) == len(sequences),
+              'counts must be the same length as sequences;'
+              'len(counts) = %d; len(sequences) = %d' %
+              (len(counts), len(sequences)))
 
     # Define valid types
     valid_types = MATRIX_TYPES.copy()
@@ -537,9 +557,10 @@ def alignment_to_matrix(sequences,
     index = list(range(L))
     counts_df = pd.DataFrame(data=0, columns=columns, index=index)
 
-    # Sum of the number of occurrances of each character at each position
+    # Sum of the number of occurrences of each character at each position
     for c in columns:
-        counts_df.loc[:, c] = (char_array == c).astype(float).sum(axis=0).T
+        tmp_mat = (char_array == c).astype(float) * counts[:, np.newaxis]
+        counts_df.loc[:, c] = tmp_mat.sum(axis=0).T
 
     # Convert counts matrix to matrix of requested type
     out_df = transform_matrix(counts_df,

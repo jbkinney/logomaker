@@ -798,11 +798,11 @@ class Logo:
         padding: (number >= -0.5)
             Amount of padding to add on the left and right sides of highlight.
             
-        color: (matplotlib color)
+        color: (None or matplotlib color)
             Color to use for highlight. Can be a named matplotlib color or
             an RGB array.
 
-        edgecolor: (matplotlib color)
+        edgecolor: (None or matplotlib color)
             Color to use for highlight box edges. Can be a named matplotlib
             color or an RGB array.
             
@@ -844,14 +844,16 @@ class Logo:
               'pmin <= pmax not satisfied.')
 
         # validate that padding is a valid number
-        check(isinstance(padding, (float, int) and padding >= -0.5),
+        check(isinstance(padding, (float, int)) and padding >= -0.5,
               'padding = %s must be a number >= -0.5' % repr(padding))
 
         # validate color
-        color = get_rgb(color)
+        if color is not None:
+            color = get_rgb(color)
 
         # validate edegecolor
-        edgecolor = get_rgb(edgecolor)
+        if edgecolor is not None:
+            edgecolor = get_rgb(edgecolor)
 
         # validate floor and set to ymin if None
         if floor is None:

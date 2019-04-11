@@ -138,6 +138,10 @@ def get_rgb(color_spec):
         # Cast color_spec as RGB
         rgb = np.array(color_spec)
 
+    # Otherwise, throw error
+    else:
+        check(False, 'type(color_spec) = %s is invalid.' % type(color_spec))
+
     # Return RGB as an np.ndarray
     return rgb
 
