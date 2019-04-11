@@ -1,6 +1,6 @@
 Testing Logo() parameter df ...
-Test # 0: Expected error: dataframe needs to be a valid pandas dataframe, dataframe entered: <class 'list'>
-Test # 1: Expected error: dataframe needs to be a valid pandas dataframe, dataframe entered: <class 'str'>
+Test # 0: Expected error: out_df needs to be a valid pandas out_df, out_df entered: <class 'list'>
+Test # 1: Expected error: out_df needs to be a valid pandas out_df, out_df entered: <class 'str'>
 Test # 2: Expected success.
 Test # 3: Expected success.
 Tests passed: 4. Tests failed: 0.
@@ -16,124 +16,122 @@ Test # 10: Expected success.
 Tests passed: 11. Tests failed: 0.
 
 Testing Logo() parameter font_name ...
-Test # 11: Expected error: Invalid choice for font_family. For a list of valid choices, please call logomaker.list_font_names().
-Test # 12: Expected error: Invalid choice for font_family. For a list of valid choices, please call logomaker.list_font_names().
-Test # 13: Expected error: type(font_family) = <class 'pandas.core.frame.DataFrame'> must be of type str
+Test # 11: Expected error: Invalid choice for font_name. For a list of valid choices, please call logomaker.list_font_names().
+Test # 12: Expected error: Invalid choice for font_name. For a list of valid choices, please call logomaker.list_font_names().
+Test # 13: Expected error: type(font_name) = <class 'pandas.core.frame.DataFrame'> must be of type str
 Test # 14: Expected success.
 Test # 15: Expected success.
 Test # 16: Expected success.
 Tests passed: 17. Tests failed: 0.
 
 Testing Logo() parameter stack_order ...
-Test # 17: Expected error: stack_order = incorrect argument; must be "big_on_top", "small_on_top", "fixed", "flipped".
-Test # 18: Expected error: stack_order = 0.0; must be "big_on_top", "small_on_top", "fixed", "flipped".
-Test # 19: Expected error: stack_order = None; must be "big_on_top", "small_on_top", "fixed", "flipped".
+Test # 17: Expected error: stack_order = incorrect argument; must be in {'small_on_top', 'fixed', 'big_on_top'}.
+Test # 18: Expected error: stack_order = 0.0; must be in {'small_on_top', 'fixed', 'big_on_top'}.
+Test # 19: Expected error: stack_order = None; must be in {'small_on_top', 'fixed', 'big_on_top'}.
 Test # 20: Expected success.
 Test # 21: Expected success.
 Test # 22: Expected success.
-Test # 23: Expected success.
-Tests passed: 24. Tests failed: 0.
+Tests passed: 23. Tests failed: 0.
 
 Testing Logo() parameter center_values ...
-Test # 24: Expected error: type(center_values) = <class 'str'>; must be of type bool 
-Test # 25: Expected error: type(center_values) = <class 'float'>; must be of type bool 
-Test # 26: Expected error: type(center_values) = <class 'NoneType'>; must be of type bool 
+Test # 23: Expected error: type(center_values) = <class 'str'>; must be of type bool.
+Test # 24: Expected error: type(center_values) = <class 'float'>; must be of type bool.
+Test # 25: Expected error: type(center_values) = <class 'NoneType'>; must be of type bool.
+Test # 26: Expected success.
 Test # 27: Expected success.
-Test # 28: Expected success.
-Tests passed: 29. Tests failed: 0.
+Tests passed: 28. Tests failed: 0.
 
 Testing Logo() parameter baseline_width ...
-Test # 29: Expected error: type(baseline_width) = <class 'str'> must be of type number
-Test # 30: Expected error: baseline_width = -0.1 must be >= 0.0
-Test # 31: Expected error: type(baseline_width) = <class 'NoneType'> must be of type number
+Test # 28: Expected error: type(baseline_width) = <class 'str'> must be of type number
+Test # 29: Expected error: baseline_width = -0.1 must be >= 0.0
+Test # 30: Expected error: type(baseline_width) = <class 'NoneType'> must be of type number
+Test # 31: Expected success.
 Test # 32: Expected success.
 Test # 33: Expected success.
-Test # 34: Expected success.
-Tests passed: 35. Tests failed: 0.
+Tests passed: 34. Tests failed: 0.
 
 Testing Logo() parameter flip_below ...
-Test # 35: Expected error: type(flip_below) = <class 'str'>; must be of type bool 
-Test # 36: Expected error: type(flip_below) = <class 'float'>; must be of type bool 
-Test # 37: Expected error: type(flip_below) = <class 'NoneType'>; must be of type bool 
+Test # 34: Expected error: type(flip_below) = <class 'str'>; must be of type bool 
+Test # 35: Expected error: type(flip_below) = <class 'float'>; must be of type bool 
+Test # 36: Expected error: type(flip_below) = <class 'NoneType'>; must be of type bool 
+Test # 37: Expected success.
 Test # 38: Expected success.
-Test # 39: Expected success.
-Tests passed: 40. Tests failed: 0.
+Tests passed: 39. Tests failed: 0.
 
 Testing Logo() parameter shade_below ...
-Test # 40: Expected error: type(shade_below) = <class 'str'> must be of type float
+Test # 39: Expected error: type(shade_below) = <class 'str'> must be of type float
+Test # 40: Expected error: shade_below must be between 0 and 1
 Test # 41: Expected error: shade_below must be between 0 and 1
-Test # 42: Expected error: shade_below must be between 0 and 1
-Test # 43: Expected error: type(shade_below) = <class 'NoneType'> must be of type float
+Test # 42: Expected error: type(shade_below) = <class 'NoneType'> must be of type float
+Test # 43: Expected success.
 Test # 44: Expected success.
 Test # 45: Expected success.
 Test # 46: Expected success.
 Test # 47: Expected success.
-Test # 48: Expected success.
-Tests passed: 49. Tests failed: 0.
+Tests passed: 48. Tests failed: 0.
 
 Testing Logo() parameter fade_below ...
-Test # 49: Expected error: type(fade_below) = <class 'str'> must be of type float
+Test # 48: Expected error: type(fade_below) = <class 'str'> must be of type float
+Test # 49: Expected error: fade_below must be between 0 and 1
 Test # 50: Expected error: fade_below must be between 0 and 1
-Test # 51: Expected error: fade_below must be between 0 and 1
-Test # 52: Expected error: type(fade_below) = <class 'NoneType'> must be of type float
+Test # 51: Expected error: type(fade_below) = <class 'NoneType'> must be of type float
+Test # 52: Expected success.
 Test # 53: Expected success.
 Test # 54: Expected success.
 Test # 55: Expected success.
 Test # 56: Expected success.
-Test # 57: Expected success.
-Tests passed: 58. Tests failed: 0.
+Tests passed: 57. Tests failed: 0.
 
 Testing Logo() parameter fade_probabilities ...
-Test # 58: Expected error: type(fade_probabilities) = <class 'str'>; must be of type bool 
+Test # 57: Expected error: type(fade_probabilities) = <class 'str'>; must be of type bool 
+Test # 58: Expected error: type(fade_probabilities) = <class 'float'>; must be of type bool 
 Test # 59: Expected error: type(fade_probabilities) = <class 'float'>; must be of type bool 
-Test # 60: Expected error: type(fade_probabilities) = <class 'float'>; must be of type bool 
-Test # 61: Expected error: type(fade_probabilities) = <class 'NoneType'>; must be of type bool 
-Test # 62: Warning: Row sums in probability matrix are not close to 1. Reormalizing rows...
+Test # 60: Expected error: type(fade_probabilities) = <class 'NoneType'>; must be of type bool 
+Test # 61: in validate_matrix(): Row sums in df are not close to 1. Reormalizing rows...
 Expected success.
-Test # 63: Expected success.
-Tests passed: 64. Tests failed: 0.
+Test # 62: Expected success.
+Tests passed: 63. Tests failed: 0.
 
 Testing Logo() parameter vsep ...
-Test # 64: Expected error: type(vsep) = <class 'str'>; must be of type float or int 
-Test # 65: Expected error: vsep = 0 must be greater than 0 
-Test # 66: Expected error: type(vsep) = <class 'NoneType'>; must be of type float or int 
+Test # 63: Expected error: type(vsep) = <class 'str'>; must be of type float or int 
+Test # 64: Expected error: vsep = 0 must be greater than 0 
+Test # 65: Expected error: type(vsep) = <class 'NoneType'>; must be of type float or int 
+Test # 66: Expected success.
 Test # 67: Expected success.
 Test # 68: Expected success.
 Test # 69: Expected success.
-Test # 70: Expected success.
-Tests passed: 71. Tests failed: 0.
+Tests passed: 70. Tests failed: 0.
 
 Testing Logo() parameter show_spines ...
-Test # 71: Expected error: type(show_spines) = incorrect argument must be of type bool
-Test # 72: Expected error: type(show_spines) = -0.1 must be of type bool
+Test # 70: Expected error: show_spines = 'incorrect argument'; show_spines must be None or boolean.
+Test # 71: Expected error: show_spines = -0.1; show_spines must be None or boolean.
+Test # 72: Expected success.
 Test # 73: Expected success.
 Test # 74: Expected success.
-Test # 75: Expected success.
-Tests passed: 76. Tests failed: 0.
+Tests passed: 75. Tests failed: 0.
 
 Testing Logo() parameter zorder ...
-Test # 76: Expected error: type(zorder) = <class 'str'>; must be of type or int 
-Test # 77: Expected error: type(zorder) = <class 'float'>; must be of type or int 
+Test # 75: Expected error: type(zorder) = <class 'str'>; zorder must be a number.
+Test # 76: Expected success.
+Test # 77: Expected success.
 Test # 78: Expected success.
-Test # 79: Expected success.
-Test # 80: Expected success.
-Tests passed: 81. Tests failed: 0.
+Tests passed: 79. Tests failed: 0.
 
 Testing Logo() parameter figsize ...
-Test # 81: Expected error: type(figsize) = <class 'str'>; must be of type (tuple,list) 
-Test # 82: Expected error: type(figsize) = <class 'float'>; must be of type (tuple,list) 
-Test # 83: Expected error: Values of figsize array must be > 0
-Test # 84: Expected error: The figsize array must have two elements
-Test # 85: Expected error: Values of figsize array must be > 0
-Test # 86: Expected error: all elements of figsize array must be of type int
-Test # 87: Expected error: The figsize array must have two elements
-Test # 88: Expected success.
-Test # 89: Expected success.
-Tests passed: 90. Tests failed: 0.
+Test # 79: Expected error: type(figsize) = <class 'str'>; figsize must be array-like.
+Test # 80: Expected error: type(figsize) = <class 'float'>; figsize must be array-like.
+Test # 81: Expected error: all elements of figsize array must be numbers > 0.
+Test # 82: Expected error: figsize must have length two.
+Test # 83: Expected error: all elements of figsize array must be numbers > 0.
+Test # 84: Expected error: all elements of figsize array must be numbers > 0.
+Test # 85: Expected error: figsize must have length two.
+Test # 86: Expected success.
+Test # 87: Expected success.
+Tests passed: 88. Tests failed: 0.
 
 Testing Logo() parameter draw_now ...
-Test # 90: Expected error: type(draw_now) = <class 'str'>; must be of type bool 
-Test # 91: Expected error: type(draw_now) = <class 'float'>; must be of type bool 
-Test # 92: Expected success.
-Test # 93: Expected success.
-Tests passed: 94. Tests failed: 0.
+Test # 88: Expected error: type(draw_now) = <class 'str'>; must be of type bool 
+Test # 89: Expected error: type(draw_now) = <class 'float'>; must be of type bool 
+Test # 90: Expected success.
+Test # 91: Expected success.
+Tests passed: 92. Tests failed: 0.

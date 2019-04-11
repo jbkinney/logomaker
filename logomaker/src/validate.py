@@ -60,6 +60,9 @@ def validate_matrix(df, matrix_type=None, allow_nan=False):
 
     # check that all column names are strings and have length 1
     for i, col in enumerate(out_df.columns):
+
+        # convert from unicode to string for python 2
+        col = str(col)
         check(isinstance(col, str),
               'column number %d is of type %s; must be a str' % (i, col))
         check(len(col) == 1,

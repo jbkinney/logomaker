@@ -113,6 +113,10 @@ def get_rgb(color_spec):
     Safely returns an RGB np.ndarray given a valid color specification
     """
 
+    # TODO: the following code should be reviewed for edge-cases:
+    # initalizing rgb to handle referenced before assignment type error
+    rgb = None
+
     # If color specification is a string
     if isinstance(color_spec, str):
         try:
@@ -161,6 +165,7 @@ def get_color_dict(color_scheme, chars):
 
     # Check that all entries in chars are strings of length 1
     for i, c in enumerate(chars):
+        c = str(c) # convert from unicode to string to work with python 2
         check(isinstance(c, str) and len(c)==1,
               'entry number %d in chars is %s; ' % (i, repr(c)) +
               'must instead be a single character')

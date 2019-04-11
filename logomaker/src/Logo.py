@@ -844,7 +844,7 @@ class Logo:
               'pmin <= pmax not satisfied.')
 
         # validate that padding is a valid number
-        check(isinstance(padding, (float, int) and padding >= -0.5),
+        check(isinstance(padding, (float, int)) and padding >= -0.5,
               'padding = %s must be a number >= -0.5' % repr(padding))
 
         # validate color
