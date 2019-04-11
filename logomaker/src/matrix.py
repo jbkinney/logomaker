@@ -500,8 +500,8 @@ def alignment_to_matrix(sequences,
     # validate inputs
 
     # Make sure sequences is list-like
-    check(isinstance(sequences, (list, tuple, set, np.ndarray)),
-          'sequences must be a list, tuple, set, or np.ndarray.')
+    check(isinstance(sequences, (list, tuple, set, np.ndarray, pd.Series)),
+          'sequences must be a list, tuple, set, np.ndarray, or pd.Series.')
     sequences = list(sequences)
 
     # Make sure sequences has at least 1 element
