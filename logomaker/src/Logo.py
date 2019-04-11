@@ -6,9 +6,8 @@ from matplotlib.patches import Rectangle
 from matplotlib.axes import Axes
 
 # Import stuff from logomaker
-from logomaker.src.Glyph import Glyph
-from logomaker.src import colors as lm_color
-from logomaker.src.validate import validate_matrix, validate_probability_mat
+from logomaker.src.Glyph import Glyph, list_font_names
+from logomaker.src.validate import validate_matrix
 from logomaker.src.error_handling import check, handle_errors
 from logomaker.src.colors import get_color_dict, get_rgb
 from logomaker.src.matrix import transform_matrix
@@ -180,15 +179,16 @@ class Logo:
         self.cs = np.array([c for c in self.df.columns])
         self.C = len(self.cs)
 
+        # get color dictionary
+        # NOTE: this validates color_scheme; not self._input_checks()
+        self.rgb_dict = get_color_dict(self.color_scheme, self.cs)
+
         # get list of positions
         self.ps = np.array([p for p in self.df.index])
 
         # center matrix if requested
         if self.center_values:
             self.df = transform_matrix(self.df, center_values=True)
-
-        # get color dictionary
-        self.rgb_dict = get_color_dict(self.color_scheme, self.cs)
 
         # compute characters
         self._compute_glyphs()
@@ -213,130 +213,130 @@ class Logo:
         if self.draw_now:
             self.draw()
 
-##### CODE REVIEW: CONTINUE HERE GOING DOWN
-
     def _input_checks(self):
-
         """
-        check input parameters in the Logo constructor for correctness
+        Validate parameters passed to the Logo constructor EXCEPT for
+        color_scheme; that is validated in the Logo constructor
         """
 
-        # Validate dataframe
+        # validate dataframe
         self.df = validate_matrix(self.df)
+
+        # CANNOT validate color_scheme here; this is done in Logo constructor.
+
+        # validate that font_name is a str
+        check(isinstance(self.font_name, str),
+              'type(font_name) = %s must be of type str' % type(self.font_name))
+
+        # validate font_name value
+        check(self.font_name in list_font_names(),
+              'Invalid choice for font_name. For a list of valid choices, '
+              'please call logomaker.list_font_names().')
+
+        # validate stack_order
+        valid_stack_orders = {'big_on_top', 'small_on_top', 'fixed'}
+        check(self.stack_order in valid_stack_orders,
+              'stack_order = %s; must be in %s.' %
+              (self.stack_order, valid_stack_orders))
 
         # check that center_values is a boolean
         check(isinstance(self.center_values, bool),
-              'type(center_values) = %s; must be of type bool ' % type(self.center_values))
-
-
-        # # check that color scheme is valid
-        # if self.color_scheme is not None:
-        #
-        #     # if color scheme is specified as a string, check that string message maps
-        #     # to a valid matplotlib color scheme
-        #
-        #     if type(self.color_scheme) == str:
-        #
-        #         # get allowed list of matplotlib color schemes
-        #
-        #         valid_color_strings = list(matplotlib.cm.cmap_d.keys())
-        #         valid_color_strings.extend(['classic', 'grays', 'base_paring','hydrophobicity', 'chemistry', 'charge'])
-        #
-        #         check(self.color_scheme in valid_color_strings,
-        #               # 'color_scheme = %s; must be in %s' % (self.color_scheme, str(valid_color_strings)))
-        #               'color_scheme = %s; is an invalid color scheme. Valid choices include classic, chemistry, grays. '
-        #               'A full list of valid color schemes can be found by '
-        #               'printing list(matplotlib.cm.cmap_d.keys()). ' % self.color_scheme)
-        #
-        #     # otherwise limit the allowed types to tuples, lists, dicts
-        #     else:
-        #         check(isinstance(self.color_scheme,(tuple,list,dict)),
-        #               'type(color_scheme) = %s; must be of type (tuple,list,dict) ' % type(self.color_scheme))
-        #
-        #         # check that RGB values are between 0 and 1 is
-        #         # color_scheme is a list or tuple
-        #
-        #         if type(self.color_scheme) == list or type(self.color_scheme) == tuple:
-        #
-        #             check(all(i <= 1.0 for i in self.color_scheme),
-        #                   'Values of color_scheme array must be between 0 and 1')
-        #
-        #             check(all(i >= 0.0 for i in self.color_scheme),
-        #                   'Values of color_scheme array must be between 0 and 1')
+              'type(center_values) = %s; must be of type bool.' %
+              type(self.center_values))
 
         # check baseline_width is a number
-        check(isinstance(self.baseline_width,(int,float)),
-              'type(baseline_width) = %s must be of type number' %(type(self.baseline_width)))
+        check(isinstance(self.baseline_width, (int, float)),
+              'type(baseline_width) = %s must be of type number' %
+              (type(self.baseline_width)))
 
         # check baseline_width >= 0.0
         check(self.baseline_width >= 0.0,
-              'baseline_width = %s must be >= 0.0' % (self.baseline_width))
+              'baseline_width = %s must be >= 0.0' % self.baseline_width)
 
-        # check that stack_order is valid
-        check(self.stack_order in {'big_on_top', 'small_on_top', 'fixed'},
-              'stack_order = %s; must be "big_on_top", "small_on_top", "fixed".' % self.stack_order)
-
-        # check that flip_below is a boolean
+        # check that flip_below is boolean
         check(isinstance(self.flip_below, bool),
-            'type(flip_below) = %s; must be of type bool ' % type(self.flip_below))
+              'type(flip_below) = %s; must be of type bool ' %
+              type(self.flip_below))
 
-        # validate shade_below
+        # validate that shade_below is a number
         check(isinstance(self.shade_below, (float, int)),
-              'type(shade_below) = %s must be of type float' % type(self.shade_below))
+              'type(shade_below) = %s must be of type float' %
+              type(self.shade_below))
 
-        # ensure that shade_below is between 0 and 1
-        check(0.0 <= self.shade_below <= 1.0, 'shade_below must be between 0 and 1')
+        # validate that shade_below is between 0 and 1
+        check(0.0 <= self.shade_below <= 1.0,
+              'shade_below must be between 0 and 1')
 
-        # validate fade_below
+        # validate that fade_below is a number
         check(isinstance(self.fade_below, (float, int)),
-              'type(fade_below) = %s must be of type float' % type(self.fade_below))
+              'type(fade_below) = %s must be of type float' %
+              type(self.fade_below))
 
-        # ensure that fade_below is between 0 and 1
-        check(0.0 <= self.fade_below <= 1.0, 'fade_below must be between 0 and 1')
+        # validate that fade_below is between 0 and 1
+        check(0.0 <= self.fade_below <= 1.0,
+              'fade_below must be between 0 and 1')
 
-        # ensure fade_probabilities is of type bool
+        # validate that fade_probabilities is boolean
         check(isinstance(self.fade_probabilities, bool),
-              'type(fade_probabilities) = %s; must be of type bool ' % type(self.fade_probabilities))
+              'type(fade_probabilities) = %s; must be of type bool '
+              % type(self.fade_probabilities))
 
-        # validate vsep
+        # validate that vpad is a number
+        check(isinstance(self.vpad, (float, int)),
+              'type(vpad) = %s must be of type float' % type(self.vpad))
+
+        # validate that vpad is between 0 and 1
+        check(0.0 <= self.vpad <= 1.0, 'vpad must be between 0 and 1')
+
+        # validate that vsep is a number
         check(isinstance(self.vsep, (float, int)),
-              'type(vsep) = %s; must be of type float or int ' % type(self.vsep))
+              'type(vsep) = %s; must be of type float or int ' %
+              type(self.vsep))
 
-        check(self.vsep >= 0, "vsep = %d must be greater than 0 " % self.vsep)
+        # validate that vsep is >= 0
+        check(self.vsep >= 0,
+              "vsep = %d must be greater than 0 " % self.vsep)
 
-        # validate show_spines is a bool if its not none
-        if self.show_spines is not None:
-            check(isinstance(self.show_spines,bool), 'type(show_spines) = %s must be of type bool'%self.show_spines)
+        # validate that alpha is a number
+        check(isinstance(self.alpha, (float, int)),
+              'type(alpha) = %s must be of type float' % type(self.alpha))
+
+        # validate that alpha is between 0 and 1
+        check(0.0 <= self.alpha <= 1.0, 'alpha must be between 0 and 1')
+
+        # validate show_spines is None or boolean
+        check(isinstance(self.show_spines, bool) or (self.show_spines is None),
+              'show_spines = %s; show_spines must be None or boolean.'
+              % repr(self.show_spines))
+
+        # validate ax
+        check(isinstance(self.ax, Axes) or (self.ax is None),
+              'ax = %s; ax must be None or a matplotlib.Axes object.' %
+              repr(self.ax))
 
         # validate zorder
-        check(isinstance(self.zorder, int),
-              'type(zorder) = %s; must be of type or int ' % type(self.zorder))
+        check(isinstance(self.zorder, (float, int)),
+              'type(zorder) = %s; zorder must be a number.' %
+              type(self.zorder))
 
-        # the following check needs to be fixed based on whether the calling function
-        # is the constructor, draw_baseline, or style_glyphs_below.
-        # check(self.zorder >= 0, "zorder = %d must be greater than 0 " % self.zorder)
+        # validate that figsize is array=like
+        check(isinstance(self.figsize, (tuple, list, np.ndarray)),
+              'type(figsize) = %s; figsize must be array-like.' %
+              type(self.figsize))
+        self.figsize = tuple(self.figsize) # Just to pin down variable type.
 
-        # validate figsize
-        check(isinstance(self.figsize, (tuple, list)),
-              'type(figsize) = %s; must be of type (tuple,list) ' % type(self.figsize))
+        # validate length of figsize
+        check(len(self.figsize) == 2, 'figsize must have length two.')
 
-        check(len(self.figsize) == 2, 'The figsize array must have two elements')
-
-        check(all([isinstance(n, (int,float)) for n in self.figsize]),
-              'all elements of figsize array must be of type int')
-
-        check(all(i > 0 for i in self.figsize),
-              'Values of figsize array must be > 0')
-
-        # validate ax. Need to go over this in code review
-        #check(isinstance(self.ax,(None,matplotlib.axes._base._AxesBase)),
-              #'ax needs to be None or a valid matplotlib axis object')
+        # validate that each element of figsize is a number
+        check(all([isinstance(n, (int, float)) and n > 0
+                   for n in self.figsize]),
+              'all elements of figsize array must be numbers > 0.')
 
         # check that draw_now is a boolean
         check(isinstance(self.draw_now, bool),
-              'type(draw_now) = %s; must be of type bool ' % type(self.draw_now))
-
-    ##### CODE REVIEW: CONTINUE HERE GOING UP
+              'type(draw_now) = %s; must be of type bool ' %
+              type(self.draw_now))
 
     @handle_errors
     def style_glyphs(self,
@@ -482,7 +482,7 @@ class Logo:
         self._update_ax(ax)
 
         # make sure matrix is a probability matrix
-        self.df = validate_probability_mat(self.df)
+        self.df = validate_matrix(self.df, matrix_type='probability')
 
         # iterate over all positions and characters
         for p in self.ps:

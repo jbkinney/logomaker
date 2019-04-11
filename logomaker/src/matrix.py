@@ -4,9 +4,7 @@ import pandas as pd
 
 # Logomaker imports
 from logomaker.src.error_handling import check, handle_errors
-from logomaker.src.validate import validate_matrix, \
-    validate_probability_mat, \
-    validate_information_mat
+from logomaker.src.validate import validate_matrix
 
 # Specifies built-in character alphabets
 ALPHABET_DICT = {
@@ -273,7 +271,7 @@ def _counts_mat_to_probability_mat(counts_df, pseudocount=1.0):
     prob_df = _normalize_matrix(prob_df)
 
     # Validate and return
-    prob_df = validate_probability_mat(prob_df)
+    prob_df = validate_matrix(prob_df, matrix_type='probability')
     return prob_df
 
 
@@ -283,7 +281,7 @@ def _probability_mat_to_weight_mat(prob_df, background=None):
     """
 
     # Validate matrix before use
-    prob_df = validate_probability_mat(prob_df)
+    prob_df = validate_matrix(prob_df, matrix_type='probability')
 
     # Get background matrix
     bg_df = _get_background_mat(prob_df, background)
@@ -317,7 +315,7 @@ def _weight_mat_to_probability_mat(weight_df, background=None):
     prob_df = _normalize_matrix(prob_df)
 
     # Validate and return
-    prob_df = validate_probability_mat(prob_df)
+    prob_df = validate_matrix(prob_df, matrix_type='probability')
     return prob_df
 
 
@@ -327,7 +325,7 @@ def _probability_mat_to_information_mat(prob_df, background=None):
     """
 
     # Validate matrix before use
-    prob_df = validate_probability_mat(prob_df)
+    prob_df = validate_matrix(prob_df, matrix_type='probability')
 
     # Get background matrix
     bg_df = _get_background_mat(prob_df, background)
@@ -341,7 +339,7 @@ def _probability_mat_to_information_mat(prob_df, background=None):
     info_df.loc[:, :] = fg_vals * info_vec[:, np.newaxis]
 
     # Validate and return
-    info_df = validate_information_mat(info_df)
+    info_df = validate_matrix(info_df, matrix_type='information')
     return info_df
 
 
@@ -351,7 +349,7 @@ def _information_mat_to_probability_mat(info_df, background=None):
     """
 
     # Validate matrix before use
-    info_df = validate_information_mat(info_df)
+    info_df = validate_matrix(info_df, matrix_type='information')
 
     # Get background matrix
     bg_df = _get_background_mat(info_df, background)
@@ -368,7 +366,7 @@ def _information_mat_to_probability_mat(info_df, background=None):
     prob_df = _normalize_matrix(info_df)
 
     # Validate and return
-    prob_df = validate_probability_mat(prob_df)
+    prob_df = validate_matrix(prob_df, matrix_type='probability')
     return prob_df
 
 
@@ -396,7 +394,7 @@ def _normalize_matrix(df):
     prob_df.loc[:, :] = df.values / sums[:, np.newaxis]
 
     # Validate and return probability matrix
-    prob_df = validate_probability_mat(prob_df)
+    prob_df = validate_matrix(prob_df, matrix_type='probability')
     return prob_df
 
 
@@ -461,7 +459,7 @@ def _get_background_mat(df, background):
         bg_df = _normalize_matrix(bg_df)
 
     # validate as probability matrix
-    bg_df = validate_probability_mat(bg_df)
+    bg_df = validate_matrix(bg_df, matrix_type='probability')
     return bg_df
 
 

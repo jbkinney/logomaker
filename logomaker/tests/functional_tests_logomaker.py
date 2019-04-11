@@ -182,7 +182,7 @@ def test_logomaker_Logo():
 
     # test parameter zorder. Need to review zorder's input check in Logo
     test_parameter_values(func=logomaker.Logo, var_name='zorder',
-                          fail_list=['incorrect argument', -0.1],
+                          fail_list=['incorrect argument'],
                           success_list=[0, 1, 3], df=good_rnap_df, draw_now=False)
 
     # test parameter figsize
