@@ -1,4 +1,7 @@
-# logomaker
+# logomaker 
+
+[![Downloads](https://pepy.tech/badge/logomaker)](https://pepy.tech/project/logomaker)
+
 Software for creating highly customized sequence logos
 
 ## Installation
