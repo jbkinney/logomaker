@@ -8,12 +8,6 @@ Logomaker: a Python API for creating publication quality sequence logos
 
     <h1><font color="red">Under Active Development</font></h1>
 
-.. image:: _static/najafi1.png
-   :height: 250px
-   :width: 250 px
-   :alt: Najafi recreated
-   :align: right
-
 Logomaker is an awesome Python application programming interface (API) for generating publication-quality sequence logos.
 Sequence logos are a popular way of representing a variety of sequence-function relationships.
 Currently available Python applications for making sequence logos are optimized only for specific
@@ -26,21 +20,6 @@ incorporation into multi-panel figures.
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
-Examples
---------
-
-RNAP Enrichment
-===============
-
-.. image:: _static/RNAP.png
-   :scale: 30 %
-
-Saliency
-========
-
-.. image:: _static/Saliency.png
-   :scale: 30 %
 
 Installation
 ------------
