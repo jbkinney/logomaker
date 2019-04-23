@@ -2,7 +2,7 @@ Tutorial
 ========
 
 This tutorial provides a walk through of the Logomaker functionality. Code snippets are provided for
-easy reproduction. Note that the mathematical definitions of various types of logos can be
+easy reproduction. Note that detailed information and mathematical definitions of various types of logos can be
 found in :ref:`matrix_definitions`. We begin by importing three useful python packages and Logomaker::
 
     import numpy as np
@@ -179,8 +179,6 @@ uses randomly generated saliency values::
 
 .. image:: _static/tutorial_images/saliency_logo.png
 
-.. _matrix_definitions:
-
 Validate Matrix
 ---------------
 
@@ -237,6 +235,7 @@ is a valid probability matrix:
 
 .. image:: _static/tutorial_images/RNAP_validated_probability_logo.png
 
+.. _matrix_definitions:
 
 Matrix Definitions
 ==================
@@ -266,11 +265,10 @@ Built-in matrix and logo types
 ------------------------------
 
 Although Logomaker will draw logos corresponding to any user-specified matrix, additional support
-is provided for matrices of five specific types: counts matrix, probability matrix, enrichment matrix,
+is provided for matrices of five specific types: counts matrix, probability matrix, weight matrix,
 saliency matrix, and information matrix. Each matrix type directly or indirectly represents the marginal
 statistics of a sequence alignment, and Logomaker can generate any one of these types of matrices from a
-sequence alignment supplied by the user. Methods to interconvert matrices of these types are also provided.
-Moreover, each of these five matrix types comes with its own logo style. These matrices and their corresponding
+sequence alignment supplied by the user. These matrices and their corresponding
 logos are described in detail below.
 
 Counts matrix
@@ -298,8 +296,8 @@ where :math:`C` is the number of possible characters and :math:`\lambda` is a us
 A probability logo has heights given by these :math:`p_{ci}` values. The y axis extends from 0 to 1
 and is labeled 'probability'.
 
-Enrichment or Weight matrix
----------------------------
+Weight matrix
+-------------
 
 An enrichment matrix represent the relative likelihood of observing each character at each position
 relative to some user-specified "background" model. Such matrices are sometimes referred to as position weight
@@ -314,7 +312,7 @@ This equation can be inverted to give :math:`p_{ic}`:
 :math:`p_{ic} = \frac{b_{ic} 2^{w_{ic}}}{ \sum_{c'} b_{ic'} 2^{w_{ic'}} }`
 
 where the denominator is included to explicitly enforce the the requirement that :math:`\sum_c p_{ic} = 1` at
-every :math:`i`. Note that :math:`b_{ic}` will often not depend on $i$, but it does vary with :math:`i` in some cases, such as
+every :math:`i`. Note that :math:`b_{ic}` will often not depend on :math:`i`, but it does vary with :math:`i` in some cases, such as
 computation of enrichment scores in deep mutational scanning experiments. Enrichment logos have heights given
 by the :math:`w_{ci}` values, which can be either positive or negative. The y-axis is labeled ':math:`\log_2` enrichment'
 by default.
@@ -330,8 +328,8 @@ are given by
 
 The position-dependent (but not character dependent) quantity :math:`I_i` is called the "information content"
 of site :math:`i`, and the sum of these quantities, :math:`I = \sum_{i} I_i`, is the information content
-of the entire matrix. These information values :math`I_{ic}`  are nonnegative and are said to be in units of
-'bits' due to the use of :math:`\log_2` in Eq. ref{eq:prob_to_info}. A corresponding information logo is drawn
+of the entire matrix. These information values :math:`I_{ic}`  are nonnegative and are said to be in units of
+'bits' due to the use of :math:`\log_2`. A corresponding information logo is drawn
 using these :math:`I_{ic}` values as character heights, as well as a y-axis labeled  'information (bits)'.
 
 .. :math:`g_{ic} = \tilde{g}_{ic} - \frac{1}{C} \sum_{c'} \tilde{g}_{ic'} ,~~~\tilde{g}_{ic} = -\frac{1}{\alpha} \log \frac{p_{ic}}{b_{ic}}`

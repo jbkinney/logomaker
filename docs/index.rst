@@ -1,6 +1,6 @@
-=======================================================================
-Logomaker: a Python API for creating publication quality sequence logos
-=======================================================================
+=============================================
+Logomaker: beautiful sequence logos in Python
+=============================================
 
 *Written by Ammar Tareen, and Justin B. Kinney.*
 
@@ -44,7 +44,11 @@ Tutorial
 Examples
 --------
 
-Walk user through each panel of figure 1 here
+.. toctree::
+   :maxdepth: 2
+
+   examples
+
 
 Implementation
 --------------
