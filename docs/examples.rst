@@ -241,12 +241,12 @@ model of splice site selection::
     ax.plot([exon_start, exon_stop],[y,y], color='k', linewidth=5)
 
 This example demonstrates how Logomaker is able to leverage the entire machinery of matplotlib, thus
-the user is able to customize their logos however much they want.
+allowing the user to customize their logos however much they want.
 
 .. image:: _static/examples_images/1F.png
 
 References
-----------
+~~~~~~~~~~
 
 .. [#sortseq2010] Kinney JB, Murugan A, Callan CG, Cox EC. 2010. `Using deep sequencing to characterize the biophysical mechanism of a transcriptional regulatory sequence`. Proc Natl Acad Sci USA 107:9158-9163 :download:`PDF <sortseq2010.pdf>`.
 
