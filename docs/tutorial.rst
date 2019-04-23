@@ -314,13 +314,12 @@ This equation can be inverted to give :math:`p_{ic}`:
 where the denominator is included to explicitly enforce the the requirement that :math:`\sum_c p_{ic} = 1` at
 every :math:`i`. Note that :math:`b_{ic}` will often not depend on :math:`i`, but it does vary with :math:`i` in some cases, such as
 computation of enrichment scores in deep mutational scanning experiments. Enrichment logos have heights given
-by the :math:`w_{ci}` values, which can be either positive or negative. The y-axis is labeled ':math:`\log_2` enrichment'
-by default.
+by the :math:`w_{ci}` values, which can be either positive or negative.
 
 Information matrix
 ------------------
 
-Information logos were described in the original 1990 paper of Schneider and Stephens cite{Schneider},
+Information logos were described in the original 1990 paper of Schneider and Stephens [#weblogo1990]_,
 and remain the most popular type of sequence logo. The entries :math:`I_{ic}` in the corresponding information matrices
 are given by
 
@@ -389,4 +388,8 @@ Make an enrichment logo
 
 .. image:: _static/tutorial_images/Example_CRP.png
 
+References
+~~~~~~~~~~
+
+.. [#weblogo1990] Schneider,T.D. and Stephens,R.M. (1990) Nucleic Acids Res., 18, 6097-6100.
 
