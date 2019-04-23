@@ -109,9 +109,149 @@ their height. Stacking order of characters is also set by using the keyword argu
 if stack_order =  'small_on_top', glyphs are stacked away from x-axis in order of decreasing absolute value.
 **vpad** allows whitespace to be set above and below each character.
 
+Protein Sequence Logo: WW domain
+--------------------------------
+
+We now turn to protein sequence logos. We focus on the WW domain [#WWdomain]_, with the eponymous positions of this
+domain highlighted.
+
+::
+
+    ww_df = pd.read_csv('matrices/ww_info_matrix.txt', delim_whitespace=True, index_col=0)
+    ww_df.head()
+
++-----+----------+----------+----------+----------+----------+----------+----------+
+| pos | A        | C        | D        | E        | F        | G        | H        |
++=====+==========+==========+==========+==========+==========+==========+==========+
+| 0   | 0.001592 | 0.001592 | 0.001592 | 0.001592 | 0.001592 | 0.001592 | 0.001592 |
++-----+----------+----------+----------+----------+----------+----------+----------+
+| 1   | 0.034975 | 0.001399 | 0.001399 | 0.020985 | 0.006995 | 0.012591 | 0.01399  |
++-----+----------+----------+----------+----------+----------+----------+----------+
+| 2   | 0.103247 | 0.018391 | 0.090664 | 0.137448 | 0.007098 | 0.020327 | 0.018714 |
++-----+----------+----------+----------+----------+----------+----------+----------+
+| 3   | 0.071196 | 0.00063  | 0.127271 | 0.094508 | 0.00441  | 1.462354 | 0.031503 |
++-----+----------+----------+----------+----------+----------+----------+----------+
+| 4   | 0.001046 | 0.001046 | 0.001046 | 0.001046 | 0.007325 | 0.001046 | 0.001046 |
++-----+----------+----------+----------+----------+----------+----------+----------+
+
+Note that only part of this dataframe is displayed due to space considerations::
+
+    logo = lm.Logo(ww_df,
+                   font_name='Stencil Std',
+                   color_scheme='NajafabadiEtAl2017',
+                   vpad=.1,
+                   width=.8)
+    logo.ax.set_ylabel('information (bits)')
+    logo.style_xticks(anchor=0, spacing=5, rotation=45)
+    logo.highlight_position(p=4, color='yellow', alpha=1)
+    logo.highlight_position(p=26, color='yellow', alpha=1)
+    logo.ax.set_xlim([-1,len(ww_df)])
+
+.. image:: _static/examples_images/1D.png
+
+We use the method *logo.highlight_position* to highlight the positions of the 2 W appearing in the above logo. Note that
+the color scheme is part of a number of default color dictionaries Logomaker has. The list of available color schemes
+can be viewed by calling `logomaker.list_color_schemes()`. The user can choose named colors in matplotlib and also
+pass in custom color dictionaries.
+
+Autonomously Replicating Sequence Logo
+--------------------------------------
+
+We demonstrate an enrichment logo representing the effects of mutations within the ARS1 replication origin of S. cerevisiae
+on replication efficiency. We begin by loading the dataframe::
+
+    # load ars data
+    ars_df = pd.read_csv('matrices/ars_weight_matrix.txt', delim_whitespace=True, index_col=0)
+    ars_df.reset_index(inplace=True, drop=True)
+    ars_df = ars_df.loc[10:59,:]
+    ars_df.head()
+
++-----+-----------+-----------+-----------+-----------+
+| pos | A         | C         | G         | T         |
++=====+===========+===========+===========+===========+
+| 10  | -0.017399 | -0.358681 | -0.300618 | 0.676698  |
++-----+-----------+-----------+-----------+-----------+
+| 11  | -0.061535 | -0.274267 | -0.361952 | 0.697754  |
++-----+-----------+-----------+-----------+-----------+
+| 12  | -0.105651 | -0.185962 | -0.440681 | 0.732294  |
++-----+-----------+-----------+-----------+-----------+
+| 13  | 0.409042  | -0.132714 | -0.391267 | 0.114938  |
++-----+-----------+-----------+-----------+-----------+
+| 14  | -0.034017 | 0.438359  | -0.280204 | -0.124138 |
++-----+-----------+-----------+-----------+-----------+
+
+We then use the function *highlight_position_range* to highlight a range of positions indicating the A (left) and
+the B1 (right) elements.
+
+::
+
+    logo = lm.Logo(ars_df,
+               color_scheme='dimgray',
+               font_name='sans')
+
+    logo.style_glyphs_in_sequence(sequence=ars_consensus_seq, color='darkorange')
+    logo.style_spines(visible=False)
+    logo.ax.set_ylim([-5,5])
+    logo.ax.set_ylabel('$\log_2$ enrichment', labelpad=0)
+    logo.ax.set_yticks([-4,-2,0,2,4])
+    logo.ax.set_xticks([])
+    logo.highlight_position_range(pmin=17, pmax=32, color='lightcyan')
+    logo.highlight_position_range(pmin=42, pmax=50, color='palegreen', alpha=.3)
+
+.. image:: _static/examples_images/1E.png
+
+Saliency Logo
+-------------
+
+Saliency maps of deep neural networks accentuate important nucleotides. We adapt a saliency logo from [#Jaganathan]_
+representing the importance of nucleotides in the vicinity of U2SUR exon 9, as predicted by a deep neural network
+model of splice site selection::
+
+    # Get exon bounds
+    data_df = pd.read_excel('data/Janganathan2018_Fig1D.xlsx')
+    exon_indices = data_df['exon']
+    indices = data_df.index
+    exon_start = min(indices[exon_indices])
+    exon_stop = max(indices[exon_indices])
+
+    # make figure
+    fig, ax = plt.subplots(figsize=[6.5,1.25])
+
+    # draw logo
+    logo = lm.Logo(saliency_df, ax=ax)
+    logo.style_spines(visible=False)
+    logo.style_spines(spines=['left'],visible=True,bounds=[0,.75])
+    ax.set_yticks([0,.75])
+    ax.set_yticklabels(['0','0.75'])
+    ax.set_ylim([-.5,.75])
+    ax.set_xticks([])
+    ax.set_ylabel('           saliency', labelpad=-2)
+
+    # Draw gene
+    y = -.2
+    ax.axhline(y, color='k', linewidth=1)
+    xs = np.arange(-3,len(saliency_df),10)
+    ys = y*np.ones(len(xs))
+    ax.plot(xs,ys,marker='4', linewidth=0, markersize=5, color='k')
+
+    # Draw gene name
+    ax.text(5,-.5,'U2SURP', fontstyle='italic')
+
+    # Draw exon
+    ax.plot([exon_start, exon_stop],[y,y], color='k', linewidth=5)
+
+This example demonstrates how Logomaker is able to leverage the entire machinery of matplotlib, thus
+the user is able to customize their logos however much they want.
+
+.. image:: _static/examples_images/1F.png
+
 References
 ----------
 
 .. [#sortseq2010] Kinney JB, Murugan A, Callan CG, Cox EC. 2010. `Using deep sequencing to characterize the biophysical mechanism of a transcriptional regulatory sequence`. Proc Natl Acad Sci USA 107:9158-9163 :download:`PDF <sortseq2010.pdf>`.
 
 .. [#wong2018] Wong MS, Kinney JB, Krainer AR. `Quantitative activity profile and context dependence of all 434 human 5' splice sites`. Mol Cell. 2018;71:1012-26 e3.
+
+.. [#WWdomain] Fowler, D. M. et al. `High-resolution mapping of protein sequence-function relationships.` Nature Methods 7, 741–746 (2010).
+
+.. [#Jaganathan] Jaganathan, K. et al. (2019). `Predicting Splicing from Primary Sequence with Deep Learning.` Cell, 176(3), 535-548.e24.
