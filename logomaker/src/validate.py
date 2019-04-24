@@ -119,6 +119,7 @@ def validate_matrix(df, matrix_type=None, allow_nan=False):
             print('in validate_matrix(): Row sums in df are not close to 1. '
                   'Reormalizing rows...')
             df.loc[:, :] = df.values / sums[:, np.newaxis]
+            out_df = df.copy()
 
     # nothing more to check if type is None
     elif matrix_type is None:
