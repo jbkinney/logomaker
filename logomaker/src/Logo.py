@@ -196,22 +196,23 @@ class Logo:
         # style glyphs below x-axis
         self.style_glyphs_below(shade=self.shade_below,
                                 fade=self.fade_below,
-                                draw_now=self.draw_now,
+                                draw_now=False,
                                 ax=self.ax)
 
         # fade glyphs by value if requested
         if self.fade_probabilities:
             self.fade_glyphs_in_probability_logo(v_alpha0=0,
                                                  v_alpha1=1,
-                                                 draw_now=self.draw_now)
+                                                 draw_now=False)
+
+        # Draw now if requested
+        if self.draw_now:
+            self.draw()
 
         # Either show or hide spines based on self.show_spines
         if self.show_spines is not None:
             self.style_spines(visible=self.show_spines)
 
-        # Draw now if requested
-        if self.draw_now:
-            self.draw()
 
     def _input_checks(self):
         """
@@ -1125,7 +1126,7 @@ class Logo:
                 if bounds is not None:
                     spine.set_bounds(bounds[0], bounds[1])
 
-    def draw(self, ax=None):
+    def draw(self, ax=None, clear=False):
         """
         Draws characters on the Axes object 'ax' provided to the Logo
         constructor. Note: all previous content drawn on ax will be erased.
@@ -1136,10 +1137,22 @@ class Logo:
             Axes on which to draw the logo. Defaults to the previously
             specified Axes or, if that was never set, to plt.gca().
 
+        clear: (bool)
+            If True, Axes will be cleared before logo is drawn.
+
         returns
         -------
         None
         """
+
+        # validate ax
+        check((ax is None) or isinstance(ax, Axes),
+              'ax must be either a matplotlib Axes object or None.')
+
+        # validate clear
+        check(isinstance(clear, bool),
+              'type(clear) = %s; must be of type bool ' %
+              type(clear))
 
         # update ax
         self._update_ax(ax)
@@ -1149,8 +1162,9 @@ class Logo:
             fig, ax = plt.subplots(1, 1, figsize=self.figsize)
             self.ax = ax
 
-        # clear previous content from ax
-        self.ax.clear()
+        # clear previous content from ax if requested
+        if clear:
+            self.ax.clear()
 
         # draw each glyph
         for g in self.glyph_list:
