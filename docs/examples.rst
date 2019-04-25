@@ -63,8 +63,9 @@ and lables is also demonstrated::
 5' Splice Sites in the Human Genome
 -----------------------------------
 
-We now illustrate a probability generated from 202,764 5'ss sequences in the human transcriptome.
-The data are obtained from [#wong2018]_.
+
+We now illustrate a probability logo computed from all annotated 5' splices sites in the human genome.
+The data are obtained from [#frankish2019]_.
 
 ::
 
@@ -106,8 +107,8 @@ The data are obtained from [#wong2018]_.
 .. image:: _static/examples_images/1C.png
 
 The dashed line indicates intron/exon boundaries. This example shows the use of the keyword argument
-**fade_probabilities**; when True, the characters in each stack are assigned an alpha value equal to
-their height. Stacking order of characters is also set by using the keyword argument **stack_order**:
+**fade_probabilities**; when True, the characters in each stack are assigned an alpha (representing transparency)
+value equal to their height. Stacking order of characters is also set by using the keyword argument **stack_order**:
 if stack_order =  'small_on_top', glyphs are stacked away from x-axis in order of decreasing absolute value.
 **vpad** allows whitespace to be set above and below each character.
 
@@ -115,7 +116,7 @@ Protein Sequence Logo: WW domain
 --------------------------------
 
 We now turn to protein sequence logos. We focus on the WW domain [#WWdomain]_, with the eponymous positions of this
-domain highlighted.
+domain highlighted. We first load the data
 
 ::
 
@@ -143,6 +144,7 @@ Note that only part of this dataframe is displayed due to space considerations::
                    color_scheme='NajafabadiEtAl2017',
                    vpad=.1,
                    width=.8)
+
     logo.ax.set_ylabel('information (bits)')
     logo.style_xticks(anchor=0, spacing=5, rotation=45)
     logo.highlight_position(p=4, color='yellow', alpha=1)
@@ -151,16 +153,17 @@ Note that only part of this dataframe is displayed due to space considerations::
 
 .. image:: _static/examples_images/1D.png
 
-We use the method *logo.highlight_position* to highlight the positions of the 2 W appearing in the above logo. Note that
+We use the method *logo.highlight_position* to highlight the positions of the 2 W's appearing in the above logo. Note that
 the color scheme is part of a number of default color dictionaries Logomaker has. The list of available color schemes
 can be viewed by calling `logomaker.list_color_schemes()`. The user can choose named colors in matplotlib and also
 pass in custom color dictionaries.
 
-Autonomously Replicating Sequence Logo
---------------------------------------
+Autonomously Replicating Sequence (ARS) Logo
+--------------------------------------------
 
-We demonstrate an enrichment logo representing the effects of mutations within the ARS1 replication origin of S. cerevisiae
-on replication efficiency. We begin by loading the dataframe::
+We demonstrate an enrichment logo representing the effects of mutations within the ARS1 replication origin of
+S. cerevisiae on replication efficiency. These data (unpublished) were collected by Justin B. Kinney from a mutARS-seq
+experiment analogous to the one reported by [#Liachko2013]_. We begin by loading the dataframe::
 
     # load ars data
     ars_df = pd.read_csv('matrices/ars_weight_matrix.txt', delim_whitespace=True, index_col=0)
@@ -182,23 +185,26 @@ on replication efficiency. We begin by loading the dataframe::
 | 14  | -0.034017 | 0.438359  | -0.280204 | -0.124138 |
 +-----+-----------+-----------+-----------+-----------+
 
-We then use the function *highlight_position_range* to highlight a range of positions indicating the A (left) and
-the B1 (right) elements.
+We then use the function *highlight_position_range* to highlight a range of positions indicating the A (lightcyan),
+the B1 (honeydew), B2 (lavenderblush) elements for the ARS.
 
 ::
 
     logo = lm.Logo(ars_df,
-               color_scheme='dimgray',
-               font_name='sans')
+                   #ax=ax,
+                   color_scheme='dimgray',
+                   font_name='Luxi Mono')
 
-    logo.style_glyphs_in_sequence(sequence=ars_consensus_seq, color='darkorange')
+    logo.style_glyphs_in_sequence(sequence=ars_seq, color='darkorange')
     logo.style_spines(visible=False)
-    logo.ax.set_ylim([-5,5])
+    logo.ax.set_ylim([-4,4])
     logo.ax.set_ylabel('$\log_2$ enrichment', labelpad=0)
     logo.ax.set_yticks([-4,-2,0,2,4])
     logo.ax.set_xticks([])
-    logo.highlight_position_range(pmin=17, pmax=32, color='lightcyan')
-    logo.highlight_position_range(pmin=42, pmax=50, color='palegreen', alpha=.3)
+
+    logo.highlight_position_range(pmin=7, pmax=22, color='lightcyan')
+    logo.highlight_position_range(pmin=33, pmax=40, color='honeydew')
+    logo.highlight_position_range(pmin=64, pmax=81, color='lavenderblush')
 
 .. image:: _static/examples_images/1E.png
 
@@ -207,7 +213,7 @@ Saliency Logo
 
 Saliency maps of deep neural networks accentuate important nucleotides. We adapt a saliency logo from [#Jaganathan]_
 representing the importance of nucleotides in the vicinity of U2SUR exon 9, as predicted by a deep neural network
-model of splice site selection::
+model of splice site selection (reproduced with author permission)::
 
     # Get exon bounds
     data_df = pd.read_excel('data/Janganathan2018_Fig1D.xlsx')
@@ -252,8 +258,10 @@ References
 
 .. [#sortseq2010] Kinney JB, Murugan A, Callan CG, Cox EC. 2010. `Using deep sequencing to characterize the biophysical mechanism of a transcriptional regulatory sequence`. Proc Natl Acad Sci USA 107:9158-9163 :download:`PDF <sortseq2010.pdf>`.
 
-.. [#wong2018] Wong MS, Kinney JB, Krainer AR. `Quantitative activity profile and context dependence of all 434 human 5' splice sites`. Mol Cell. 2018;71:1012-26 e3.
+.. [#frankish2019] Frankish, A. et al. (2019). `GENCODE reference annotation for the human and mouse genomes.` Nucl Acids Res, 47(D1), D766–D773.
 
 .. [#WWdomain] Fowler, D. M. et al. `High-resolution mapping of protein sequence-function relationships.` Nature Methods 7, 741–746 (2010).
+
+.. [#Liachko2013] Liachko, I. et al. (2013). `High-resolution mapping, characterization, and optimization of autonomously replicating sequences in yeast.` Genome Res, 23(4), 698-704.
 
 .. [#Jaganathan] Jaganathan, K. et al. (2019). `Predicting Splicing from Primary Sequence with Deep Learning.` Cell, 176(3), 535-548.e24.
