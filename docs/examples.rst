@@ -191,7 +191,6 @@ the B1 (honeydew), B2 (lavenderblush) elements for the ARS.
 ::
 
     logo = lm.Logo(ars_df,
-                   #ax=ax,
                    color_scheme='dimgray',
                    font_name='Luxi Mono')
 
