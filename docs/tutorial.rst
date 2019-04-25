@@ -1,9 +1,10 @@
 Tutorial
 ========
 
-This tutorial provides a walk through of the Logomaker functionality. Code snippets are provided for
-easy reproduction. Note that detailed information and mathematical definitions of various types of logos can be
-found in :ref:`matrix_definitions`. We begin by importing three useful python packages and Logomaker::
+This tutorial provides a walk through of the basic Logomaker functionality. For highly styled and customized logos,
+please see :ref:`examples`. Code snippets are provided for easy reproduction. Note that detailed information and
+mathematical definitions of various types of logos can be found in :ref:`matrix_definitions`. We begin by importing
+three useful python packages and Logomaker::
 
     import numpy as np
     import pandas as pd
@@ -28,7 +29,7 @@ are commonly found in fasta format.
     ATATTGGTGATCCATAAAACAATATT
     ...
 
-The data used in this example describe mutagenized DNA sequences corresponding to CRP binding sites.
+The data used in this example are mutagenized DNA sequences corresponding to CRP binding sites (from [#sortseq2010]_).
 We can remove the non-sequence lines to obtain just the raw sequences::
 
     with open('crp_sites.fasta','r') as f:
@@ -40,7 +41,7 @@ We can remove the non-sequence lines to obtain just the raw sequences::
     ...
 
 Once in this form, we can use logomaker's method :ref:`alignment_to_matrix` to generate a
-counts dataframe, which now be input to logomaker.
+counts dataframe, which can be input to Logomaker.
 
 ::
 
@@ -186,8 +187,8 @@ To check if a dataframe represents a valid matrix, i.e., an object that can be d
 Logomaker provides the method :ref:`validate_matrix`. Consider the following matrix, representing
 an additive, energetic binding model for the transcription factor RNAP to DNA::
 
-df = pd.read_csv('rnap_matrix.txt', delim_whitespace=True)
-df.head()
+    df = pd.read_csv('rnap_matrix.txt', delim_whitespace=True)
+    df.head()
 
 +-----+---------+---------+---------+---------+
 | pos |    A    |    C    |    G    |    T    |
@@ -244,7 +245,7 @@ A matrix is defined by a set of textual characters, a set of numerical positions
 quantity for every character-position pair. In what follows, we use the symbol :math:`i` to represent possible
 positions, and the symbol :math:`c` (or :math:`c'`) to represent possible characters.
 
-Within Python, each matrix is represented as a pandas data frame in which rows are indexed by positions
+In Logomaker, each matrix is represented as a pandas data frame in which rows are indexed by positions
 and columns are named using the character each represents. Any set of numerical positions can be used,
 as can any non-whitespace characters. Logomaker is agnostic to the set of characters used.
 
@@ -278,8 +279,8 @@ A counts matrix represent the number of occurrences of each character at each po
 alignment (although the user can choose to exclude certain characters, e.g., '-' character representing gaps).
 Specifically, a counts matrix has entries :math:`n_{ic}` that represent the number of occurrences of character
 :math:`c` at position :math:`i`. These :math:`n_{ic}` values are all required to be greater or equal to zero. Counts logos are
-assigned character heights corresponding to these :math:`n_{ci}` values. The y axis of such logos is labeled 'counts'
-and extends from 0 to :math:`N`, where :math:`N` is the number of sequences in the alignment. Note that, Because certain
+assigned character heights corresponding to these :math:`n_{ic}` values. The y axis of such logos extends from 0 to
+:math:`N`, where :math:`N` is the number of sequences in the alignment. Note that, Because certain
 characters might be excluded when computing :math:`n_{ic}` from an alignment, it is possible to have
 :math:`\sum_c n_{ic} < N` at some positions.
 
@@ -293,17 +294,18 @@ from a counts matrix via
 :math:`p_{ic} = \frac{n_{ic} + \lambda}{\sum_{c'} n_{ic'} + C \lambda}`
 
 where :math:`C` is the number of possible characters and :math:`\lambda` is a user-defined pseudocount.
-A probability logo has heights given by these :math:`p_{ci}` values. The y axis extends from 0 to 1
-and is labeled 'probability'.
+A probability logo has heights given by these :math:`p_{ic}` values. The y axis extends from 0 to 1.
 
 Weight matrix
 -------------
 
-An enrichment matrix represent the relative likelihood of observing each character at each position
-relative to some user-specified "background" model. Such matrices are sometimes referred to as position weight
-matrices (PWMs) or position-specific scoring matrices (PSSMs). The elements :math:`w_{ic}` of an
-enrichment matrix can be computed from a probability matrix (elements :math:`p_{ic}`) and a
-background matrix (also a probability matrix but denoted :math:`b_{ic}`) using the formula
+A weight matrix draws characters with positive values above the x-axis and draw characters with negative
+values below it. A weight matrix can be used to represent an enrichment logo, where the relative likelihood
+of observing each character at each position is relative to some user-specified "background" model.
+Such matrices are sometimes referred to as position weight matrices (PWMs) or position-specific
+scoring matrices (PSSMs). The elements :math:`w_{ic}` of an enrichment matrix can be computed from a
+probability matrix (elements :math:`p_{ic}`) and a background matrix
+(also a probability matrix but denoted :math:`b_{ic}`) using the formula
 
 :math:`w_{ic} = \log_2 \frac{p_{ic}}{b_{ic}}`
 
@@ -314,7 +316,7 @@ This equation can be inverted to give :math:`p_{ic}`:
 where the denominator is included to explicitly enforce the the requirement that :math:`\sum_c p_{ic} = 1` at
 every :math:`i`. Note that :math:`b_{ic}` will often not depend on :math:`i`, but it does vary with :math:`i` in some cases, such as
 computation of enrichment scores in deep mutational scanning experiments. Enrichment logos have heights given
-by the :math:`w_{ci}` values, which can be either positive or negative.
+by the :math:`w_{ic}` values, which can be either positive or negative.
 
 Information matrix
 ------------------
@@ -323,7 +325,7 @@ Information logos were described in the original 1990 paper of Schneider and Ste
 and remain the most popular type of sequence logo. The entries :math:`I_{ic}` in the corresponding information matrices
 are given by
 
-:math:`I_{ci} = p_{ci} I_i,~~~I_i = \sum_c p_{ci} \log_2 \frac{p_{ci}}{b_{ci}}`
+:math:`I_{ic} = p_{ci} I_i,~~~I_i = \sum_c p_{ci} \log_2 \frac{p_{ci}}{b_{ci}}`
 
 The position-dependent (but not character dependent) quantity :math:`I_i` is called the "information content"
 of site :math:`i`, and the sum of these quantities, :math:`I = \sum_{i} I_i`, is the information content
@@ -336,60 +338,10 @@ using these :math:`I_{ic}` values as character heights, as well as a y-axis labe
 .. :math:`p_{ci} = \frac{b_{ci} \exp [ - \alpha g_{ci} ] }{\sum_{c'} b_{c'i} \exp[ - \alpha g_{c'i} ] }`
 
 
-Make an enrichment logo
-~~~~~~~~~~~~~~~~~~~~~~~~
-::
-
-    # Convert seuqenes to weight matrix
-    weight_df = logomaker.alignment_to_matrix(seqs, to_type='weight', center_weights=True)
-
-    # preview weight matrix
-    weight_df.head()
-
-+-----+-----------+-----------+----------+----------+
-| pos |    A      |    C      |     G    |     T    |
-+=====+===========+===========+==========+==========+
-| 0   |  0.201587 | 0.067196  | 0.067196 | 0.067196 |
-+-----+-----------+-----------+----------+----------+
-| 1   |  0.201587 | 0.067196  | 0.067196 | 0.067196 |
-+-----+-----------+-----------+----------+----------+
-| 2   | -0.10637  | -0.167351 | 0.13686  | 0.13686  |
-+-----+-----------+-----------+----------+----------+
-| 3   |  0.287282 | 0.041222  | -0.2039  | 0.44996  |
-+-----+-----------+-----------+----------+----------+
-| 4   | -0.056109 | -0.871858 | 0.344537 | 0.583429 |
-+-----+-----------+-----------+----------+----------+
-
-
-::
-
-    fig, ax = plt.subplots(figsize=[6.5,1.5])
-
-    # Create counts matrix
-    logo = logomaker.Logo(weight_df,
-                          ax=ax,
-                          center_values=False,
-                          fade_below=.7,
-                          shade_below=.5,
-                          font_name='Arial Rounded MT Bold')
-
-    # Style axes
-    logo.style_spines(visible=False)
-    ax.set_xticks([])
-    ax.set_yticks([])
-
-    # Tight layout
-    plt.tight_layout()
-
-    # Save as pdf
-    out_file = out_prefix+'.pdf'
-    fig.savefig(out_file)
-    print('Done! Output written to %s.'%out_file)
-
-.. image:: _static/tutorial_images/Example_CRP.png
-
 References
 ~~~~~~~~~~
+
+.. [#sortseq2010] Kinney, J. B. et al. (2010). `Using deep sequencing to characterize the biophysical mechanism of a transcriptional regulatory sequence.` Proc Natl Acad Sci USA, 107(20), 9158-9163.
 
 .. [#weblogo1990] Schneider,T.D. and Stephens,R.M. (1990) Nucleic Acids Res., 18, 6097-6100.
 
