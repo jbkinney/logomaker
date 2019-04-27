@@ -6,26 +6,20 @@ from logomaker.src.error_handling import check, handle_errors
 matrix_dir = os.path.dirname(os.path.abspath(__file__)) \
              + '/../examples/matrices'
 
-# List of supported distributions by name
-VALID_MATRICES = ['.'.join(name.split('.')[:-1]) for name in
-                  os.listdir(matrix_dir) if '.txt' in name]
-
 # load directory of file
 data_dir = os.path.dirname(os.path.abspath(__file__)) \
            + '/../../data'
-
-# List of supported distributions by name
-VALID_DATAFILES = [name for name in
-                   os.listdir(data_dir) if
-                   len(name.split('.')) >= 2 and
-                   len(name.split('.')[0]) > 0]
 
 @handle_errors
 def list_example_matrices():
     """
     Return list of available matrices.
     """
-    return VALID_MATRICES
+    # List of supported distributions by name
+    valid_matrices = ['.'.join(name.split('.')[:-1]) for name in
+                      os.listdir(matrix_dir) if '.txt' in name]
+
+    return valid_matrices
 
 
 @handle_errors
@@ -33,7 +27,13 @@ def list_example_datafiles():
     """
     Return list of available data files.
     """
-    return VALID_DATAFILES
+    # List of supported distributions by name
+    valid_datafiles = [name for name in
+                       os.listdir(data_dir) if
+                       len(name.split('.')) >= 2 and
+                       len(name.split('.')[0]) > 0]
+
+    return valid_datafiles
 
 
 @handle_errors
@@ -57,16 +57,19 @@ def get_example_matrix(name=None, print_description=True):
         A data frame containing an example matrix.
     """
 
-    # check that dataset is valid
-    check(name in list_example_matrices(),
-          'Matrix "%s" not recognized. Please choose from: \n%s'
-          % (name, '\n'.join([repr(x) for x in VALID_MATRICES])))
+    # get list of valid matrices
+    valid_matrices = list_example_matrices()
 
-    # set file dataset
+    # check that matrix name is valid
+    check(name in valid_matrices,
+          'Matrix "%s" not recognized. Please choose from: \n%s'
+          % (name, '\n'.join([repr(x) for x in valid_matrices])))
+
+    # set matrix file
     file_name = '%s/%s.txt' % (matrix_dir, name)
     assert os.path.isfile(file_name), 'File %s does not exist!'%file_name
 
-    # if user wants a description of the example matrx
+    # if user wants a description of the example matrix, provide it
     if print_description:
         print('Description of example matrix "%s":' % name)
         with open(file_name, 'r') as f:
@@ -75,11 +78,8 @@ def get_example_matrix(name=None, print_description=True):
             description = "".join(lines)
             print(description)
 
-    # load data frame
-    df = pd.read_csv(file_name, sep='\t', index_col=0, comment='#')
-
-    # return data frame
-    return df
+    # return matrix data frame
+    return pd.read_csv(file_name, sep='\t', index_col=0, comment='#')
 
 
 @handle_errors
@@ -103,16 +103,19 @@ def open_example_datafile(name=None, print_description=True):
         A handle to the requested file
     """
 
-    # check that dataset is valid
-    check(name in list_example_datafiles(),
-          'Matrix "%s" not recognized. Please choose from: \n%s'
-          % (name, '\n'.join([repr(x) for x in VALID_DATAFILES])))
+    # get list of valid data files
+    valid_datafiles = list_example_datafiles()
 
-    # set file dataset
+    # check that specified datafile is valid
+    check(name in valid_datafiles,
+          'Matrix "%s" not recognized. Please choose from: \n%s'
+          % (name, '\n'.join([repr(x) for x in valid_datafiles])))
+
+    # set datafile file name
     file_name = '%s/%s' % (data_dir, name)
     assert os.path.isfile(file_name), 'File %s does not exist!' % file_name
 
-    # if user wants a description of the data file, provide it
+    # if user wants a description of the datafile, provide it
     if print_description:
         print('Description of example matrix "%s":' % name)
         with open(file_name, 'r') as f:
@@ -121,5 +124,5 @@ def open_example_datafile(name=None, print_description=True):
             description = "".join(lines)
             print(description)
 
-    # return file handle
+    # return file handle to datafile
     return open(file_name, 'r')
