@@ -1,3 +1,13 @@
+# 
+# CRP energy matrix from Kinney et al. (2010).
+# Matrix values are in units of kcal/mol.
+# 
+# References
+# 
+# Kinney JB et al. (2010) Using deep sequencing to characterize the
+# biophysical mechanism of a transcriptional regulatory sequence.
+# Proc Natl Acad Sci USA. 107(20):9158–63.
+# 
 pos	A	C	G	T
 0	-0.18364197530864196	0.15586419753086422	0.09413580246913582	-0.06635802469135801
 1	-0.29012345679012347	0.2777777777777778	0.1111111111111111	-0.09876543209876544

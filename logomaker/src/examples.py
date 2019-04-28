@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import gzip
 from logomaker.src.error_handling import check, handle_errors
 
 # load directory of file
@@ -8,7 +9,7 @@ matrix_dir = os.path.dirname(os.path.abspath(__file__)) \
 
 # load directory of file
 data_dir = os.path.dirname(os.path.abspath(__file__)) \
-           + '/../../data'
+           + '/../examples/datafiles'
 
 @handle_errors
 def list_example_matrices():
@@ -124,5 +125,13 @@ def open_example_datafile(name=None, print_description=True):
             description = "".join(lines)
             print(description)
 
-    # return file handle to datafile
-    return open(file_name, 'r')
+    # if file is a gzipped file, use gzip.open()
+    if len(file_name) >= 3 and file_name[-3:] == '.gz':
+        f = gzip.open(file_name, 'r')
+
+    # otherwise, use regular open()
+    else:
+        f = open(file_name, 'r')
+
+    # return file handle to user
+    return f

@@ -155,9 +155,9 @@ def transform_matrix(df,
           (to_type, MATRIX_TYPES))
 
     # validate background
-    check(isinstance(background, (type([]), np.ndarray)) or
+    check(isinstance(background, (type([]), np.ndarray, pd.DataFrame)) or
           (background is None),
-          'type(background) = %s must be None or of type list or array' %
+          'type(background) = %s must be None or array-like or a dataframe.' %
           type(background))
 
     # validate pseudocount
@@ -467,6 +467,7 @@ def _get_background_mat(df, background):
 def alignment_to_matrix(sequences,
                         counts=None,
                         to_type='counts',
+                        background=None,
                         characters_to_ignore='.-',
                         center_weights=False,
                         pseudocount=1.0):
@@ -486,6 +487,12 @@ def alignment_to_matrix(sequences,
     to_type: (str)
         The type of matrix to output. Must be 'counts', 'probability',
         'weight', or 'information'
+
+    background: (array, or df)
+        Specification of background probabilities. If array, should be the
+        same length as df.columns and correspond to the probability of each
+        column's character. If df, should be a probability matrix the same
+        shape as df.
 
     characters_to_ignore: (str)
         Characters to ignore within sequences. This is often needed when
@@ -538,6 +545,12 @@ def alignment_to_matrix(sequences,
               'len(counts) = %d; len(sequences) = %d' %
               (len(counts), len(sequences)))
 
+    # validate background
+    check(isinstance(background, (type([]), np.ndarray, pd.DataFrame)) or
+          (background is None),
+          'type(background) = %s must be None or array-like or a dataframe.' %
+          type(background))
+
     # Define valid types
     valid_types = MATRIX_TYPES.copy()
 
@@ -566,7 +579,8 @@ def alignment_to_matrix(sequences,
     out_df = transform_matrix(counts_df,
                               from_type='counts',
                               to_type=to_type,
-                              pseudocount=pseudocount)
+                              pseudocount=pseudocount,
+                              background=background)
 
     # Center values only if center_weights is True and to_type is 'weight'
     if center_weights and to_type == 'weight':
@@ -734,15 +748,15 @@ def saliency_to_matrix(seq, values, cols=None, alphabet=None):
     parameters
     ----------
 
-    seq: (str)
+    seq: (str or array-like list of single characters)
         sequence for which values matrix is constructed
 
-    values: (array)
+    values: (array-like list of numbers)
         array of values values for each character in sequence
 
     cols: (str or array-like or None)
         The characters to use for the matrix columns. If None, cols is
-        constructed from the unqiue characters in seq. Overriden by alphabet
+        constructed from the unqiue characters in seq. Overridden by alphabet
         and is_iupac.
 
     alphabet: (str or None)
@@ -756,12 +770,24 @@ def saliency_to_matrix(seq, values, cols=None, alphabet=None):
 
     """
 
+    # try to convert seq to str; throw exception if fail
+    if isinstance(seq, (list, np.ndarray, pd.Series)):
+        try:
+            seq = ''.join([str(x) for x in seq])
+        except:
+            check(False, 'could not convert %s to type str' % repr(str))
+    else:
+        try:
+            seq = str(seq)
+        except:
+            check(False, 'could not convert %s to type str' % repr(str))
+
     # validate seq
     check(isinstance(seq, str),
           'type(seq) = %s must be of type str' % type(seq))
 
     # validate background: check that it is a list or array
-    check(isinstance(values, (type([]), np.ndarray)),
+    check(isinstance(values, (type([]), np.ndarray, pd.Series)),
           'type(values) = %s must be of type list' % type(values))
 
     # cast values as a list just to be sure what we're working with
