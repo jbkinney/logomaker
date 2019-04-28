@@ -117,9 +117,9 @@ def test_parameter_values(func,
 def test_logomaker_Logo():
 
     # df inputs that successfully execute when entered into Logo.
-    good_crp_df = pd.read_csv('../figure/data/crp_tau_final_all.26.txt', delim_whitespace=True, index_col=0)
-    good_crp_df.columns = list('ACGT')
-    random_df = pd.DataFrame(np.random.randint(0,3, size=(10, 4)), columns=list('ACGT'))
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+    good_prob_df = logomaker.get_example_matrix('ss_probability_matrix')
+    random_df = pd.DataFrame(np.random.randint(0, 3, size=(10, 4)), columns=list('ACGT'))
 
     # df inputs that fail when entered into Logo.
     bad_df1 = 'x'
@@ -168,7 +168,7 @@ def test_logomaker_Logo():
     # test parameter fade_probabilities
     test_parameter_values(func=logomaker.Logo, var_name='fade_probabilities',
                           fail_list=['incorrect argument', -0.1, 1.4, None],
-                          success_list=[True,False], df=good_crp_df, draw_now=False)
+                          success_list=[True, False], df=good_prob_df, draw_now=False)
 
     # test parameter vsep
     test_parameter_values(func=logomaker.Logo, var_name='vsep',
