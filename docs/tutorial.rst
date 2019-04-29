@@ -227,8 +227,13 @@ and then transform it to an information matrix::
     ww_info_df = lm.transform_matrix(ww_counts_df, from_type='counts', to_type='information')
 
     # show logo
-    lm.Logo(ww_info_df)
+    logo = lm.Logo(ww_info_df)
 
+    # highlight position of 2 W's
+    logo.highlight_position(p=4, color='gold', alpha=.5)
+    logo.highlight_position(p=40, color='gold', alpha=.5)
+
+Here, we have also used the function `highlight_position` to demarcate the two W's the logo:
 
 .. image:: _static/tutorial_images/ww_info_logo.png
 
@@ -319,9 +324,78 @@ Just as before, we now re-use :ref:`saliency_to_matrix`::
 Advanced Styling
 ----------------
 
+This section introduces some advanced styling functionality the Logomaker offers.
+
 Glyphs
 ------
 
+Logomaker uses the :ref:`Glyph` class to render individual glyphs; this class also allows the user to customize
+each glyph according to their needs. As an example, the following figure shows how to raw a single character::
+
+    from logomaker import Glyph
+
+    fig, ax = plt.subplots(figsize=[7,3])
+
+    # set bounding box
+    ax.set_xlim([0,2])
+    ax.set_ylim([-1,1])
+
+    Glyph(c='A',
+          p=1,
+          width= 1.0,
+          alpha=.85,
+          ax = ax,
+          vpad = 0.1,
+          font_weight=0,
+          ceiling=0.9,
+          floor=-0.9,
+          color='white',
+          flip=False,
+          mirror=True,
+          edgecolor='red',
+          edgewidth=2)
+
+.. image:: _static/tutorial_images/glyph_A.png
+   :align: center
+
+The coordinate system that the glyph class uses is introduced in the figure
+below:
+
+.. image:: _static/tutorial_images/Glyph_coordinate_system.png
+   :width:  450
+   :height: 350
+   :align:  center
+
+Logomaker also allows the user to use the Glyph class to draw logos directly from input strings. The user
+can subsequently modify individual glyphs in the rendered logo::
+
+    fig, ax = plt.subplots(figsize=[15,3])
+
+    # Style axes
+    s = 'LOGOMAKER'
+    ax.set_ylim([0,1])
+    ax.set_xlim([-.5,len(s)-.5])
+    #ax.axis('off')
+
+    # Create a list of glyphs
+    glyphs = []
+    for p, c in enumerate(s):
+        g = Glyph(c=c, p=p,ax=ax, draw_now=False, ceiling=1,floor=0,color='black')
+        glyphs.append(g)
+
+    # Modify a single glyph
+    g = glyphs[5]
+    g.color='dodgerblue'
+    g.floor=.5
+    g.font_name='Comic Sans MS'
+    g.flip=False
+
+    # Draw all glyphs
+    for g in glyphs:
+        g.draw()
+
+.. image:: _static/tutorial_images/logo_from_string_via_glyphs.png
+   :align: center
 
 .. _matrix_types:
 
@@ -424,6 +498,13 @@ using these :math:`I_{ic}` values as character heights.
 .. :math:`g_{ic} = \tilde{g}_{ic} - \frac{1}{C} \sum_{c'} \tilde{g}_{ic'} ,~~~\tilde{g}_{ic} = -\frac{1}{\alpha} \log \frac{p_{ic}}{b_{ic}}`
 
 .. :math:`p_{ci} = \frac{b_{ci} \exp [ - \alpha g_{ci} ] }{\sum_{c'} b_{c'i} \exp[ - \alpha g_{c'i} ] }`
+
+
+Jupyter notebook Downloads
+==========================
+
+-   :download:`Logoamker Tutorial Simple <Logomaker_Tutorial_Simple.ipynb>`
+-   :download:`Logoamker Tutorial Glyphs <Logomaker_Tutorial_Glyphs.ipynb>`
 
 
 References
