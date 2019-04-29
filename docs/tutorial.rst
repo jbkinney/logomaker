@@ -1,23 +1,84 @@
 Tutorial
 ========
 
-This tutorial provides a walk through of the basic Logomaker functionality. For highly styled and customized logos,
-please see :ref:`examples`. Code snippets are provided for easy reproduction. Note that detailed information and
-mathematical definitions of various types of logos can be found in :ref:`matrix_definitions`. We begin by importing
-three useful python packages and Logomaker::
+This tutorial provides a walk through of the Logomaker functionality. Code snippets snippets as wells as complete
+jupyter notebooks are provided at the end of each section.
 
+Simple Example
+---------------
+
+To get started with Logomaker, we begin by importing three useful python packages and Logomaker::
+
+    # useful imports
     import numpy as np
     import pandas as pd
     import matplotlib.pyplot as plt
+    import logomaker as lm
 
-    import logomaker
+    # logomaker method to load example matrices
+    crp_df = -lm.get_example_matrix('crp_energy_matrix')
+    crp_df.head()
 
-Alignment to Matrix
--------------------
++---+------+------+------+------+
+|   | A    | C    | G    |  T   |
++===+======+======+======+======+
+| 0 | 0.00 | 0.55 | 0.45 | 0.19 |
++---+------+------+------+------+
+| 1 | 0.00 | 0.92 | 0.65 | 0.31 |
++---+------+------+------+------+
+| 2 | 0.00 | 0.96 | 0.72 | 0.11 |
++---+------+------+------+------+
+| 3 | 0.21 | 1.04 | 1.06 | 0.00 |
++---+------+------+------+------+
+| 4 | 0.13 | 0.46 | 0.32 | 0.00 |
++---+------+------+------+------+
 
-The input to Logomaker's Logo class is a pandas data frame in which columns represent
-characters, rows represent positions, and values represent character heights. Multiple sequence alignments
-are commonly found in fasta format.
+These data correspond to an energy matrix for the transcription factor CRP, and are from from [#sortseq2010]_. Note
+that users can easily load data using the Logomaker method :ref:`get_example_matrix`.
+To draw a logo, logomaker expects a pandas dataframe as input to its :ref:`Logo` class. The columns of this dataframe
+represent characters, rows represent positions, and values represent character heights conveying some type of
+information about their biological importance. Thus, we draw the logo as follows::
+
+    logo = lm.Logo(crp_df)
+
+.. image:: _static/tutorial_images/simple_example.png
+
+Basic Styling
+-------------
+
+This section introduces basic styling options logomaker provides, applied to the CRP logo from the previous section.
+We still use the :ref:`Logo` class (specifically, its constructor) to draw the logo, however we now set a few extra
+for styling::
+
+    # some basic styling for the crp logo
+    logo = lm.Logo(df=crp_df,
+                          center_values=True,
+                          font_name='Arial Rounded MT Bold',
+                          fade_below=0.5,
+                          shade_below=0.5)
+
+    # style logo spines
+    logo.style_spines(visible=False)
+    logo.style_spines(spines=['left','bottom'], visible=True, linewidth=2)
+
+    # set axes labels
+    logo.ax.set_xlabel('Position',fontsize=14)
+    logo.ax.set_ylabel("$-\Delta \Delta G$ (kcal/mol)", labelpad=-1,fontsize=14)
+
+Note also that we have used the Logo class function `style_spines` for customizing the spines of the counts logo.
+Additionally, the `ax` object available to the variable `logo` in the above snippet is a
+`Matplotlib Axes object <https://matplotlib.org/api/axes_api.html>`_, which allows the user to leverage the
+functionality of matplotlib for further customization. The resulting logo looks like
+
+.. image:: _static/tutorial_images/basic_styling.png
+
+Matrix from alignment
+---------------------
+
+Logomaker provides functionality to convert multiple sequence alignments to valid dataframes that can subsequently
+be drawn. Note that detailed information about matrix types can be found in the section :ref:`matrix_types`.
+Consider the following multiple sequence alignment (in fasta format) representing CRP binding sites
+on the E-Coli genome (from [#crpsitesfa]_).
 
 ::
 
@@ -29,15 +90,26 @@ are commonly found in fasta format.
     ATATTGGTGATCCATAAAACAATATT
     ...
 
-The data used in this example are mutagenized DNA sequences corresponding to CRP binding sites (from [#sortseq2010]_).
+These data can be obtained by calling the logomaker method :ref:`open_example_datafile` as follows::
+
+    crp_sites = lm.open_example_datafile('crp_sites.fa')
+    with open(crp_sites.name, 'r') as f:
+        raw_seqs = f.readlines()
+    raw_seqs[:20]
+
+
 We can remove the non-sequence lines to obtain just the raw sequences::
 
-    with open('crp_sites.fasta','r') as f:
-        seqs = [l.strip() for l in f.readlines() if '>' not in l and len(l.strip())>0]
+    # extract binding site sequences from FASTA lines
+    seqs = [seq.strip() for seq in raw_seqs if ('#' not in seq) and ('>') not in seq]
+    # preview sequences
+    seqs[:5]
 
     ATAAGCAGGATTTAGCTCACACTTAT
     AAAAATGTGATACCAATCACAGAATA
     ATATTGGTGATCCATAAAACAATATT
+    ATATTGGTGAGGAACTTAACAATATT
+    GATTATTTGCACGGCGTCACACTTTG
     ...
 
 Once in this form, we can use logomaker's method :ref:`alignment_to_matrix` to generate a
@@ -45,7 +117,7 @@ counts dataframe, which can be input to Logomaker.
 
 ::
 
-    counts_mat = logomaker.alignment_to_matrix(seqs)
+    counts_mat = lm.alignment_to_matrix(seqs[10:])
     counts_mat.head()
 
 The resulting pandas dataframe looks like:
@@ -66,7 +138,7 @@ The resulting pandas dataframe looks like:
 
 Entering the counts matrix into The Logo class draws a counts logo::
 
-    logomaker.Logo(counts_mat)
+    lm.Logo(counts_mat)
 
 .. image:: _static/tutorial_images/counts_logo.png
 
@@ -93,37 +165,72 @@ can be performed are listed below:
     of matrix (e.g. 'information'). To do this, set from_type and to_type
     arguments.
 
-    -    from_type = ‘counts' :raw-html:`&rarr;`  to_type = ‘probability':
-    -    from_type = ‘probability' :raw-html:`&rarr;` to_type = ‘weight':
-    -    from_type = ‘weight' :raw-html:`&rarr;` to_type = ‘probability':
-    -    from_type = ‘probability' :raw-html:`&rarr;` to_type = ‘information':
-    -    from_type = ‘information' :raw-html:`&rarr;` to_type = ‘probability':
+    +----------------+---+---------------+---------+---+----------------+
+    | from_type      | = | ‘counts’      | to_type | = | ‘probability': |
+    +----------------+---+---------------+---------+---+----------------+
+    | from_type      | = | ‘probability' | to_type | = | ‘weight'       |
+    +----------------+---+---------------+---------+---+----------------+
+    | from_type      | = | ‘weight'      | to_type | = | ‘weight'       |
+    +----------------+---+---------------+---------+---+----------------+
+    | from_type      | = | ‘probability' | to_type | = | ‘information'  |
+    +----------------+---+---------------+---------+---+----------------+
+    | from_type      | = | ‘information' | to_type | = | ‘probability'  |
+    +----------------+---+---------------+---------+---+----------------+
 
 
 Using these five 1-step transformations, 2-step transformations
-are also enabled, e.g., from_type=‘counts' :raw-html:`&rarr;` to_type=‘information'. As an example,
-two matrix transformations are shown as follows::
+are also enabled, e.g., from_type=‘counts' :raw-html:`&rarr;` to_type=‘information'. In the following, we show
+two examples of the transform matrix functionality, beginning with the CRP logo::
 
     # Counts matrix -> Weight matrix
-    weight_mat = logomaker.transform_matrix(counts_mat,
-                                            background=background,
+    weight_mat = lm.transform_matrix(counts_mat,
                                             from_type='counts',
                                             to_type='weight')
-    logomaker.Logo(weight_mat, center_values=True)
+
+    lm.Logo(weight_mat, center_values=True,font_name='Arial Rounded MT Bold')
 
 .. image:: _static/tutorial_images/weight_logo.png
 
-::
+For our second example, we load the WW domain protein alignment (from [#WWdomain]_), by using the function
+:ref:`open_example_datafile`::
 
-    # Counts matrix -> Information matrix
-    info_mat = logomaker.transform_matrix(counts_mat,
-                                     background=background,
-                                     from_type='counts',
-                                     to_type='information')
-    logomaker.Logo(info_mat)
+    # load ww alignment
+    with logomaker.open_example_datafile('ww_sequences.fa', print_description=False) as f:
+        lines = f.readlines()
+
+    # extract ww domain sequences
+    seqs = [seq.strip().upper() for seq in lines if ('#' not in seq) and ('>') not in seq]
+
+    # preview sequences
+    seqs[:5]
+
+    LPPQW..TEA.VDVDT...GKFYFVHVET.......KETRWERP
+    --PGW..TAT.VDPAS...GRTYYYHAAT.......GETRWEPP
+    LPSGW..VEQ.TDPSS...GRPYYYHNAS.......NLTQWERP
+    LPAGW..VAA.NDPSS...GRTYYYHAES.......GVTSWNPP
+    LPNGW..QEL.VDPSS...GSTYYYNEVN.......GTTSWDRP
+    LPEGW..VEL.VHESS...GKTYYFHAED.......NVTSWEQP
+
+We load the alignment as a count matrix, again by using :ref:`alignment_to_matrix`::
+
+    # create counts matrix
+    ww_counts_df = lm.alignment_to_matrix(sequences=seqs, to_type='counts', characters_to_ignore='.-X')
+
+    # show full ww counts
+    lm.Logo(ww_counts_df)
+
+.. image:: _static/tutorial_images/ww_counts_logo.png
+
+and then transform it to an information matrix::
+
+    # transform to information matrix
+    ww_info_df = lm.transform_matrix(ww_counts_df, from_type='counts', to_type='information')
+
+    # show logo
+    lm.Logo(ww_info_df)
 
 
-.. image:: _static/tutorial_images/information_logo.png
+.. image:: _static/tutorial_images/ww_info_logo.png
 
 Sequence to Matrix
 ------------------
@@ -139,7 +246,7 @@ be readily visualized::
 
     # Create CRP logo from IUPAC motif
     iupac_seq = 'WWNTGTGANNNNNNTCACANWW'
-    iupac_mat = logomaker.sequence_to_matrix(iupac_seq,  is_iupac=True)
+    iupac_mat = lm.sequence_to_matrix(iupac_seq,  is_iupac=True)
     iupac_mat.head()
 
 +-----+-------+-------+------+------+
@@ -169,81 +276,62 @@ values dataframe. The returned dataframe is a L by C matrix where C is
 the number ofcharacters and L is sequence length.  If matrix is denoted as
 S, i indexes positions and c indexes characters, then :math:`S_{ic}` will be non-zero
 (equal to the value in the values array at position p) only if character c
-occurs at position p in sequence. All other elements of S are zero. The following example
-uses randomly generated saliency values::
+occurs at position p in sequence. All other elements of S are zero. As an example we use saliency data
+from [#Jaganathan]_::
 
-    # draw saliency matrix
-    sequence = 'ATAAGCAGGATTTAGCTCACACTTAT'
-    saliency_values = np.random.uniform(low=-3.0, high=6.0, size=(len(sequence),))
-    saliency_mat = logomaker.saliency_to_matrix(sequence,values)
-    logomaker.Logo(saliency_mat)
+    # useful python library for working with matrices and dataframes
+    import pandas as pd
+
+    # load saliency data
+    with lm.open_example_datafile('nn_saliency_values.txt') as f:
+        saliency_data_df = pd.read_csv(f, comment='#', sep='\t')
+
+    # preview dataframe
+    saliency_data_df.head()
+
++----------------------+
+|character |   value   |
++======================+
+| G        | -0.001725 |
++----------------------+
+| G        |  0.033557 |
++----------------------+
+| G        |  0.030026 |
++----------------------+
+| G        |  0.012748 |
++----------------------+
+| G        |  0.000337 |
++----------------------+
+
+Just as before, we now re-use :ref:`saliency_to_matrix`::
+
+    # create saliency matrix
+    saliency_mat_df = lm.saliency_to_matrix(seq=saliency_data_df['character'],
+                                                   values=saliency_data_df['value'])
+
+    # show logo
+    lm.Logo(saliency_mat_df)
+
 
 .. image:: _static/tutorial_images/saliency_logo.png
 
-Validate Matrix
----------------
 
-To check if a dataframe represents a valid matrix, i.e., an object that can be displayed as a logo,
-Logomaker provides the method :ref:`validate_matrix`. Consider the following matrix, representing
-an additive, energetic binding model for the transcription factor RNAP to DNA::
+Advanced Styling
+----------------
 
-    df = pd.read_csv('rnap_matrix.txt', delim_whitespace=True)
-    df.head()
+Glyphs
+------
 
-+-----+---------+---------+---------+---------+
-| pos |    A    |    C    |    G    |    T    |
-+=====+=========+=========+=========+=========+
-| 0   |  0.0089 | 0.1109  | 0.0000  | 0.0963  |
-+-----+---------+---------+---------+---------+
-| 1   |  0.0400 | 0.2615  | 0.0000  | 0.3227  |
-+-----+---------+---------+---------+---------+
-| 2   | 0.0640  | 0.0240  | 0.0499  | 0.0000  |
-+-----+---------+---------+---------+---------+
-| 3   | 0.0000  | 0.1247  | 0.0216  | 0.1117  |
-+-----+---------+---------+---------+---------+
-| 4   | 0.5063  | 0.0463  | 0.0000  | 1.0121  |
-+-----+---------+---------+---------+---------+
 
-This is easily visualized as a weight logo::
+.. _matrix_types:
 
-    logo = logomaker.Logo(df,center_values=True)
+Matrix Types
+============
 
-.. image:: _static/tutorial_images/RNAP_weight_logo_centered.png
-
-However, if the user wants to check whether the dataframe in the variable *df* is a validate probability
-matrix, they can run::
-
-    df = logomaker.validate_matrix(df,matrix_type='probability')
-    df.head()
-
-The first line in the snippet will print out a message that validate_matrix will normalize the dataframe:
-*in validate_matrix(): Row sums in df are not close to 1. Reormalizing rows...*. The resulting dataframe
-is a valid probability matrix:
-
-+-----+---------+---------+---------+---------+
-| pos |    A    |    C    |    G    |    T    |
-+=====+=========+=========+=========+=========+
-| 0   |0.041185 |0.513188 |0.000000 |0.445627 |
-+-----+---------+---------+---------+---------+
-| 1   |0.064082 |0.418936 |0.000000 |0.516982 |
-+-----+---------+---------+---------+---------+
-| 2   | 0.464104| 0.174039|0.361856 | 0.000000|
-+-----+---------+---------+---------+---------+
-| 3   |0.000000 |0.483333 |0.083721 |0.432946 |
-+-----+---------+---------+---------+---------+
-| 4   |0.323576 |0.029590 |0.000000 |0.646833 |
-+-----+---------+---------+---------+---------+
-
-.. image:: _static/tutorial_images/RNAP_validated_probability_logo.png
-
-.. _matrix_definitions:
-
-Matrix Definitions
-==================
-
-A matrix is defined by a set of textual characters, a set of numerical positions, and a numerical
-quantity for every character-position pair. In what follows, we use the symbol :math:`i` to represent possible
-positions, and the symbol :math:`c` (or :math:`c'`) to represent possible characters.
+This section provides defnitions of matrix types supported by Logomaker. A matrix is defined by a set of textual
+characters, a set of numerical positions, and a numerical quantity for every character-position pair. In what
+follows, we use the symbol :math:`i` to represent possible positions, and the symbol :math:`c` (or :math:`c'`)
+to represent possible characters.
 
 In Logomaker, each matrix is represented as a pandas data frame in which rows are indexed by positions
 and columns are named using the character each represents. Any set of numerical positions can be used,
@@ -267,9 +355,9 @@ Built-in matrix and logo types
 
 Although Logomaker will draw logos corresponding to any user-specified matrix, additional support
 is provided for matrices of five specific types: counts matrix, probability matrix, weight matrix,
-saliency matrix, and information matrix. Each matrix type directly or indirectly represents the marginal
-statistics of a sequence alignment, and Logomaker can generate any one of these types of matrices from a
-sequence alignment supplied by the user. These matrices and their corresponding
+saliency matrix, and information matrix. Apart from saliency, each matrix type directly or indirectly
+represents the marginal statistics of a sequence alignment, and Logomaker can generate any
+one of these types of matrices from a sequence alignment supplied by the user. These matrices and their corresponding
 logos are described in detail below.
 
 Counts matrix
@@ -331,7 +419,7 @@ The position-dependent (but not character dependent) quantity :math:`I_i` is cal
 of site :math:`i`, and the sum of these quantities, :math:`I = \sum_{i} I_i`, is the information content
 of the entire matrix. These information values :math:`I_{ic}`  are nonnegative and are said to be in units of
 'bits' due to the use of :math:`\log_2`. A corresponding information logo is drawn
-using these :math:`I_{ic}` values as character heights, as well as a y-axis labeled  'information (bits)'.
+using these :math:`I_{ic}` values as character heights.
 
 .. :math:`g_{ic} = \tilde{g}_{ic} - \frac{1}{C} \sum_{c'} \tilde{g}_{ic'} ,~~~\tilde{g}_{ic} = -\frac{1}{\alpha} \log \frac{p_{ic}}{b_{ic}}`
 
@@ -343,5 +431,10 @@ References
 
 .. [#sortseq2010] Kinney, J. B. et al. (2010). `Using deep sequencing to characterize the biophysical mechanism of a transcriptional regulatory sequence.` Proc Natl Acad Sci USA, 107(20), 9158-9163.
 
-.. [#weblogo1990] Schneider,T.D. and Stephens,R.M. (1990) Nucleic Acids Res., 18, 6097-6100.
+.. [#crpsitesfa] Salgado H, et al. (2013) `RegulonDB v8.0: omics data sets, evolutionary conservation, regulatory phrases, cross-validated gold standards and more.` Nucl Acids Res. 41 (Database issue):D203-13.
 
+.. [#WWdomain] Finn RD et al. (2014) `Pfam: the protein families database.` Nucl Acids Res. 42(Database issue):D222–30.
+
+.. [#Jaganathan] Jaganathan K et al. (2019) `Predicting Splicing from Primary Sequence with Deep Learning.` Cell. 176(3):535–548.e24.
+
+.. [#weblogo1990] Schneider,T.D. and Stephens,R.M. (1990) Nucleic Acids Res., 18, 6097-6100.
