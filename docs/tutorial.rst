@@ -55,7 +55,8 @@ for styling::
                           center_values=True,
                           font_name='Arial Rounded MT Bold',
                           fade_below=0.5,
-                          shade_below=0.5)
+                          shade_below=0.5,
+                          figsize=(10,3))
 
     # style logo spines
     logo.style_spines(visible=False)
@@ -296,17 +297,17 @@ from [#Jaganathan]_::
 
 +----------------------+
 |character |   value   |
-+======================+
++==========+===========+
 | G        | -0.001725 |
-+----------------------+
++----------+-----------+
 | G        |  0.033557 |
-+----------------------+
++----------+-----------+
 | G        |  0.030026 |
-+----------------------+
++----------+-----------+
 | G        |  0.012748 |
-+----------------------+
++----------+-----------+
 | G        |  0.000337 |
-+----------------------+
++----------+-----------+
 
 Just as before, we now re-use :ref:`saliency_to_matrix`::
 
@@ -315,7 +316,7 @@ Just as before, we now re-use :ref:`saliency_to_matrix`::
                                                    values=saliency_data_df['value'])
 
     # show logo
-    lm.Logo(saliency_mat_df)
+    lm.Logo(saliency_mat_df, figsize=(15,3))
 
 
 .. image:: _static/tutorial_images/saliency_logo.png
@@ -324,7 +325,100 @@ Just as before, we now re-use :ref:`saliency_to_matrix`::
 Advanced Styling
 ----------------
 
-This section introduces some advanced styling functionality the Logomaker offers.
+This section introduces some advanced styling functionality that Logomaker offers. We begin by using some yet unused
+keyword arguments from the constructor of the :ref:`Logo` class.
+
+Fade Probabilities
+~~~~~~~~~~~~~~~~~~
+
+We begin with the `fade_probabilities` argument used on the CRP dataframe::
+
+    crp_df = lm.get_example_matrix('crp_counts_matrix')
+    logo = lm.Logo(crp_df, font_name = 'Arial Rounded MT Bold')
+
+The dataframe contained in the variable `crp_df` is a counts matrix. This matrix will need to be transformed into a
+probability matrix to ulitize the `fade_probabilities` keyword::
+
+    # counts matrix -> Probability matrix
+    prob_mat = lm.transform_matrix(crp_df,
+                                          from_type='counts',
+                                          to_type='probability')
+    prob_mat.head()
+
++-----+----------+---------+----------+-----------+
+| pos |   A      |    C    |     G    |      T    |
++=====+==========+=========+==========+===========+
+| 0   | 0.370166 | 0.182320| 0.201657 | 0.245856  |
++-----+----------+---------+----------+-----------+
+| 1   | 0.408840 | 0.129834| 0.162983 |0.298343   |
++-----+----------+---------+----------+-----------+
+| 2   | 0.461326 | 0.074586| 0.107735 |0.356354   |
++-----+----------+---------+----------+-----------+
+| 3   | 0.455801 | 0.080110| 0.121547 |0.342541   |
++-----+----------+---------+----------+-----------+
+| 4   | 0.370166 | 0.127072| 0.132597 |0.370166   |
++-----+----------+---------+----------+-----------+
+
+
+::
+
+    logo = lm.Logo(prob_mat,
+                   fade_probabilities=True,
+                   stack_order='small_on_top')
+
+The additional parameter `stack_order` stack glyphs away from x-axis in order of decreasing absolute value. This can
+alternately be set to `big_on_top` or `fixed`. The resulting logo looks like:
+
+.. image:: _static/tutorial_images/fade_probabilities.png
+
+Style glyphs in sequence
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+We can further customize the faded probability logo shown above by using the method `style_glyphs_in_sequence` as
+shown below::
+
+    logo = lm.Logo(prob_mat,
+                   fade_probabilities=True,
+                   stack_order='small_on_top')
+
+    logo.style_glyphs_in_sequence('.....TGTGA......TCACA.....',color='black')
+
+The resulting logo styles the glyphs that we specified:
+
+.. image:: _static/tutorial_images/fade_probabilities_styled_glyphs.png
+
+
+Style ticks
+~~~~~~~~~~~
+
+Ticks are easily styled according the users needs. We demonstrate xtick styling on the CRP energy logo::
+
+    crp_energy_df = lm.get_example_matrix('crp_energy_matrix')
+
+    logo = lm.Logo(df=-crp_energy_df,
+                  center_values=True,
+                  font_name = 'Arial Rounded MT Bold')
+
+    logo.style_xticks(spacing=5, anchor=25, rotation=45, fmt='%d', fontsize=14)
+
+
+.. image:: _static/tutorial_images/style_xticks.png
+   :align: center
+
+Highlight position ranges
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Important positions on a sequences logo can be emphasized by using the method `highlight_position_range`. The methods
+draw a rectangle at specified locations and style properties, as shown below::
+
+    logo = lm.Logo(df=-crp_energy_df,
+                  center_values=True,
+                  font_name = 'Arial Rounded MT Bold')
+
+    logo.highlight_position_range(5,9,alpha=0.5,color='lightgray')
+    logo.highlight_position_range(16,20,alpha=0.3,color='lightblue',edgecolor='black')
+
+.. image:: _static/tutorial_images/highlight_position_ranges.png
 
 Glyphs
 ------
@@ -353,7 +447,7 @@ each glyph according to their needs. As an example, the following figure shows h
           flip=False,
           mirror=True,
           edgecolor='red',
-          edgewidth=2)
+          edgewidth=4)
 
 .. image:: _static/tutorial_images/glyph_A.png
    :align: center
@@ -503,8 +597,11 @@ using these :math:`I_{ic}` values as character heights.
 Jupyter notebook Downloads
 ==========================
 
+The code presented in this tutorial can be found in the following scripts:
+
 -   :download:`Logoamker Tutorial Simple <Logomaker_Tutorial_Simple.ipynb>`
 -   :download:`Logoamker Tutorial Glyphs <Logomaker_Tutorial_Glyphs.ipynb>`
+-   :download:`Logoamker Tutorial Advanced <Logomaker_Tutorial_Advanced.ipynb>`
 
 
 References
