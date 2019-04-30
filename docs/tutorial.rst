@@ -47,5 +47,8 @@ tutorial notebook introduces some advanced styling functionality that Logomaker 
 Glyph
 -----
 
+The `glyphs <https://github.com/jbkinney/logomaker/blob/master/logomaker/tutorials/6_glyphs.ipynb>`_ tutorial notebook
+shows how Logomaker renders individual characters, or glyphs, and how to customize them.
+
 
 
