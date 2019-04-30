@@ -180,6 +180,23 @@ def get_color_dict(color_scheme, chars):
         color_scheme = CHARS_TO_COLORS_DICT.get(key, 'gray')
         color_dict = get_color_dict(color_scheme, chars)
 
+    # otherwise, if color_scheme is a dictionary
+    elif isinstance(color_scheme, dict):
+
+        # make sure all the keys are strings
+        for key in color_scheme.keys():
+            check(isinstance(key, str),
+                  'color_scheme dict contains a key (%s) ' % repr(key) +
+                  'that is not of type str.')
+
+        # expand the dictionary
+        color_dict = _expand_color_dict(color_scheme)
+
+        # set all values to rgb
+        for key in color_scheme.keys():
+            color_dict[key] = to_rgb(color_dict[key])
+
+
     # otherwise, if color_scheme is a string, it must either be a valid key in
     # COLOR_SCHEME_DICT or a named matplotlib color
     elif isinstance(color_scheme, str):
