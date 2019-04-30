@@ -210,10 +210,6 @@ class Logo:
         if self.draw_now:
             self.draw()
 
-        # Either show or hide spines based on self.show_spines
-        if self.show_spines is not None:
-            self.style_spines(visible=self.show_spines)
-
 
     def _input_checks(self):
         """
@@ -1061,6 +1057,10 @@ class Logo:
         None
         """
 
+        # clear the self.show_spines attribute;
+        # the user calling this means they want to override this attribute
+        self.show_spines = None
+
         # validate that spines is a set-like object
         check(isinstance(spines, (tuple, list, set)),
               'type(spines) = %s; must be of type (tuple, list, set) ' %
@@ -1186,6 +1186,10 @@ class Logo:
         ymin = min([g.floor for g in self.glyph_list])
         ymax = max([g.ceiling for g in self.glyph_list])
         self.ax.set_ylim([ymin, ymax])
+
+        # style spines if requested
+        if self.show_spines is not None:
+            self.style_spines(visible=self.show_spines)
 
     def _update_ax(self, ax):
         """ Reset ax if user has passed a new one."""
