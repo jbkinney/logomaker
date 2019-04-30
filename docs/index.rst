@@ -29,11 +29,24 @@ manager. At the command line::
 The code for logomaker is open source and available on
 `GitHub <https://github.com/jbkinney/logomaker>`_.
 
+Quick Start
+-----------
+
+To run a quick demo of Logomaker, run from within Python::
+
+
+   import logomaker as lm
+
+   crp_df = -lm.get_example_matrix('crp_energy_matrix')
+   logo = lm.Logo(crp_df, font_name = 'Arial Rounded MT Bold')
+
+.. image:: _static/CRP_energy_logo.png
+
 Tutorial
 --------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    tutorial
 
@@ -56,6 +69,7 @@ Implementation
    Glyph
    matrix
    validate
+   examples_src
 
 Contact
 -------
