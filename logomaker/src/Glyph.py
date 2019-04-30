@@ -166,6 +166,9 @@ class Glyph:
         # Check inputs
         self._input_checks()
 
+        # Make patch
+        self.patch = self._make_patch()
+
         # Draw now if requested
         if draw_now:
             self.draw()
@@ -179,6 +182,8 @@ class Glyph:
         **kwargs:
             Attributes and their values.
         """
+
+        # Set each attribute passed by user
         for key, value in kwargs.items():
 
             # If key corresponds to a color, convert to rgb
@@ -187,6 +192,9 @@ class Glyph:
 
             # Save variable name
             self.__dict__[key] = value
+
+        # Remake patch
+        self.patch = self._make_patch()
 
     def draw(self, ax=None):
         """
@@ -202,9 +210,6 @@ class Glyph:
         -------
         None.
         """
-
-        # Make patch
-        self.patch = self._make_patch()
 
         # If user passed ax, use that
         if ax is not None:
@@ -268,7 +273,7 @@ class Glyph:
 
         # If need to mirror char, do it within tmp_path
         if self.mirror:
-            transformation = Affine2D().scale(sx=-11, sy=1)
+            transformation = Affine2D().scale(sx=-1, sy=1)
             tmp_path = transformation.transform_path(tmp_path)
 
         # Get bounding box for temporary character and max_stretched_character

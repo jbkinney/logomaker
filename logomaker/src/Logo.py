@@ -197,6 +197,7 @@ class Logo:
         self.style_glyphs_below(shade=self.shade_below,
                                 fade=self.fade_below,
                                 draw_now=False,
+                                flip=self.flip_below,
                                 ax=self.ax)
 
         # fade glyphs by value if requested
