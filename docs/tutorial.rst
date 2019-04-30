@@ -41,6 +41,9 @@ chosen saliency values and (ii) a saliency logo adapted from a publised paper.
 Advanced Styling
 ----------------
 
+The `advanced styling <https://github.com/jbkinney/logomaker/blob/master/logomaker/tutorials/5_advanced_styling.ipynb>`_
+tutorial notebook introduces some advanced styling functionality that Logomaker offers.
+
 Glyph
 -----
 
