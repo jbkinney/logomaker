@@ -507,6 +507,8 @@ class Logo:
 
     @handle_errors
     def style_glyphs_below(self,
+                           color=None,
+                           alpha=None,
                            shade=0.0,
                            fade=0.0,
                            flip=True,
@@ -519,6 +521,12 @@ class Logo:
 
         parameters
         ----------
+
+        color: (color specification)
+            Color to use before shade is applied.
+
+        alpha: (number in [0,1])
+            Opacity to use when rendering characters, before fade is applied.
 
         shade: (number in [0,1])
             The amount to shade characters below the x-axis.
@@ -543,6 +551,22 @@ class Logo:
         -------
         None
         """
+
+        # validate color and transform to RBG
+        if color is not None:
+            color = get_rgb(color)
+
+        # validate alpha
+        if alpha is not None:
+            # check alpha is a number
+            check(isinstance(alpha, (float, int)),
+                  'type(alpha) = %s must be a float or int' %
+                  type(alpha))
+            self.alpha = float(alpha)
+
+            # check 0 <= alpha <= 1.0
+            check(0 <= alpha <= 1.0,
+                  'alpha must be between 0.0 and 1.0 (inclusive)')
 
         # validate shade
         check(isinstance(shade, (float, int)),
@@ -590,13 +614,19 @@ class Logo:
                     # get glyph
                     g = self.glyph_df.loc[p, c]
 
-                    # modify color and alpha
-                    color = np.array(g.color) * (1.0 - shade)
-                    alpha = g.alpha * (1.0 - fade)
+                    # modify color
+                    if color is None:
+                        color = get_rgb(g.color)
+                    else:
+                        color = get_rgb(color)
+
+                    # modify alpha
+                    if alpha is None:
+                        alpha = g.alpha
 
                     # set glyph attributes
-                    g.set_attributes(color=color,
-                                     alpha=alpha,
+                    g.set_attributes(color=color*(1.0 - shade),
+                                     alpha=alpha*(1.0 - fade),
                                      flip=flip,
                                      **kwargs)
 

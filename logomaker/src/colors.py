@@ -193,7 +193,7 @@ def get_color_dict(color_scheme, chars):
         color_dict = _expand_color_dict(color_scheme)
 
         # set all values to rgb
-        for key in color_scheme.keys():
+        for key in color_dict.keys():
             color_dict[key] = to_rgb(color_dict[key])
 
 
