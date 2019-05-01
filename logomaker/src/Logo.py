@@ -511,7 +511,7 @@ class Logo:
                            alpha=None,
                            shade=0.0,
                            fade=0.0,
-                           flip=True,
+                           flip=None,
                            draw_now=True,
                            ax=None,
                            **kwargs):
@@ -616,17 +616,19 @@ class Logo:
 
                     # modify color
                     if color is None:
-                        color = get_rgb(g.color)
+                        this_color = get_rgb(g.color)
                     else:
-                        color = get_rgb(color)
+                        this_color = color
 
                     # modify alpha
                     if alpha is None:
-                        alpha = g.alpha
+                        this_alpha = g.alpha
+                    else:
+                        this_alpha = alpha
 
                     # set glyph attributes
-                    g.set_attributes(color=color*(1.0 - shade),
-                                     alpha=alpha*(1.0 - fade),
+                    g.set_attributes(color=this_color*(1.0 - shade),
+                                     alpha=this_alpha*(1.0 - fade),
                                      flip=flip,
                                      **kwargs)
 
