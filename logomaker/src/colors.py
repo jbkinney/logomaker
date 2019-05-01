@@ -10,8 +10,15 @@ from logomaker.src.matrix import ALPHABET_DICT
 CHARS_TO_COLORS_DICT = {
     tuple('ACGT'): 'classic',
     tuple('ACGU'): 'classic',
-    tuple('ACDEFGHIKLMNPQRSTVWY'): 'hydrophobicity',
+    tuple('ACDEFGHIKLMNPQRSTVWY'): 'weblogo_protein',
 }
+
+weblogo_blue = [.02, .09, .74]
+weblogo_pink = [.83, .11, .75]
+weblogo_green = [.13, .83, .15]
+weblogo_red = [.83, .04, .08]
+weblogo_black = [0, 0, 0]
+
 
 # COLOR_SCHEME_DICT provides a default set of logo colorschemes
 # that can be passed to the 'color_scheme' argument of Logo()
@@ -34,6 +41,88 @@ COLOR_SCHEME_DICT = {
     'base_pairing': {
         'TAU': [1, .55, 0],
         'GC': [0, 0, 1]
+    },
+
+    # Weblogo: http://weblogo.berkeley.edu/examples.html
+    # BlockLogo: http://research4.dfci.harvard.edu/cvc/blocklogo/HTML/examples.php
+    'weblogo_protein': {
+        'RHK' : weblogo_blue, # positive charge
+        'DE' : weblogo_red, # negative charge
+        'QN' : weblogo_pink, # polar uncharged long
+        'GCSTY' : weblogo_green, # polar uncharged short and special cases (???)
+        'ILMAFVPW' : weblogo_black # hydrophobic
+    },
+
+    # Skylign: http://skylign.org/logo/example
+    'skylign_protein': {
+        'F': [.16, .99, .18],
+        'Y': [.04, .40, .05],
+        'L': [.99, .60, .25],
+        'V': [1.0, .80, .27],
+        'I': [.80, .60, .24],
+        'H': [.40, .02, .20],
+        'W': [.42, .79, .42],
+        'A': [.99, .60, .42],
+        'S': [.04, .14, .98],
+        'T': [.17, 1.0, 1.0],
+        'M': [.80, .60, .80],
+        'N': [.21, .40, .40],
+        'Q': [.40, .41, .79],
+        'R': [.59, .02, .04],
+        'K': [.40, .20, .03],
+        'E': [.79, .04, .22],
+        'G': [.95, .94, .22],
+        'D': [.99, .05, .11],
+        'P': [.10, .61, .99],
+        'C': [.09, .60, .60]
+    },
+
+    # dmslogo: https://jbloomlab.github.io/dmslogo/dmslogo.colorschemes.html
+    'dmslogo_charge': {
+        'A': '#000000',
+        'C': '#000000',
+        'D': '#0000FF',
+        'E': '#0000FF',
+        'F': '#000000',
+        'G': '#000000',
+        'H': '#FF0000',
+        'I': '#000000',
+        'K': '#FF0000',
+        'L': '#000000',
+        'M': '#000000',
+        'N': '#000000',
+        'P': '#000000',
+        'Q': '#000000',
+        'R': '#FF0000',
+        'S': '#000000',
+        'T': '#000000',
+        'V': '#000000',
+        'W': '#000000',
+        'Y': '#000000'
+    },
+
+    # dmslogo: https://jbloomlab.github.io/dmslogo/dmslogo.colorschemes.html
+    'dmslogo_funcgroup': {
+        'A': '#f76ab4',
+        'C': '#ff7f00',
+        'D': '#e41a1c',
+        'E': '#e41a1c',
+        'F': '#84380b',
+        'G': '#f76ab4',
+        'H': '#3c58e5',
+        'I': '#12ab0d',
+        'K': '#3c58e5',
+        'L': '#12ab0d',
+        'M': '#12ab0d',
+        'N': '#972aa8',
+        'P': '#12ab0d',
+        'Q': '#972aa8',
+        'R': '#3c58e5',
+        'S': '#ff7f00',
+        'T': '#ff7f00',
+        'V': '#12ab0d',
+        'W': '#84380b',
+        'Y': '#84380b'
     },
 
     'hydrophobicity': {
