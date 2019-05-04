@@ -16,8 +16,8 @@ in this section assume that the following packages have been imported in Python 
     import logomaker as lm
 
 
-:math:`\Delta \Delta G` CRP Weight Logo
------------------------------------------
+CRP Energy Logo
+---------------
 
 The following logo shows an energy matrix for the transcription factor CRP. The energy matrix used to make this
 was determined by Kinney *et. al.* in [#sortseq2010]_. The logo uses shading and fading of characters below the x-axis

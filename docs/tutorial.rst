@@ -51,8 +51,8 @@ The advanced styling tutorial notebook introduces some advanced styling function
 Glyph
 -----
 
-The glyphs tutorial notebook shows how Logomaker renders individual characters, or glyphs, and how to customize them.
+The glyph objects tutorial notebook shows how Logomaker renders individual characters, or glyphs, and how to customize them.
 
-- `glyphs <https://github.com/jbkinney/logomaker/blob/master/logomaker/tutorials/6_glyphs.ipynb>`_
+- `glyph objects <https://github.com/jbkinney/logomaker/blob/master/logomaker/tutorials/6_glyph_objects.ipynb>`_
 
 

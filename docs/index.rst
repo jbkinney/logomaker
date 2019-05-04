@@ -36,9 +36,7 @@ To run a quick demo of Logomaker, run from within Python::
 
 
    import logomaker as lm
-
-   crp_df = -lm.get_example_matrix('crp_energy_matrix')
-   logo = lm.Logo(crp_df, font_name = 'Arial Rounded MT Bold')
+   lm.demo()
 
 .. image:: _static/CRP_energy_logo.png
 
