@@ -48,8 +48,8 @@ The advanced styling tutorial notebook introduces some advanced styling function
 
 - `advanced styling <https://github.com/jbkinney/logomaker/blob/master/logomaker/tutorials/5_advanced_styling.ipynb>`_
 
-Glyph
------
+Glyph Objects
+-------------
 
 The glyph objects tutorial notebook shows how Logomaker renders individual characters, or glyphs, and how to customize them.
 

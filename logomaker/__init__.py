@@ -26,7 +26,7 @@ def demo(example='crp_energy_matrix'):
 
     example: (str)
 
-        A string specifying which example matrix to draw logo for. Must be one of
+        A string specifying which example matrix to draw a logo for. Must be one of
         the following.
         [
             'ars_enrichment_matrix', 'crp_counts_matrix'    , 'crp_energy_matrix'
@@ -44,5 +44,5 @@ def demo(example='crp_energy_matrix'):
 
     import matplotlib.pyplot as plt
     df = get_example_matrix(example)
-    Logo(df,font_name='Arial Rounded MT Bold',color_scheme='classic')
+    Logo(df,font_name='Arial Rounded MT Bold')
     plt.show()
