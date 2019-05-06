@@ -190,6 +190,11 @@ class Logo:
         if self.center_values:
             self.df = transform_matrix(self.df, center_values=True)
 
+        # create axes if not specified by user
+        if self.ax is None:
+            fig, ax = plt.subplots(1, 1, figsize=self.figsize)
+            self.ax = ax
+
         # compute characters
         self._compute_glyphs()
 
@@ -197,8 +202,7 @@ class Logo:
         self.style_glyphs_below(shade=self.shade_below,
                                 fade=self.fade_below,
                                 draw_now=False,
-                                flip=self.flip_below,
-                                ax=self.ax)
+                                flip=self.flip_below)
 
         # fade glyphs by value if requested
         if self.fade_probabilities:
@@ -340,7 +344,6 @@ class Logo:
     def style_glyphs(self,
                      color_scheme=None,
                      draw_now=True,
-                     ax=None,
                      **kwargs):
         """
         Modifies the properties of all characters in a Logo.
@@ -366,9 +369,6 @@ class Logo:
         draw_now: (bool)
             Whether to re-draw modified logo on current Axes object.
 
-        ax: (matplotlib Axes object)
-            New Axes object, if any, on which to draw the Logo.
-
         **kwargs:
             Keyword arguments to pass to Glyph.set_attributes()
 
@@ -388,13 +388,6 @@ class Logo:
         check(isinstance(draw_now, bool),
               'type(draw_now) = %s; must be of type bool ' %
               type(draw_now))
-
-        # check ax
-        check((ax is None) or isinstance(ax, Axes),
-              'ax must be either a matplotlib Axes object or None.')
-
-        # update ax if axes are provided by the user
-        self._update_ax(ax)
 
         # update glyph-specific attributes if they are passed as kwargs
         for key in ['zorder', 'vpad', 'font_name']:
@@ -419,8 +412,7 @@ class Logo:
     def fade_glyphs_in_probability_logo(self,
                                         v_alpha0=0.0,
                                         v_alpha1=1.0,
-                                        draw_now=True,
-                                        ax=None):
+                                        draw_now=True):
 
         """
         Fades glyphs in probability logo according to value.
@@ -435,9 +427,6 @@ class Logo:
 
         draw_now: (bool)
             Whether to readraw modified Logo.
-
-        ax: (matplotlib Axes object)
-            New Axes object, if any, on which to draw the Logo.
 
         returns
         -------
@@ -471,13 +460,6 @@ class Logo:
         check(isinstance(draw_now, bool),
               'type(draw_now) = %s; must be of type bool ' %
               type(draw_now))
-
-        # check ax
-        check((ax is None) or isinstance(ax, Axes),
-              'ax must be either a matplotlib Axes object or None.')
-
-        # update ax if axes are provided by the user
-        self._update_ax(ax)
 
         # make sure matrix is a probability matrix
         self.df = validate_matrix(self.df, matrix_type='probability')
@@ -513,7 +495,6 @@ class Logo:
                            fade=0.0,
                            flip=None,
                            draw_now=True,
-                           ax=None,
                            **kwargs):
 
         """
@@ -536,9 +517,6 @@ class Logo:
 
         flip: (bool)
             If True, characters below the x-axis will be flipped upside down.
-
-        ax: (matplotlib Axes object)
-            The Axes object on which to draw the logo.
 
         draw_now: (bool)
             Whether to readraw modified Logo.
@@ -591,13 +569,6 @@ class Logo:
               'type(flip) = %s; must be of type bool ' %
               type(flip))
 
-        # check ax
-        check((ax is None) or isinstance(ax, Axes),
-              'ax must be either a matplotlib Axes object or None.')
-
-        # update ax if axes are provided by the user
-        self._update_ax(ax)
-
         # check that draw_now is a boolean
         check(isinstance(draw_now, bool),
               'type(draw_now) = %s; must be of type bool ' %
@@ -637,7 +608,7 @@ class Logo:
             self.draw()
 
     @handle_errors
-    def style_single_glyph(self, p, c, draw_now=True, ax=None, **kwargs):
+    def style_single_glyph(self, p, c, draw_now=True, **kwargs):
         """
         Modifies the properties of a single character in Logo.
 
@@ -655,9 +626,6 @@ class Logo:
         draw_now: (bool)
             Specifies whether to readraw the modified Logo on the current Axes.
             Warning: setting this to True will slow down rendering.
-
-        ax: (matplotlib Axes object)
-            New Axes object, if any, on which to draw Logo.
 
         **kwargs:
             Keyword arguments to pass to Glyph.set_attributes()
@@ -691,13 +659,6 @@ class Logo:
         check(isinstance(draw_now, bool),
               'type(draw_now) = %s; must be of type bool ' % type(draw_now))
 
-        # check ax
-        check((ax is None) or isinstance(ax, Axes),
-              'ax must be either a matplotlib Axes object or None.')
-
-        # update ax if provided by the user.
-        self._update_ax(ax)
-
         # Get glyph from glyph_df
         g = self.glyph_df.loc[p, c]
 
@@ -712,7 +673,6 @@ class Logo:
     def style_glyphs_in_sequence(self,
                                  sequence,
                                  draw_now=True,
-                                 ax=None,
                                  **kwargs):
         """
         Restyles the glyphs in a specific sequence.
@@ -726,9 +686,6 @@ class Logo:
 
         draw_now: (bool)
             Whether to readraw modified logo on the current Axes.
-
-        ax: (matplotlib Axes object)
-            New Axes object, if any, on which to draw logo.
 
         **kwargs:
             Keyword arguments to pass to Glyph.set_attributes()
@@ -750,13 +707,6 @@ class Logo:
         # check that draw_now is a boolean
         check(isinstance(draw_now, bool),
               'type(draw_now) = %s; must be of type bool ' % type(draw_now))
-
-        # check ax
-        check((ax is None) or isinstance(ax, Axes),
-              'ax must be either a matplotlib Axes object or None.')
-
-        # update Axes if provided by the user
-        self._update_ax(ax)
 
         # for each position in the logo...
         for i, p in enumerate(self.glyph_df.index):
@@ -1159,16 +1109,12 @@ class Logo:
                 if bounds is not None:
                     spine.set_bounds(bounds[0], bounds[1])
 
-    def draw(self, ax=None, clear=False):
+    def draw(self, clear=False):
         """
-        Draws characters on the Axes object 'ax' provided to the Logo
-        constructor. Note: all previous content drawn on ax will be erased.
+        Draws characters in Logo.
 
         parameters
         ----------
-        ax: (Axes object)
-            Axes on which to draw the logo. Defaults to the previously
-            specified Axes or, if that was never set, to plt.gca().
 
         clear: (bool)
             If True, Axes will be cleared before logo is drawn.
@@ -1178,22 +1124,10 @@ class Logo:
         None
         """
 
-        # validate ax
-        check((ax is None) or isinstance(ax, Axes),
-              'ax must be either a matplotlib Axes object or None.')
-
         # validate clear
         check(isinstance(clear, bool),
               'type(clear) = %s; must be of type bool ' %
               type(clear))
-
-        # update ax
-        self._update_ax(ax)
-
-        # if ax is still None, create figure
-        if self.ax is None:
-            fig, ax = plt.subplots(1, 1, figsize=self.figsize)
-            self.ax = ax
 
         # clear previous content from ax if requested
         if clear:
@@ -1201,7 +1135,7 @@ class Logo:
 
         # draw each glyph
         for g in self.glyph_list:
-            g.draw(self.ax)
+            g.draw()
 
         # flag that this logo has indeed been drawn
         self.has_been_drawn = True
@@ -1222,11 +1156,6 @@ class Logo:
         # style spines if requested
         if self.show_spines is not None:
             self.style_spines(visible=self.show_spines)
-
-    def _update_ax(self, ax):
-        """ Reset ax if user has passed a new one."""
-        if ax is not None:
-            self.ax = ax
 
     def _compute_glyphs(self):
         """

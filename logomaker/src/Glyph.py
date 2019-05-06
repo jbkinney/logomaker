@@ -166,6 +166,10 @@ class Glyph:
         # Check inputs
         self._input_checks()
 
+        # If ax is not set, set to current axes object
+        if self.ax is None:
+            self.ax = plt.gca()
+
         # Make patch
         self.patch = self._make_patch()
 
@@ -196,32 +200,18 @@ class Glyph:
         # Remake patch
         self.patch = self._make_patch()
 
-    def draw(self, ax=None):
+    def draw(self):
         """
         Draws Glyph given current parameters.
 
         parameters
         ----------
-
-        ax: (matplotlib Axes object)
-            The axes object on which to draw the Glyph.
+        None.
 
         returns
         -------
         None.
         """
-
-        # If user passed ax, use that
-        if ax is not None:
-
-            # Check to make sure ax is a matplotlib Axes object
-            check(isinstance(ax, Axes),
-                  'ax is not a matplotlib Axes object')
-            self.ax = ax
-
-        # If ax is not set, set to current axes object
-        if self.ax is None:
-            self.ax = plt.gca()
 
         # Draw character
         if self.patch is not None:

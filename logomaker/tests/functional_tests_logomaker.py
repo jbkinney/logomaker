@@ -6,6 +6,7 @@ sys.path.append('../../')
 import logomaker
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 global_success_counter = 0
 global_fail_counter = 0
@@ -112,6 +113,9 @@ def test_parameter_values(func,
 
         # Test function
         test_for_mistake(func=func, should_fail=False, **kwargs)
+
+    # close all figures that might have been generated
+    plt.close('all')
 
 
 def test_logomaker_Logo():
