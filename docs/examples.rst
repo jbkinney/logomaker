@@ -3,13 +3,14 @@
 Examples
 ========
 
-This section provides the code to draw logos from the Logomaker manuscript. All the snippets of code provided
+This section provides the code to draw logos from figure 1 in the Logomaker manuscript. All the snippets of code provided
 in this section assume that the following packages have been imported in Python before running them::
 
     import numpy as np
     import pandas as pd
-    import matplotlib as mpl
     import matplotlib.pyplot as plt
+    %matplotlib inline
+    plt.ion()
 
     import sys
     sys.path.append('../../')
@@ -19,11 +20,11 @@ in this section assume that the following packages have been imported in Python 
 CRP Energy Logo
 ---------------
 
-The following logo shows an energy matrix for the transcription factor CRP. The energy matrix used to make this
+An energy logo for the transcription factor CRP is shown. The energy matrix used to make this logo
 was determined by Kinney *et. al.* in [#sortseq2010]_. The logo uses shading and fading of characters below the x-axis
 to emphasize characters with positive values. The shading and fading features are set by using the keyword
 arguments **shade_below** and **fade_below** in the constructor for :ref:`Logo`. Additionally, styling options for spines,
-ticks, and lables is also demonstrated::
+ticks, and lables are also demonstrated::
 
     ### CRP panel
 
@@ -45,8 +46,8 @@ ticks, and lables is also demonstrated::
 
 .. image:: _static/examples_images/1B.png
 
-5' Splice Sites in the Human Genome
------------------------------------
+5' Splice Sites Logo
+--------------------
 
 
 We now illustrate a probability logo computed from all annotated 5' splices sites in the human genome.
@@ -83,10 +84,10 @@ above and below each character.::
 Protein Sequence Logo: WW domain
 --------------------------------
 
-We now turn to protein sequence logos. We focus on the WW domain alignment [#WWdomain]_, and highlight the eponymous
-positions of this alignment. To do the highlights, we use the Logomaker method *logo.highlight_position*. Note that
+We now show a logo drawn from the WW domain alignment [#WWdomain]_, and highlight the eponymous
+positions of this alignment. To do the highlights, we use the Logomaker method *highlight_position*. Note that
 the color scheme is part of a number of default color dictionaries Logomaker has. The list of available color schemes
-can be viewed by calling `logomaker.list_color_schemes()`. The user can choose named colors in matplotlib and also
+can be viewed by calling `lm.list_color_schemes()`. The user can choose named colors in matplotlib and also
 pass in custom color dictionaries::
 
     ### WW panel
@@ -113,7 +114,7 @@ Autonomously Replicating Sequence (ARS) Logo
 --------------------------------------------
 
 We demonstrate an enrichment logo representing the effects mutations have on replication efficiency within the ARS1
-replication origin of S. cerevisiae . These data (unpublished) were collected by Justin B. Kinney from a mutARS-seq
+replication origin of S. cerevisiae. These data (unpublished) were collected by Justin B. Kinney from a mutARS-seq
 experiment analogous to the one reported by [#Liachko2013]_. We use the function *highlight_position_range* to
 highlight a range of positions indicating the A (lightcyan), the B1 (honeydew), B2 (lavenderblush) elements for the ARS.
 
@@ -159,8 +160,8 @@ Saliency Logo
 
 Saliency maps of deep neural networks accentuate important nucleotides. We adapt a saliency logo from [#Jaganathan]_
 representing the importance of nucleotides in the vicinity of U2SUR exon 9, as predicted by a deep neural network
-model of splice site selection. This example demonstrates how Logomaker is able to leverage the a lot of functionality
-from matplotlib, thus allowing the user to customize their logos however much they want
+model of splice site selection. This example demonstrates how Logomaker is able to leverage functionality
+from `matplotlib <https://matplotlib.org/>`_, thus allowing the user to customize their logos however much they want
 (reproduced with author permission)::
 
     ### Saliency panel
