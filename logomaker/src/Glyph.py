@@ -116,6 +116,10 @@ class Glyph:
 
     alpha: (number in [0,1])
         Opacity of the rendered Glyph.
+
+    figsize: ([float, float]):
+        The default figure size for the rendered glyph; only used if ax is
+        not supplied by the user.
     """
 
     @handle_errors
@@ -136,7 +140,8 @@ class Glyph:
                  flip=False,
                  mirror=False,
                  zorder=None,
-                 alpha=1):
+                 alpha=1,
+                 figsize=(1, 1)):
 
         # Set attributes
         self.p = p
@@ -156,13 +161,15 @@ class Glyph:
         self.edgewidth = edgewidth
         self.font_name = font_name
         self.font_weight = font_weight
+        self.figsize = figsize
 
         # Check inputs
         self._input_checks()
 
         # If ax is not set, set to current axes object
         if self.ax is None:
-            self.ax = plt.gca()
+            fig, ax = plt.subplots(1, 1, figsize=self.figsize)
+            self.ax = ax
 
         # Make patch
         self._make_patch()
@@ -177,21 +184,21 @@ class Glyph:
             Attributes and their values.
         """
 
-        # remove drawn patch 19.05.07
+        # remove drawn patch
         if (self.patch is not None) and (self.patch.axes is not None):
             self.patch.remove()
 
-        # Set each attribute passed by user
+        # set each attribute passed by user
         for key, value in kwargs.items():
 
-            # If key corresponds to a color, convert to rgb
+            # if key corresponds to a color, convert to rgb
             if key in ('color', 'edgecolor'):
                 value = to_rgb(value)
 
-            # Save variable name
+            # save variable name
             self.__dict__[key] = value
 
-        # Remake patch
+        # remake patch
         self._make_patch()
 
     def draw(self):
