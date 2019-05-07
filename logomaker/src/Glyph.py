@@ -116,11 +116,6 @@ class Glyph:
 
     alpha: (number in [0,1])
         Opacity of the rendered Glyph.
-
-    draw_now: (bool)
-        If True, the Glyph is rendered immediately after it is specified.
-        Set to False if you wish to change the properties of this Glyph
-        after initial specification and before rendering.
     """
 
     @handle_errors
@@ -141,8 +136,7 @@ class Glyph:
                  flip=False,
                  mirror=False,
                  zorder=None,
-                 alpha=1,
-                 draw_now=True):
+                 alpha=1):
 
         # Set attributes
         self.p = p
@@ -171,11 +165,7 @@ class Glyph:
             self.ax = plt.gca()
 
         # Make patch
-        self.patch = self._make_patch()
-
-        # Draw now if requested
-        if draw_now:
-            self.draw()
+        self._make_patch()
 
     def set_attributes(self, **kwargs):
         """
@@ -186,6 +176,10 @@ class Glyph:
         **kwargs:
             Attributes and their values.
         """
+
+        # remove drawn patch 19.05.07
+        if (self.patch is not None) and (self.patch.axes is not None):
+            self.patch.remove()
 
         # Set each attribute passed by user
         for key, value in kwargs.items():
@@ -198,7 +192,7 @@ class Glyph:
             self.__dict__[key] = value
 
         # Remake patch
-        self.patch = self._make_patch()
+        self._make_patch()
 
     def draw(self):
         """
@@ -227,8 +221,9 @@ class Glyph:
         # Set height
         height = self.ceiling - self.floor
 
-        # If height is zero, just return none
+        # If height is zero, set patch to None and return None
         if height == 0.0:
+            self.patch = None
             return None
 
         # Set bounding box for character,
@@ -303,15 +298,15 @@ class Glyph:
         char_path = transformation.transform_path(tmp_path)
 
         # Convert char_path to a patch, which can now be drawn on demand
-        patch = PathPatch(char_path,
-                          facecolor=self.color,
-                          zorder=self.zorder,
-                          alpha=self.alpha,
-                          edgecolor=self.edgecolor,
-                          linewidth=self.edgewidth)
+        self.patch = PathPatch(char_path,
+                               facecolor=self.color,
+                               zorder=self.zorder,
+                               alpha=self.alpha,
+                               edgecolor=self.edgecolor,
+                               linewidth=self.edgewidth)
 
-        # Return patch representing the Glyph
-        return patch
+        # add patch to axes
+        self.ax.add_patch(self.patch)
 
     def _input_checks(self):
 

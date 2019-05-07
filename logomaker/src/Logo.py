@@ -1133,9 +1133,9 @@ class Logo:
         if clear:
             self.ax.clear()
 
-        # draw each glyph
-        for g in self.glyph_list:
-            g.draw()
+            # draw each glyph
+            for g in self.glyph_list:
+                g.draw()
 
         # flag that this logo has indeed been drawn
         self.has_been_drawn = True
@@ -1215,7 +1215,6 @@ class Logo:
                               ceiling=ceiling,
                               color=this_color,
                               flip=flip,
-                              draw_now=False,
                               zorder=self.zorder,
                               font_name=self.font_name,
                               alpha=self.alpha,
