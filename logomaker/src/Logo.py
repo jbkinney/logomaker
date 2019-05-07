@@ -95,10 +95,8 @@ class Logo:
         existing opacity values.
 
     show_spines: (None or bool)
-        Whether a box should be drawn around the logo. Note: if set to either
-        True or False, the Logo will be drawn immediately and draw_now will
-        be overridden. For additional customization of spines, use
-        Logo.style_spines().
+        Whether a box should be drawn around the logo.  For additional
+        customization of spines, use Logo.style_spines().
 
     ax: (matplotlib Axes object)
         The matplotlb Axes object on which the logo is drawn.
@@ -110,11 +108,6 @@ class Logo:
     figsize: ([float, float]):
         The default figure size for the rendered logo; only used if ax is
         not supplied by the user.
-
-    draw_now: (bool)
-        If True, the logo is rendered immediately after it is specified.
-        Set to False if you wish to change the properties of any characters
-        after initial specification.
 
     **kwargs:
         Additional key word arguments to send to the Glyph constructor.
@@ -139,7 +132,6 @@ class Logo:
                  ax=None,
                  zorder=0,
                  figsize=(10, 2.5),
-                 draw_now=True,
                  **kwargs):
 
         # set class attributes
@@ -160,7 +152,6 @@ class Logo:
         self.zorder = zorder
         self.figsize = figsize
         self.ax = ax
-        self.draw_now = draw_now
 
         # save other keyword arguments
         self.glyph_kwargs = kwargs
@@ -201,18 +192,15 @@ class Logo:
         # style glyphs below x-axis
         self.style_glyphs_below(shade=self.shade_below,
                                 fade=self.fade_below,
-                                draw_now=False,
                                 flip=self.flip_below)
 
         # fade glyphs by value if requested
         if self.fade_probabilities:
             self.fade_glyphs_in_probability_logo(v_alpha0=0,
-                                                 v_alpha1=1,
-                                                 draw_now=False)
+                                                 v_alpha1=1)
 
-        # Draw now if requested
-        if self.draw_now:
-            self.draw()
+        # draw
+        self.draw()
 
 
     def _input_checks(self):
@@ -335,15 +323,9 @@ class Logo:
                    for n in self.figsize]),
               'all elements of figsize array must be numbers > 0.')
 
-        # check that draw_now is a boolean
-        check(isinstance(self.draw_now, bool),
-              'type(draw_now) = %s; must be of type bool ' %
-              type(self.draw_now))
-
     @handle_errors
     def style_glyphs(self,
                      color_scheme=None,
-                     draw_now=True,
                      **kwargs):
         """
         Modifies the properties of all characters in a Logo.
@@ -366,9 +348,6 @@ class Logo:
                  'G': 'green',
                  'T': 'red'}
 
-        draw_now: (bool)
-            Whether to re-draw modified logo on current Axes object.
-
         **kwargs:
             Keyword arguments to pass to Glyph.set_attributes()
 
@@ -383,11 +362,6 @@ class Logo:
         if color_scheme is not None:
             self.color_scheme = color_scheme
             self.rgb_dict = get_color_dict(self.color_scheme, self.cs)
-
-        # check that draw_now is a boolean
-        check(isinstance(draw_now, bool),
-              'type(draw_now) = %s; must be of type bool ' %
-              type(draw_now))
 
         # update glyph-specific attributes if they are passed as kwargs
         for key in ['zorder', 'vpad', 'font_name']:
@@ -404,15 +378,10 @@ class Logo:
             # set each glyph attribute
             g.set_attributes(**kwargs)
 
-        # draw now if requested
-        if draw_now:
-            self.draw()
-
     @handle_errors
     def fade_glyphs_in_probability_logo(self,
                                         v_alpha0=0.0,
-                                        v_alpha1=1.0,
-                                        draw_now=True):
+                                        v_alpha1=1.0):
 
         """
         Fades glyphs in probability logo according to value.
@@ -424,9 +393,6 @@ class Logo:
             Matrix values marking values that are rendered using
             alpha=0 and alpha=1, respectively. These values must satisfy
             v_alpha0 < v_alpha1.
-
-        draw_now: (bool)
-            Whether to readraw modified Logo.
 
         returns
         -------
@@ -456,11 +422,6 @@ class Logo:
               'must have v_alpha0 < v_alpha1;'
               'here, v_alpha0 = %f and v_alpha1 = %f' % (v_alpha0, v_alpha1))
 
-        # check that draw_now is a boolean
-        check(isinstance(draw_now, bool),
-              'type(draw_now) = %s; must be of type bool ' %
-              type(draw_now))
-
         # make sure matrix is a probability matrix
         self.df = validate_matrix(self.df, matrix_type='probability')
 
@@ -483,10 +444,6 @@ class Logo:
                 # Set glyph attributes
                 g.set_attributes(alpha=alpha)
 
-        # Draw now if requested
-        if draw_now:
-            self.draw()
-
     @handle_errors
     def style_glyphs_below(self,
                            color=None,
@@ -494,7 +451,6 @@ class Logo:
                            shade=0.0,
                            fade=0.0,
                            flip=None,
-                           draw_now=True,
                            **kwargs):
 
         """
@@ -517,9 +473,6 @@ class Logo:
 
         flip: (bool)
             If True, characters below the x-axis will be flipped upside down.
-
-        draw_now: (bool)
-            Whether to readraw modified Logo.
 
         **kwargs:
             Keyword arguments to pass to Glyph.set_attributes(), but only
@@ -569,11 +522,6 @@ class Logo:
               'type(flip) = %s; must be of type bool ' %
               type(flip))
 
-        # check that draw_now is a boolean
-        check(isinstance(draw_now, bool),
-              'type(draw_now) = %s; must be of type bool ' %
-              type(draw_now))
-
         # iterate over all positions and characters
         for p in self.ps:
             for c in self.cs:
@@ -603,12 +551,8 @@ class Logo:
                                      flip=flip,
                                      **kwargs)
 
-        # draw now if requested
-        if draw_now:
-            self.draw()
-
     @handle_errors
-    def style_single_glyph(self, p, c, draw_now=True, **kwargs):
+    def style_single_glyph(self, p, c, **kwargs):
         """
         Modifies the properties of a single character in Logo.
 
@@ -622,10 +566,6 @@ class Logo:
         c: (str of length 1)
             Character to modify. Must be the name of a column in the matrix df
             passed to the Logo constructor.
-
-        draw_now: (bool)
-            Specifies whether to readraw the modified Logo on the current Axes.
-            Warning: setting this to True will slow down rendering.
 
         **kwargs:
             Keyword arguments to pass to Glyph.set_attributes()
@@ -655,24 +595,15 @@ class Logo:
         check(c in self.glyph_df.columns,
               'c=%s is not a valid character' % c)
 
-        # check that draw_now is a boolean
-        check(isinstance(draw_now, bool),
-              'type(draw_now) = %s; must be of type bool ' % type(draw_now))
-
         # Get glyph from glyph_df
         g = self.glyph_df.loc[p, c]
 
         # update glyph attributes
         g.set_attributes(**kwargs)
 
-        # draw now if requested
-        if draw_now:
-            self.draw()
-
     @handle_errors
     def style_glyphs_in_sequence(self,
                                  sequence,
-                                 draw_now=True,
                                  **kwargs):
         """
         Restyles the glyphs in a specific sequence.
@@ -683,9 +614,6 @@ class Logo:
             A string the same length as the logo, specifying which character
             to restyle at each position. Characters in sequence that are not
             in the columns of the Logo's df are ignored.
-
-        draw_now: (bool)
-            Whether to readraw modified logo on the current Axes.
 
         **kwargs:
             Keyword arguments to pass to Glyph.set_attributes()
@@ -704,10 +632,6 @@ class Logo:
               'sequence to restyle (length %d) ' % len(sequence) +
               'must have same length as logo (length %d).' % self.L)
 
-        # check that draw_now is a boolean
-        check(isinstance(draw_now, bool),
-              'type(draw_now) = %s; must be of type bool ' % type(draw_now))
-
         # for each position in the logo...
         for i, p in enumerate(self.glyph_df.index):
 
@@ -717,11 +641,7 @@ class Logo:
             # modify the glyph corresponding character c at position p.
             # only modify if c is a valid character; if not, ignore position
             if c in self.cs:
-                self.style_single_glyph(p, c, draw_now=False, **kwargs)
-
-        # draw now if requested
-        if draw_now:
-            self.draw()
+                self.style_single_glyph(p, c, **kwargs)
 
     @handle_errors
     def highlight_position(self, p, **kwargs):
@@ -745,10 +665,6 @@ class Logo:
         # validate p
         check(isinstance(p, int),
               'type(p) = %s must be of type int' % type(p))
-
-        # If logo is not yet drawn, draw
-        if not self.has_been_drawn:
-            self.draw()
 
         # pass the buck to highlight_position_range
         self.highlight_position_range(pmin=p, pmax=p, **kwargs)
@@ -803,10 +719,6 @@ class Logo:
         -------
         None
         """
-
-        # draw if logo has not yet been drawn
-        if not self.has_been_drawn:
-            self.draw()
 
         # get ymin and ymax from Axes object
         ymin, ymax = self.ax.get_ylim()
@@ -922,10 +834,6 @@ class Logo:
         # validate that linewidth >= 0
         check(linewidth >= 0, 'linewidth must be >= 0')
 
-        # draw if logo has not yet been drawn
-        if not self.has_been_drawn:
-            self.draw()
-
         # Render baseline
         self.ax.axhline(zorder=zorder,
                         color=color,
@@ -983,10 +891,6 @@ class Logo:
         check(isinstance(rotation, (float, int)),
               'type(rotation) = %s; must be of type float or int ' %
               type(rotation))
-
-        # draw if logo has not yet been drawn
-        if not self.has_been_drawn:
-            self.draw()
 
         # Get list of positions that span all positions in the matrix df
         p_min = min(self.ps)
@@ -1091,10 +995,6 @@ class Logo:
             check(bounds[0] < bounds[1],
                   'bounds = %s; must have bounds[0] < bounds[1]' % repr(bounds))
 
-        # draw if logo has not yet been drawn
-        if not self.has_been_drawn:
-            self.draw()
-
         # iterate over all spines
         for name, spine in self.ax.spines.items():
 
@@ -1137,9 +1037,6 @@ class Logo:
             for g in self.glyph_list:
                 g.draw()
 
-        # flag that this logo has indeed been drawn
-        self.has_been_drawn = True
-
         # draw baseline
         self.draw_baseline(linewidth=self.baseline_width)
 
@@ -1160,8 +1057,6 @@ class Logo:
     def _compute_glyphs(self):
         """
         Specifies the placement and styling of all glyphs within the logo.
-        Note that glyphs can later be changed after this is called but before
-        draw() is called.
         """
         # Create a dataframe of glyphs
         glyph_df = pd.DataFrame()

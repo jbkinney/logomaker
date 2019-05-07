@@ -130,75 +130,70 @@ def test_logomaker_Logo():
 
     # test parameter df
     test_parameter_values(func=logomaker.Logo, var_name='df',fail_list=[bool_fail_list,bad_df1],
-                          success_list=[good_crp_df,random_df],draw_now=False)
+                          success_list=[good_crp_df,random_df])
 
     # test parameter colors
     test_parameter_values(func=logomaker.Logo, var_name='color_scheme', fail_list=['x','bad_color_name',3],
                           success_list=['classic', 'grays', 'charge','salmon'],
-                          df=good_crp_df,draw_now=False)
+                          df=good_crp_df)
 
     # test parameter font names
     test_parameter_values(func=logomaker.Logo, var_name='font_name', fail_list=['x', 'bad_font_name', good_crp_df],
                           success_list=['DejaVu Sans', 'Arial Rounded MT Bold', 'Times New Roman'],
-                          df=good_crp_df,draw_now=False)
+                          df=good_crp_df)
 
     # test parameter stack_order
     test_parameter_values(func=logomaker.Logo, var_name='stack_order', fail_list=['incorrect argument', 0.0, None],
                           success_list=['small_on_top', 'big_on_top', 'fixed'],
-                          df=good_crp_df,draw_now=False)
+                          df=good_crp_df)
 
     # test parameter center_values
     test_parameter_values(func=logomaker.Logo, var_name='center_values', fail_list=['incorrect argument', 0.0, None],
-                          success_list=[True, False], df=good_crp_df,draw_now=False)
+                          success_list=[True, False], df=good_crp_df)
 
     # test parameter baseline_width
     test_parameter_values(func=logomaker.Logo, var_name='baseline_width', fail_list=['incorrect argument', -0.1, None],
-                          success_list=[0,0.5,3], df=good_crp_df,draw_now=False)
+                          success_list=[0,0.5,3], df=good_crp_df)
 
     # test parameter flip_below
     test_parameter_values(func=logomaker.Logo, var_name='flip_below', fail_list=['incorrect argument', -0.1, None],
-                          success_list=[True, False], df=good_crp_df, draw_now=False)
+                          success_list=[True, False], df=good_crp_df)
 
     # test parameter shade_below
     test_parameter_values(func=logomaker.Logo, var_name='shade_below',
                           fail_list=['incorrect argument', -0.1, 1.4, None],
-                          success_list=[0, 0.0, 0.5, 1, 1.0], df=good_crp_df, draw_now=False)
+                          success_list=[0, 0.0, 0.5, 1, 1.0], df=good_crp_df)
 
     # test parameter fade_below
     test_parameter_values(func=logomaker.Logo, var_name='fade_below',
                           fail_list=['incorrect argument', -0.1, 1.4, None],
-                          success_list=[0, 0.0, 0.5, 1, 1.0], df=good_crp_df, draw_now=False)
+                          success_list=[0, 0.0, 0.5, 1, 1.0], df=good_crp_df)
 
     # test parameter fade_probabilities
     test_parameter_values(func=logomaker.Logo, var_name='fade_probabilities',
                           fail_list=['incorrect argument', -0.1, 1.4, None],
-                          success_list=[True, False], df=good_prob_df, draw_now=False)
+                          success_list=[True, False], df=good_prob_df)
 
     # test parameter vsep
     test_parameter_values(func=logomaker.Logo, var_name='vsep',
                           fail_list=['incorrect argument', -0.1, None],
-                          success_list=[0.0, 0,0.3,10], df=good_crp_df, draw_now=False)
+                          success_list=[0.0, 0,0.3,10], df=good_crp_df)
 
     # test parameter vsep
     # TODO: note that a value of True/False is still causing a logo to be drawn, eventhough draw_now = False
     test_parameter_values(func=logomaker.Logo, var_name='show_spines',
                           fail_list=['incorrect argument', -0.1],
-                          success_list=[None, True, False], df=good_crp_df, draw_now=False)
+                          success_list=[None, True, False], df=good_crp_df)
 
     # test parameter zorder. Need to review zorder's input check in Logo
     test_parameter_values(func=logomaker.Logo, var_name='zorder',
                           fail_list=['incorrect argument'],
-                          success_list=[0, 1, 3], df=good_crp_df, draw_now=False)
+                          success_list=[0, 1, 3], df=good_crp_df)
 
     # test parameter figsize
     test_parameter_values(func=logomaker.Logo, var_name='figsize',
                           fail_list=['incorrect argument', -0.1, [-1,-1],[-1],[0,0],['x','y'],(1,2,3)],
-                          success_list=[(10, 2.5),[5,5]], df=good_crp_df, draw_now=False)
-
-    # validate draw_now
-    test_parameter_values(func=logomaker.Logo, var_name='draw_now',
-                          fail_list=['incorrect argument', -0.1],
-                          success_list=[True, False], df=good_crp_df)
+                          success_list=[(10, 2.5),[5,5]], df=good_crp_df)
 
     # TODO: need to implement input check for 'ax' in logo and then implement functional tests for it.
 

@@ -214,8 +214,7 @@ class Glyph:
     def _make_patch(self):
         """
         Returns an appropriately scaled patch object corresponding to
-        the Glyph. Note: Does not add this patch to an axes object;
-        that is done by draw().
+        the Glyph.
         """
 
         # Set height
