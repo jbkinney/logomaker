@@ -641,6 +641,10 @@ def sequence_to_matrix(seq,
     check(isinstance(seq, str),
           'type(seq) = %s must be of type str' % type(seq))
 
+    # validate center_weights
+    check(isinstance(center_weights, bool),
+          'type(center_weights) = %s; must be bool.' % type(center_weights))
+
     # If cols is None, set to list of unique characters in sequence
     if cols is None:
         cols = list(set(seq))

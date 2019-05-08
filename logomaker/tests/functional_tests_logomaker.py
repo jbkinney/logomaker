@@ -483,10 +483,9 @@ def test_sequence_to_matrix():
                           seq='ACGTACGT')
 
     # test parameter center_weights
-    # TODO: the following parameter passes on bool fail list. Need to fix
-    # test_parameter_values(func=logomaker.sequence_to_matrix, var_name='center_weights',
-    #                       fail_list=bool_fail_list, success_list=bool_success_list,
-    #                       seq='ACGTACGT',to_type='weight')
+    test_parameter_values(func=logomaker.sequence_to_matrix, var_name='center_weights',
+                           fail_list=bool_fail_list, success_list=bool_success_list,
+                           seq='ACGTACGT',to_type='weight')
 
 
 # run tests for the Logo class and it's helper methods
