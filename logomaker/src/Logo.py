@@ -518,9 +518,10 @@ class Logo:
               'fade must be between 0 and 1; value is %f' % fade)
 
         # check that flip is a boolean
-        check(isinstance(flip, bool),
-              'type(flip) = %s; must be of type bool ' %
-              type(flip))
+        if flip is not None:
+            check(isinstance(flip, (bool)),
+                  'type(flip) = %s; must be of type bool ' %
+                  type(flip))
 
         # iterate over all positions and characters
         for p in self.ps:
