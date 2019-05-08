@@ -15,34 +15,46 @@ from logomaker.src.examples import open_example_datafile
 
 
 # demo functions for logomaker
-def demo(example='crp_energy_matrix'):
+import os
+import glob
+from logomaker.src.error_handling import check, handle_errors
+
+@handle_errors
+def demo(name='crp'):
 
     """
-
     Performs a demonstration of the Logomaker software.
 
-    parameters
-    ----------
+    parmameters
+    -----------
 
-    example: (str)
+    name: (str)
+        Must be one of ['crp', 'fig1b', 'fig1c', 'fig1d', 'fig1e', 'fig1f']
 
-        A string specifying which example matrix to draw a logo for. Must be one of
-        the following.
-        [
-            'ars_enrichment_matrix', 'crp_counts_matrix'    , 'crp_energy_matrix'
-            'nn_saliency_matrix'   , 'ss_probability_matrix', 'ww_counts_matrix',
-            'ww_information_matrix'
-        ]
-
-
-    return
-    ------
-
+    returns
+    -------
     None.
 
     """
 
-    import matplotlib.pyplot as plt
-    df = get_example_matrix(example)
-    Logo(df,font_name='Arial Rounded MT Bold')
-    plt.show()
+    # build list of demo names and corresponding files
+    example_dir = os.path.dirname(__file__)
+    example_files = glob.glob('%s/examples/demo_*.py' % example_dir)
+    examples_dict = {}
+    for file_name in example_files:
+        key = file_name.split('_')[-1][:-3]
+        examples_dict[key] = file_name
+
+    # check that name is valid
+    check(name in examples_dict.keys(),
+          'name = %s is not valid. Must be one of %s'
+          % (repr(name), examples_dict.keys()))
+
+    # open and run example file
+    file_name = examples_dict[name]
+    with open(file_name, 'r') as f:
+        content = f.read()
+        line = '-------------------------------------------------------------'
+        print('Running %s:\n%s\n%s\n%s' % \
+              (file_name, line, content, line))
+    exec(open(file_name).read())
