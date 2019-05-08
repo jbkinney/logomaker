@@ -118,7 +118,7 @@ def test_parameter_values(func,
     plt.close('all')
 
 
-def test_logomaker_Logo():
+def test_Logo():
 
     # df inputs that successfully execute when entered into Logo.
     good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
@@ -195,7 +195,96 @@ def test_logomaker_Logo():
                           fail_list=['incorrect argument', -0.1, [-1,-1],[-1],[0,0],['x','y'],(1,2,3)],
                           success_list=[(10, 2.5),[5,5]], df=good_crp_df)
 
-    # TODO: need to implement input check for 'ax' in logo and then implement functional tests for it.
+    # validate ax
+    _, temp_ax = plt.subplots(figsize=[3, 3])
+    test_parameter_values(func=logomaker.Logo, var_name='ax',
+                          fail_list=['x',1,True],
+                          success_list=[temp_ax, None], df=good_crp_df)
 
 
-test_logomaker_Logo()
+def test_Logo_style_glyphs():
+
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+
+    # test parameter color_scheme
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_glyphs,var_name='color_scheme',
+                          fail_list=['bad_color_scheme',1,True],
+                          success_list=['classic','gray','salmon'])
+
+    # TODO: how should we test kwargs for this (and other) methods?
+
+
+def test_Logo_fade_glyphs_in_probability_logo():
+
+    good_prob_df = logomaker.get_example_matrix('ss_probability_matrix')
+
+    # test parameter v_alpha0
+    test_parameter_values(func=logomaker.Logo(good_prob_df).fade_glyphs_in_probability_logo, var_name='v_alpha0',
+                          fail_list=[-1,1.1,1,1.0,'xxx',True], success_list=[0,0.0,0.999,0.5])
+
+    # TODO: a value of True v_alpha_1 works now, this should probably be fixed.
+    # test parameter v_alpha1
+    test_parameter_values(func=logomaker.Logo(good_prob_df).fade_glyphs_in_probability_logo, var_name='v_alpha1',
+                          fail_list=[1.1, -1, 'xxx'], success_list=[0.999, 0.5,1.0])
+
+
+def test_Logo_style_glyphs_below():
+
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+
+    # test parameter color
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_glyphs_below, var_name='color',
+                          fail_list=[0,'xxx',True,[0,0,-1]], success_list=['red', [1,1,1], [0,0,0],[0.1,0.2,0.3], None])
+
+    # test parameter alpha
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_glyphs_below, var_name='alpha',
+                          fail_list=[-1,'x',1.1], success_list=[0,1,0.5])
+
+    # test parameter shade
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_glyphs_below, var_name='shade',
+                          fail_list=[-1,'x',1.1], success_list=[0,1,0.5])
+
+    # test parameter fade
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_glyphs_below, var_name='fade',
+                          fail_list=[-1,'x',1.1], success_list=[0,1,0.5])
+
+    # test parameter flip
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_glyphs_below, var_name='flip',
+                          fail_list=bool_fail_list, success_list=bool_success_list)
+
+
+
+def test_style_single_glyph():
+
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+
+    # test parameter p
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_single_glyph, var_name='p',
+                          fail_list=[-1,'x',1.1,10000], success_list=[0,1,10],c='A')
+
+    # test parameter c
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_single_glyph, var_name='c',
+                          fail_list=[-1, 'x', 1.1], success_list=['A','C','G','T'], p=1)
+
+
+def test_style_glyphs_in_sequence():
+
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+
+    test_good_sequence = np.random.choice(['A', 'C', 'G', 'T'], size=26, p=[0.25, 0.25, 0.25, 0.25])
+    test_good_sequence = "".join(test_good_sequence)
+
+    test_bad_sequence = np.random.choice(['A', 'C', 'G', 'T'], size=10, p=[0.25, 0.25, 0.25, 0.25])
+    test_bad_sequence = "".join(test_bad_sequence)
+
+
+    # test parameter sequence
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_glyphs_in_sequence, var_name='sequence',
+                          fail_list=[-1, 'x', 1.1, test_bad_sequence], success_list=[test_good_sequence])
+
+test_Logo()
+test_Logo_style_glyphs()
+test_Logo_fade_glyphs_in_probability_logo()
+test_Logo_style_glyphs_below()
+test_style_single_glyph()
+test_style_glyphs_in_sequence()
