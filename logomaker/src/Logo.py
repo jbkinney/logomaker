@@ -910,8 +910,8 @@ class Logo:
     def style_spines(self,
                      spines=('top', 'bottom', 'left', 'right'),
                      visible=True,
-                     linewidth=1.0,
                      color='black',
+                     linewidth=1.0,
                      bounds=None):
         """
         Styles the spines of the Axes object in which the logo is drawn.
