@@ -25,5 +25,6 @@ setup(name='logomaker',
         'numpy',
 		'matplotlib',
 		'pandas',
+        'glob'
       ],
       zip_safe=False)
