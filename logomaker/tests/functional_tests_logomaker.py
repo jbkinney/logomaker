@@ -271,9 +271,11 @@ def test_style_glyphs_in_sequence():
 
     good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
 
+    # randomly make up a sequence of the correct length
     test_good_sequence = np.random.choice(['A', 'C', 'G', 'T'], size=26, p=[0.25, 0.25, 0.25, 0.25])
     test_good_sequence = "".join(test_good_sequence)
 
+    # randomly make up a sequence of the incorrect length
     test_bad_sequence = np.random.choice(['A', 'C', 'G', 'T'], size=10, p=[0.25, 0.25, 0.25, 0.25])
     test_bad_sequence = "".join(test_bad_sequence)
 
@@ -282,9 +284,136 @@ def test_style_glyphs_in_sequence():
     test_parameter_values(func=logomaker.Logo(good_crp_df).style_glyphs_in_sequence, var_name='sequence',
                           fail_list=[-1, 'x', 1.1, test_bad_sequence], success_list=[test_good_sequence])
 
+
+def test_highlight_position():
+
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+
+    # test parameter p
+    test_parameter_values(func=logomaker.Logo(good_crp_df).highlight_position, var_name='p',
+                          fail_list=['x',1.5], success_list=[0, 1, 10])
+
+def test_highlight_position_range():
+
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+
+    # test parameter pmin
+    test_parameter_values(func=logomaker.Logo(good_crp_df).highlight_position_range, var_name='pmin',
+                          fail_list=['x', 20], success_list=[0, 1, 10], pmax=15)
+
+    # test parameter pmax
+    test_parameter_values(func=logomaker.Logo(good_crp_df).highlight_position_range, var_name='pmax',
+                          fail_list=['x', 1], success_list=[5.5, 6, 10], pmin=5)
+
+    # test parameter padding
+    test_parameter_values(func=logomaker.Logo(good_crp_df).highlight_position_range, var_name='padding',
+                          fail_list=['x', -1], success_list=[-0.5, 0, 10], pmin=5,pmax=10)
+
+    # test parameter color
+    test_parameter_values(func=logomaker.Logo(good_crp_df).highlight_position_range, var_name='color',
+                          fail_list=['x', 1,True,'wrong_color'], success_list=['pink','red',[1,1,1]], pmin=5, pmax=10)
+
+    # test parameter edgecolor
+    test_parameter_values(func=logomaker.Logo(good_crp_df).highlight_position_range, var_name='edgecolor',
+                          fail_list=['x', 1, True, 'wrong_color'], success_list=[None,'pink', 'red', [1, 1, 1]], pmin=5,
+                          pmax=10)
+
+    # test parameter floor
+    test_parameter_values(func=logomaker.Logo(good_crp_df).highlight_position_range, var_name='floor',
+                          fail_list=['x', 10], success_list=[-1,1,None],
+                          pmin=5,
+                          pmax=10)
+
+    # test parameter ceiling
+    test_parameter_values(func=logomaker.Logo(good_crp_df).highlight_position_range, var_name='ceiling',
+                          fail_list=['x', -10], success_list=[-1, 1, None],
+                          pmin=5,
+                          pmax=10)
+
+    # test parameter zorder. Note that a value of False passes for this parameter. This should be fixed.
+    test_parameter_values(func=logomaker.Logo(good_crp_df).highlight_position_range, var_name='zorder',
+                          fail_list=['x', None], success_list=[-1, 0.5, 1],
+                          pmin=5,
+                          pmax=10)
+
+
+def test_draw_baseline():
+
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+
+    # test parameter zorder
+    test_parameter_values(func=logomaker.Logo(good_crp_df).draw_baseline, var_name='zorder',
+                          fail_list=['x', None], success_list=[-1, 0.5, 1])
+
+    # test parameter color
+    test_parameter_values(func=logomaker.Logo(good_crp_df).draw_baseline, var_name='color',
+                          fail_list=['x', 1, True, 'wrong_color'], success_list=['pink', 'red', [1, 1, 1]])
+
+    # test parameter linewidth
+    test_parameter_values(func=logomaker.Logo(good_crp_df).draw_baseline, var_name='linewidth',
+                          fail_list=['x', -1, '1', None], success_list=[0,1,1.5,2])
+
+
+def test_style_xticks():
+
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+
+    # test parameter anchor
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_xticks, var_name='anchor',
+                          fail_list=['x', None, 0.5, 1.0], success_list=[-1, 1, 2])
+
+    # test parameter spacing
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_xticks, var_name='spacing',
+                          fail_list=['x', None, 0, 0.5], success_list=[1, 2])
+
+    # test parameter fmt
+    # TODO: fmt = 'x' seems to passing in the following. This should be fixed.
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_xticks, var_name='fmt',
+                          fail_list=[None, 0], success_list=['%d'])
+
+    # test parameter rotation
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_xticks, var_name='rotation',
+                          fail_list=[None, 'x'], success_list=[-12,0,1.4,200])
+
+def test_style_spines():
+
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+
+    # test parameter anchor
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_spines, var_name='spines',
+                          fail_list=['x', None, 0.5, 1.0,'top'],
+                          success_list=[('top', 'bottom', 'left', 'right'),
+                                        ['top', 'bottom', 'left', 'right'],
+                                        ('top', 'bottom', 'left'),
+                                        ('top', 'bottom'),
+                                        ['top']])
+
+    # test parameter visible
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_spines, var_name='visible',
+                          fail_list=bool_fail_list, success_list=bool_success_list)
+
+    # test parameter color
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_spines, var_name='color',
+                          fail_list=['wrong_color',3,[0.5,0.5,0.5,0.5]], success_list=['black','green',[0.4,0.5,1.0]])
+
+    # test parameter linewidth
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_spines, var_name='linewidth',
+                          fail_list=['xxx',-1], success_list=[0.0,0,1])
+
+    # test parameter bounds
+    test_parameter_values(func=logomaker.Logo(good_crp_df).style_spines, var_name='bounds',
+                          fail_list=['xxx', -1], success_list=[None,[0,1]])
+
+
+
 test_Logo()
 test_Logo_style_glyphs()
 test_Logo_fade_glyphs_in_probability_logo()
 test_Logo_style_glyphs_below()
 test_style_single_glyph()
 test_style_glyphs_in_sequence()
+test_highlight_position()
+test_highlight_position_range()
+test_draw_baseline()
+test_style_xticks()
+test_style_spines()
