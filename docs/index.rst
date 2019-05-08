@@ -1,23 +1,21 @@
-.. image:: _static/logo_v2.png
-    :width: 300px
-    :align: center
-
-=============================================
-Logomaker: beautiful sequence logos in Python
-=============================================
+==================================================================
+Logomaker: beautiful sequence logos in Python [UNDER CONSTRUCTION]
+==================================================================
 
 *Written by Ammar Tareen and Justin B. Kinney.*
 
 Logomaker is a Python package for generating publication-quality sequence logos.
 Logomaker can generate both standard and highly customized logos illustrating the properties of DNA, RNA, or protein sequences.
 Logos are rendered as vector graphics embedded within native matplotlib Axes objects, making them easy to style and incorporate into multi-panel figures.
-The Installation, Quick Start, Tutorial, and Examples sections below are provided to help users quickly get Logomaker working for their own research needs.
+The :ref:`installation`, :ref:`quickstart`, :ref:`tutorial`, and :ref:`examples` sections below are provided to help users quickly get Logomaker working for their own research needs.
 For more information about Logomaker, please see our preprint [#Tareen2019]_.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+
+.. _installation:
 
 Installation
 --------------
@@ -32,6 +30,8 @@ manager::
 The code for logomaker is available on
 `GitHub <https://github.com/jbkinney/logomaker>`_ under an MIT
 open source license.
+
+.. _quickstart:
 
 Quick Start
 -----------
@@ -59,34 +59,16 @@ We note that the logo shown here is from Figure 1B of [#Tareen2019]_, and that t
 
     .. image:: _static/WW_information_logo.png
 
-Tutorial
---------
+
+Resources
+---------
 
 .. toctree::
-   :maxdepth: 3
+    :maxdepth: 2
 
-   tutorial
-
-Examples
---------
-
-.. toctree::
-   :maxdepth: 2
-
-   examples
-
-
-Implementation
---------------
-
-.. toctree::
-   :maxdepth: 2
-
-   Logo
-   Glyph
-   matrix
-   validate
-   examples_src
+    tutorial
+    examples
+    implementation
 
 Reference
 ----------
