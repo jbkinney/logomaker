@@ -524,6 +524,14 @@ def alignment_to_matrix(sequences,
     check(all(isinstance(seq, str) for seq in sequences),
           'sequences must all be of type string')
 
+    # validate characters_to_ignore
+    check(isinstance(characters_to_ignore, str),
+          'type(seq) = %s must be of type str' % type(characters_to_ignore))
+
+    # validate center_weights
+    check(isinstance(center_weights, bool),
+          'type(center_weights) = %s; must be bool.' % type(center_weights))
+
     # Get sequence length
     L = len(sequences[0])
 

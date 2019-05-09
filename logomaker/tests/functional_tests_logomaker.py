@@ -488,6 +488,48 @@ def test_sequence_to_matrix():
                            seq='ACGTACGT',to_type='weight')
 
 
+def test_alignment_to_matrix():
+
+    # get sequences from file
+    with logomaker.open_example_datafile('crp_sites.fa', print_description=False) as f:
+        raw_seqs = f.readlines()
+    seqs = [seq.strip() for seq in raw_seqs if ('#' not in seq) and ('>') not in seq]
+
+    # test parameter sequences
+    test_parameter_values(func=logomaker.alignment_to_matrix,var_name='sequences',
+                          fail_list = [0,'x',['AACCT','AACGATA']], success_list = [seqs,['ACA','GGA']])
+
+    # test parameter counts
+    # TODO: need to find a working example for counts other than None
+    test_parameter_values(func=logomaker.alignment_to_matrix, var_name='counts',
+                          fail_list=[0, 'x', -1], success_list=[None],sequences=['ACA', 'GGA'])
+
+    # test parameter to_type
+    test_parameter_values(func=logomaker.alignment_to_matrix, var_name='to_type',
+                          fail_list=[0, True, 'xxx'], success_list=['counts','probability', 'weight', 'information'],
+                          sequences=seqs)
+
+    # test parameter background
+    test_parameter_values(func=logomaker.alignment_to_matrix, var_name='background',
+                          fail_list=[1, 'x'], success_list=[None, [0.25,0.25,0.25,0.25]],
+                          sequences=seqs)
+
+    # test parameter characters_to_ignore
+    test_parameter_values(func=logomaker.alignment_to_matrix, var_name='characters_to_ignore',
+                          fail_list=[1, 0.5,True,None], success_list=['A','C','G'],
+                          sequences=seqs)
+
+    # test parameter center_weights
+    test_parameter_values(func=logomaker.alignment_to_matrix, var_name='center_weights',
+                          fail_list=bool_fail_list, success_list=bool_success_list,
+                          sequences=seqs)
+
+    # test parameter pseudocount
+    test_parameter_values(func=logomaker.alignment_to_matrix, var_name='pseudocount',
+                          fail_list=[None, 'x', -1], success_list=[0, 1, 10],
+                          sequences=seqs)
+
+
 # run tests for the Logo class and it's helper methods
 test_Logo()
 test_Logo_style_glyphs()
@@ -501,5 +543,7 @@ test_Logo_draw_baseline()
 test_Logo_style_xticks()
 test_Logo_style_spines()
 
+#run tests for the methods in the matrix module
 test_transform_matrix()
 test_sequence_to_matrix()
+test_alignment_to_matrix()
