@@ -365,9 +365,6 @@ class Glyph:
         # validate font_name
         check(isinstance(self.font_name, str),
               'type(font_name) = %s must be of type str' % type(self.font_name))
-        check(self.font_name in list_font_names(),
-              'Invalid choice for font_name. For a list of valid choices, '
-              'please call logomaker.list_font_names().')
 
         # check font_weight
         check(isinstance(self.font_weight, (str, int)),

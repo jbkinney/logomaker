@@ -6,7 +6,7 @@ from matplotlib.patches import Rectangle
 from matplotlib.axes import Axes
 
 # Import stuff from logomaker
-from logomaker.src.Glyph import Glyph, list_font_names
+from logomaker.src.Glyph import Glyph
 from logomaker.src.validate import validate_matrix
 from logomaker.src.error_handling import check, handle_errors
 from logomaker.src.colors import get_color_dict, get_rgb
@@ -217,11 +217,6 @@ class Logo:
         # validate that font_name is a str
         check(isinstance(self.font_name, str),
               'type(font_name) = %s must be of type str' % type(self.font_name))
-
-        # validate font_name value
-        check(self.font_name in list_font_names(),
-              'Invalid choice for font_name. For a list of valid choices, '
-              'please call logomaker.list_font_names().')
 
         # validate stack_order
         valid_stack_orders = {'big_on_top', 'small_on_top', 'fixed'}
@@ -666,6 +661,10 @@ class Logo:
         # validate p
         check(isinstance(p, int),
               'type(p) = %s must be of type int' % type(p))
+
+        # to avoid highlighting positions outside of the logo
+        #check(0 <= p < len(self.df),
+        #      'position p is invalid, must be between 0 and %d' %len(self.df))
 
         # pass the buck to highlight_position_range
         self.highlight_position_range(pmin=p, pmax=p, **kwargs)

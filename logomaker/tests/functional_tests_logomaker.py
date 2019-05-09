@@ -138,7 +138,7 @@ def test_Logo():
                           df=good_crp_df)
 
     # test parameter font names
-    test_parameter_values(func=logomaker.Logo, var_name='font_name', fail_list=['x', 'bad_font_name', good_crp_df],
+    test_parameter_values(func=logomaker.Logo, var_name='font_name', fail_list=[True, None, good_crp_df],
                           success_list=['DejaVu Sans', 'Arial Rounded MT Bold', 'Times New Roman'],
                           df=good_crp_df)
 
@@ -557,6 +557,13 @@ def test_saliency_to_matrix():
                           seq=saliency_data_df['character'], values=saliency_data_df['value'])
 
 
+def test_demo():
+
+    test_parameter_values(func=logomaker.demo,var_name='name',
+                          fail_list=[0, True, 'xxx'], success_list=['crp', 'fig1b'])
+
+    plt.close('all')
+
 
 # run tests for the Logo class and it's helper methods
 test_Logo()
@@ -577,3 +584,4 @@ test_sequence_to_matrix()
 test_alignment_to_matrix()
 test_saliency_to_matrix()
 
+#test_demo()
