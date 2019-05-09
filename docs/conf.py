@@ -91,16 +91,16 @@ html_theme_options = {
     #'analytics_id': 'UA-XXXXXXX-1',  #  Provided by Google in your dashboard
     'logo_only': True,
     'display_version': True,
-    'prev_next_buttons_location': 'bottom',
+    'prev_next_buttons_location': 'none', #'bottom',
     'style_external_links': False,
     #'vcs_pageview_mode': '',
     'style_nav_header_background': 'white',
     # Toc options
-    'collapse_navigation': True,
+    'collapse_navigation': False,
     'sticky_navigation': True,
-    'navigation_depth': 0,
-    'includehidden': False,
-    'titles_only': True
+    'navigation_depth': 3,
+    'includehidden': True,
+    'titles_only': False
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -108,7 +108,7 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-html_logo = '_static/logo_v2.png'
+html_logo = '_static/logo.png'
 
 # to customize CSS
 # def setup(app):

@@ -1,6 +1,8 @@
-==================================================================
-Logomaker: beautiful sequence logos in Python [UNDER CONSTRUCTION]
-==================================================================
+=============================================
+Logomaker: beautiful sequence logos in Python
+=============================================
+
+****[SITE UNDER CONSTRUCTION]****
 
 *Written by Ammar Tareen and Justin B. Kinney.*
 
@@ -44,20 +46,10 @@ For a quick demo of Logomaker, execute the following within Python::
 This command will generate a sequence logo representing the
 DNA binding specificity of CRP, a major transcription factor in *Escherichia coli*:
 
-.. image:: _static/CRP_energy_logo.png
+.. image:: _static/examples_images/crp_energy_logo.png
 
 This command will also print out the code used to generate the logo.
-We note that the logo shown here is from Figure 1B of [#Tareen2019]_, and that the other logos in Figure 1 can be generated in a similar manner.
-
-..
-    This command will also print out the code used to generate the logo.
-    Alternatively, the following code will generate a customized logo representing information content within WW protein domains::
-
-       import logomaker
-       logomaker.demo('fig1d')
-
-
-    .. image:: _static/WW_information_logo.png
+We note that the logo shown here is from Figure 1B of Tareen and Kinney (2019) [#Tareen2019]_, and that the other logos in Figure 1 can be generated in a similar manner.
 
 
 Resources
@@ -73,7 +65,7 @@ Resources
 Reference
 ----------
 
-.. [#Tareen2019] Tareen A, Kinney JB (2019) `Logomaker: beautiful sequence logos in Python. <https://biorxiv.org>`_ *bioRxiv doi:XXXX/XXXX.
+.. [#Tareen2019] Tareen A, Kinney JB (2019) `Logomaker: beautiful sequence logos in Python <https://biorxiv.org>`_. bioRxiv doi:XXXX/XXXX.
 
 
 Contact
