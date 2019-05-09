@@ -798,7 +798,7 @@ def saliency_to_matrix(seq, values, cols=None, alphabet=None):
     check(isinstance(seq, str),
           'type(seq) = %s must be of type str' % type(seq))
 
-    # validate background: check that it is a list or array
+    # validate values: check that it is a list or array
     check(isinstance(values, (type([]), np.ndarray, pd.Series)),
           'type(values) = %s must be of type list' % type(values))
 
@@ -819,6 +819,12 @@ def saliency_to_matrix(seq, values, cols=None, alphabet=None):
         cols_types = (str, list, set, np.ndarray)
         check(isinstance(cols, cols_types),
               'cols = %s must be None or a string, set, list, or np.ndarray')
+
+        # perform additional checks to validate cols
+        check(len(set(cols))==len(set(seq)),
+              'length of set of unique characters must be equal for "cols " and "seq"')
+        check(set(cols) == set(seq),
+              'unique characters for "cols" and "seq" must be equal.')
 
     # If alphabet is specified, override cols
     if alphabet is not None:
