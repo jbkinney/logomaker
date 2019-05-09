@@ -25,11 +25,11 @@ def demo(name='crp'):
     """
     Performs a demonstration of the Logomaker software.
 
-    parmameters
+    parameters
     -----------
 
     name: (str)
-        Must be one of ['crp', 'fig1b', 'fig1c', 'fig1d', 'fig1e', 'fig1f']
+        Must be one of {'crp', 'fig1b', 'fig1c', 'fig1d', 'fig1e', 'fig1f'}.
 
     returns
     -------

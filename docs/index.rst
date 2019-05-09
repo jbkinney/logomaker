@@ -9,7 +9,7 @@ Logomaker: beautiful sequence logos in Python
 Logomaker is a Python package for generating publication-quality sequence logos.
 Logomaker can generate both standard and highly customized logos illustrating the properties of DNA, RNA, or protein sequences.
 Logos are rendered as vector graphics embedded within native matplotlib Axes objects, making them easy to style and incorporate into multi-panel figures.
-The :ref:`installation`, :ref:`quickstart`, :ref:`tutorial`, and :ref:`examples` sections below are provided to help users quickly get Logomaker working for their own research needs.
+The :ref:`installation`, :ref:`quickstart`, :ref:`examples`, and :ref:`tutorial` sections below are provided to help users quickly get Logomaker working for their own research needs.
 For more information about Logomaker, please see our preprint [#Tareen2019]_.
 
 .. toctree::
@@ -58,8 +58,8 @@ Resources
 .. toctree::
     :maxdepth: 2
 
-    tutorial
     examples
+    tutorial
     implementation
 
 Reference

@@ -87,7 +87,7 @@ html_theme = 'sphinx_rtd_theme'
 # html_theme_options = {}
 
 html_theme_options = {
-    #'canonical_url': '',
+    'canonical_url': 'https://logomaker.readthedocs.io',
     #'analytics_id': 'UA-XXXXXXX-1',  #  Provided by Google in your dashboard
     'logo_only': True,
     'display_version': True,

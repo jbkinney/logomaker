@@ -3,6 +3,8 @@
 Examples
 ========
 
+**[UNDER CONSTRUCTION]**
+
 As described in :ref:`quickstart`, the five logos shown in Figure 1 of Tareen and Kinney (2019) [#Tareen2019]_ can be generated using the function ``logomaker.demo``. Here we describe each of these logos, as well as the snippets of code used to generate them. All snippets shown below are designed for use within an iPython Jupyter Notebook, and assume that the following header cell has already been run. ::
 
     # standard imports
@@ -17,10 +19,10 @@ As described in :ref:`quickstart`, the five logos shown in Figure 1 of Tareen an
     # logomaker import
     import logomaker
 
-CRP Energy Logo
+CRP energy logo
 ---------------
 
-The following code creates an energy logo for the *E. coli* transcription factor CRP. The energy matrix illustrated by this logo was reported by Kinney et. al. (2010) [#sortseq2010]_ based on the analysis of a massively parallel reporter assay. This energy matrix is included with Logomaker as example data, and is loaded here by calling ``logomaker.get_example`` with the argument ``'crp_energy_matrix'``. A Logo object named ``crp_logo`` is then created using the ``shade_below``, ``fade_below``, and ``font_name`` styling arguments. Subsequent styling is then performed using the Logo object methods ``style_spines`` and ``style_xticks``. Additional styling is also performed using methods of ``crp_logo.ax``, the matplotlib Axes object on which the logo is drawn. ::
+The following code creates an energy logo for the *E. coli* transcription factor CRP. The energy matrix illustrated by this logo was reported by Kinney et. al. (2010) [#sortseq2010]_ based on the analysis of a massively parallel reporter assay. This energy matrix is included with Logomaker as example data, and is loaded here by calling ``logomaker.get_example`` with the argument ``'crp_energy_matrix'``. A Logo object named ``crp_logo`` is then created using the styling parameters ``shade_below``, ``fade_below``, and ``font_name``. Subsequent styling is then performed using the Logo object methods ``style_spines`` and ``style_xticks``. Additional styling is also performed using methods of ``crp_logo.ax``, the matplotlib Axes object on which the logo is drawn. ::
 
     # load crp energy matrix
     crp_df = -logomaker.get_example_matrix('crp_energy_matrix',
@@ -32,80 +34,79 @@ The following code creates an energy logo for the *E. coli* transcription factor
                               fade_below=.5,
                               font_name='Arial Rounded MT Bold')
 
-    # styling using Logo methods
+    # style using Logo methods
     crp_logo.style_spines(visible=False)
     crp_logo.style_spines(spines=['left', 'bottom'], visible=True)
     crp_logo.style_xticks(rotation=90, fmt='%d', anchor=0)
 
-    # styling using Axes methods
+    # style using Axes methods
     crp_logo.ax.set_ylabel("$-\Delta \Delta G$ (kcal/mol)", labelpad=-1)
     crp_logo.ax.xaxis.set_ticks_position('none')
     crp_logo.ax.xaxis.set_tick_params(pad=-1)
 
 .. image:: _static/examples_images/crp_energy_logo.png
 
-5' Splice Sites Logo
---------------------
+Splice site probability logo
+----------------------------
 
-
-We now illustrate a probability logo computed from all annotated 5' splices sites in the human genome.
-The data are obtained from [#frankish2019]_. The dashed line indicates intron/exon boundaries.
-This example shows the use of the keyword argument **fade_probabilities**; when set to True, the characters in each
-stack are assigned an alpha (representing transparency) value equal to their height. Stacking order of
-characters is also set by using the keyword argument **stack_order**: if stack_order =  'small_on_top', glyphs
-are stacked away from x-axis in order of decreasing absolute value. **vpad** allows whitespace to be set
-above and below each character.::
+The following code creates a probability logo derived from all 5' splice sites annotated in the human genome [#frankish2019]_. Here the probability of each RNA nucleotide at each position is indicated by both character height and character opacity.  The dashed line indicates the intron/exon boundary, with exonic sequence on the left and intronic sequence on the right. This probability matrix is included with Logomaker as example data, and is loaded into a pandas DataFrame named ``ss_df`` by calling ``logomaker.get_example`` with the argument ``'ss_probability_matrix'``. A Logo object named ``ss_logo`` is then created using the styling parameters ``width``, ``vpad``, ``fade_probabilities``, ``stack_order``, ``color_scheme``, and ``font_name``. Subsequent styling is performed using the Logo object method ``style_spines``, as well as multiple Axes object methods. ::
 
     # load ss probability matrix
     ss_df = logomaker.get_example_matrix('ss_probability_matrix',
-                                  print_description=False)
+                                         print_description=False)
 
-    # create and style logo
-    logo = logomaker.Logo(ss_df,
-                   width=.8,
-                   vpad=.05,
-                   fade_probabilities=True,
-                   stack_order='small_on_top',
-                   color_scheme='dodgerblue',
-                   font_name='Rosewood Std')
-    logo.ax.set_xticks(range(len(ss_df)))
-    logo.ax.set_xticklabels('%+d'%x for x in [-3, -2, -1, 1, 2, 3, 4, 5, 6])
-    logo.style_spines(spines=['left', 'right'], visible=False)
-    logo.ax.set_yticks([0, .5, 1])
-    logo.ax.axvline(2.5, color='k', linewidth=1, linestyle=':')
-    logo.ax.set_ylabel('probability')
+    # create Logo object
+    ss_logo = logomaker.Logo(ss_df,
+                             width=.8,
+                             vpad=.05,
+                             fade_probabilities=True,
+                             stack_order='small_on_top',
+                             color_scheme='dodgerblue',
+                             font_name='Rosewood Std')
+
+    # style using Logo methods
+    ss_logo.style_spines(spines=['left', 'right'], visible=False)
+
+    # style using Axes methods
+    ss_logo.ax.set_xticks(range(len(ss_df)))
+    ss_logo.ax.set_xticklabels('%+d'%x for x in [-3, -2, -1, 1, 2, 3, 4, 5, 6])
+    ss_logo.ax.set_yticks([0, .5, 1])
+    ss_logo.ax.axvline(2.5, color='k', linewidth=1, linestyle=':')
+    ss_logo.ax.set_ylabel('probability')
 
 .. image:: _static/examples_images/ss_probability_logo.png
 
-Protein Sequence Logo: WW domain
---------------------------------
+WW domain information logo
+--------------------------
 
-We now show a logo drawn from the WW domain alignment [#WWdomain]_, and highlight the eponymous
-positions of this alignment. To do the highlights, we use the Logomaker method *highlight_position*. Note that
-the color scheme is part of a number of default color dictionaries Logomaker has. The list of available color schemes
-can be viewed by calling `logomaker.list_color_schemes()`. The user can choose named colors in matplotlib and also
-pass in custom color dictionaries::
+The following code creates an information logo derived from a multiple sequence alignment (obtained from PFam [#Finn2014]_) of protein WW domains. Here the height of each stack of characters indicates information content (in bits), as described by Schneider and Stevens (1990) [#Schneider1990]_. First, the data matrix is loaded into ``ww_df`` by calling ``logomaker.get_example`` with the argument ``'ww_information_matrix'``. A Logo object named ``ww_logo`` is then generated. Among other styling options, setting the ``color_scheme`` parameter to ``'NajafabadiEtAl2017'`` causes Logomaker to use a color scheme extracted from Najafabadi et. al. (2017) [#Najafabadi2017]_; the list of all available color schemes can be viewed by calling ``logomaker.list_color_schemes()``. The Logo object method ``highlight_position`` is also used to highlight the two eponymous positions of the WW domain. ::
 
     # load ww information matrix
     ww_df = logomaker.get_example_matrix('ww_information_matrix',
-                                  print_description=False)
+                                         print_description=False)
 
-    # create and style logo
-    logo = logomaker.Logo(ww_df,
-                   font_name='Stencil Std',
-                   color_scheme='NajafabadiEtAl2017',
-                   vpad=.1,
-                   width=.8)
-    logo.ax.set_ylabel('information (bits)')
-    logo.style_xticks(anchor=0, spacing=5, rotation=45)
-    logo.highlight_position(p=4, color='gold', alpha=.5)
-    logo.highlight_position(p=26, color='gold', alpha=.5)
-    logo.ax.set_xlim([-1, len(ww_df)])
+    # create logo object
+    ww_logo = logomaker.Logo(ww_df,
+                             font_name='Stencil Std',
+                             color_scheme='NajafabadiEtAl2017',
+                             vpad=.1,
+                             width=.8)
+
+    # style using Logo methods
+    ww_logo.style_xticks(anchor=0, spacing=5, rotation=45)
+    ww_logo.highlight_position(p=4, color='gold', alpha=.5)
+    ww_logo.highlight_position(p=26, color='gold', alpha=.5)
+
+    # style using Axes methods
+    ww_logo.ax.set_ylabel('information (bits)')
+    ww_logo.ax.set_xlim([-1, len(ww_df)])
 
 .. image:: _static/examples_images/ww_information_logo.png
 
-Autonomously Replicating Sequence (ARS) Logo
---------------------------------------------
+ARS enrichment logo
+-------------------
+
+**[CONTINUE HERE]**
 
 We demonstrate an enrichment logo representing the effects mutations have on replication efficiency within the ARS1
 replication origin of S. cerevisiae. These data (unpublished) were collected by Justin B. Kinney from a mutARS-seq
@@ -115,7 +116,7 @@ highlight a range of positions indicating the A (lightcyan), the B1 (honeydew), 
 
     # load ars matrix
     ars_df = logomaker.get_example_matrix('ars_enrichment_matrix',
-                                  print_description=False)
+                                          print_description=False)
 
     # load ars wt sequence
     with logomaker.open_example_datafile('ars_wt_sequence.txt',
@@ -131,24 +132,29 @@ highlight a range of positions indicating the A (lightcyan), the B1 (honeydew), 
     ars_df.reset_index(inplace=True, drop=True)
     ars_seq = ars_seq[start:stop]
 
-    # create and style logo
-    logo = logomaker.Logo(ars_df,
-                   color_scheme='dimgray',
-                   font_name='Luxi Mono')
-    logo.style_glyphs_in_sequence(sequence=ars_seq, color='darkorange')
-    logo.style_spines(visible=False)
-    logo.ax.set_ylim([-4, 4])
-    logo.ax.set_ylabel('$\log_2$ enrichment', labelpad=0)
-    logo.ax.set_yticks([-4, -2, 0, 2, 4])
-    logo.ax.set_xticks([])
-    logo.highlight_position_range(pmin=7, pmax=22, color='lightcyan')
-    logo.highlight_position_range(pmin=33, pmax=40, color='honeydew')
-    logo.highlight_position_range(pmin=64, pmax=81, color='lavenderblush')
+    # create Logo object
+    ars_logo = logomaker.Logo(ars_df,
+                              color_scheme='dimgray',
+                              font_name='Luxi Mono')
+
+    # style using Logo methods
+    ars_logo.style_glyphs_in_sequence(sequence=ars_seq, color='darkorange')
+    ars_logo.style_spines(visible=False)
+    ars_logo.highlight_position_range(pmin=7, pmax=22, color='lightcyan')
+    ars_logo.highlight_position_range(pmin=33, pmax=40, color='honeydew')
+    ars_logo.highlight_position_range(pmin=64, pmax=81, color='lavenderblush')
+
+    # style using Axes methods
+    ars_logo.ax.set_ylim([-4, 4])
+    ars_logo.ax.set_ylabel('$\log_2$ enrichment', labelpad=0)
+    ars_logo.ax.set_yticks([-4, -2, 0, 2, 4])
+    ars_logo.ax.set_xticks([])
+
 
 .. image:: _static/examples_images/ars_enrichment_logo.png
 
-Saliency Logo
--------------
+Neural network saliency logo
+----------------------------
 
 Saliency maps of deep neural networks accentuate important nucleotides. We adapt a saliency logo from [#Jaganathan]_
 representing the importance of nucleotides in the vicinity of U2SUR exon 9, as predicted by a deep neural network
@@ -190,12 +196,16 @@ References
 
 .. [#Tareen2019] Tareen A, Kinney JB (2019) `Logomaker: beautiful sequence logos in Python <https://biorxiv.org>`_. bioRxiv doi:XXXX/XXXX.
 
-.. [#sortseq2010] Kinney JB, Murugan A, Callan CG, Cox EC. 2010. `Using deep sequencing to characterize the biophysical mechanism of a transcriptional regulatory sequence`. Proc Natl Acad Sci USA 107:9158-9163 :download:`PDF <sortseq2010.pdf>`.
+.. [#sortseq2010] Kinney JB, Murugan A, Callan CG, Cox EC (2010) `Using deep sequencing to characterize the biophysical mechanism of a transcriptional regulatory sequence`. Proc Natl Acad Sci USA 107:9158-9163 :download:`PDF <sortseq2010.pdf>`.
 
-.. [#frankish2019] Frankish, A. et al. (2019). `GENCODE reference annotation for the human and mouse genomes.` Nucl Acids Res, 47(D1), D766–D773.
+.. [#frankish2019] Frankish A et al. (2019) `GENCODE reference annotation for the human and mouse genomes.` Nucl Acids Res, 47(D1):D766–D773.
 
-.. [#WWdomain] Fowler, D. M. et al. `High-resolution mapping of protein sequence-function relationships.` Nature Methods 7, 741–746 (2010).
+.. [#Finn2014] Finn RD, et al. (2014) `Pfam: the protein families database.` Nucl Acids Res. 42(Database issue):D222–30.
 
-.. [#Liachko2013] Liachko, I. et al. (2013). `High-resolution mapping, characterization, and optimization of autonomously replicating sequences in yeast.` Genome Res, 23(4), 698-704.
+.. [#Schneider1990] Schneider TD, Stephens RM (1990) `Sequence logos: a new way to display consensus sequences.` Nucl Acids Res.18(20):6097–100.
 
-.. [#Jaganathan] Jaganathan, K. et al. (2019). `Predicting Splicing from Primary Sequence with Deep Learning.` Cell, 176(3), 535-548.e24.
+.. [#Najafabadi2017] Najafabadi HS, et al. (2017) `Non-base-contacting residues enable kaleidoscopic evolution of metazoan C2H2 zinc finger DNA binding.` Genome Biol. 18(1):1–15.
+
+.. [#Liachko2013] Liachko, I. et al. (2013). `High-resolution mapping, characterization, and optimization of autonomously replicating sequences in yeast.` Genome Res, 23(4):698-704.
+
+.. [#Jaganathan] Jaganathan, K. et al. (2019). `Predicting Splicing from Primary Sequence with Deep Learning.` Cell, 176(3):535-548.e24.
