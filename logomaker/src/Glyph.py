@@ -1,3 +1,10 @@
+# explicitly set a matplotlib backend if called from python to avoid the
+# 'Python is not installed as a framework... error'
+import sys
+if sys.version_info[0] == 2:
+    import matplotlib
+    matplotlib.use('TkAgg')
+
 from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch
 from matplotlib.transforms import Affine2D, Bbox
@@ -322,6 +329,7 @@ class Glyph:
 
         # validate p
         check(isinstance(int(self.p), (float, int)),
+        #check(isinstance(self.p, (float, int)),
               'type(p) = %s must be a number' % type(self.p))
 
         # check c is of type str
@@ -352,14 +360,14 @@ class Glyph:
         check(isinstance(self.width, (float, int)),
               'type(width) = %s; must be of type float or int ' %
               type(self.width))
-        check(self.width >= 0, "width = %d must be >= 0 " %
+        check(self.width > 0, "width = %d must be > 0 " %
               self.width)
 
         # validate vpad
         check(isinstance(self.vpad, (float, int)),
               'type(vpad) = %s; must be of type float or int ' %
               type(self.vpad))
-        check(self.vpad >= 0, "vpad = %d must be >= 0 " %
+        check(0 <=self.vpad <1, "vpad = %d must be >= 0 and < 1 " %
               self.vpad)
 
         # validate font_name
