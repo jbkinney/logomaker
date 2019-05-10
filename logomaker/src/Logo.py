@@ -194,6 +194,9 @@ class Logo:
             fig, ax = plt.subplots(1, 1, figsize=self.figsize)
             self.ax = ax
 
+        # save figure as attribute
+        self.fig = ax.figure
+
         # compute characters
         self._compute_glyphs()
 

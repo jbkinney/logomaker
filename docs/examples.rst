@@ -79,7 +79,7 @@ The following code creates a probability logo derived from all 5' splice sites a
 WW domain information logo
 --------------------------
 
-The following code creates an information logo derived from a multiple sequence alignment (obtained from PFam [#Finn2014]_) of protein WW domains. Here the height of each stack of characters indicates information content (in bits), as described by Schneider and Stevens (1990) [#Schneider1990]_. First, the data matrix is loaded into ``ww_df`` by calling ``logomaker.get_example`` with the argument ``'ww_information_matrix'``. A Logo object named ``ww_logo`` is then generated. Among other styling options, setting the ``color_scheme`` parameter to ``'NajafabadiEtAl2017'`` causes Logomaker to use a color scheme extracted from Najafabadi et. al. (2017) [#Najafabadi2017]_; the list of all available color schemes can be viewed by calling ``logomaker.list_color_schemes()``. The Logo object method ``highlight_position`` is also used to highlight the two eponymous positions of the WW domain. ::
+The following code creates an information logo derived from a multiple sequence alignment (obtained from PFam [#Finn2014]_) of protein WW domains. Here the height of each stack of characters indicates information content (in bits), as described by Schneider and Stevens (1990) [#Schneider1990]_. First, the information matrix is loaded into ``ww_df`` by calling ``logomaker.get_example`` with the argument ``'ww_information_matrix'``. A Logo object named ``ww_logo`` is then generated. Among other styling options, setting the ``color_scheme`` parameter to ``'NajafabadiEtAl2017'`` causes Logomaker to use a color scheme extracted from Najafabadi et. al. (2017) [#Najafabadi2017]_; the list of all available color schemes can be viewed by calling ``logomaker.list_color_schemes()``. The Logo object method ``highlight_position`` is also used to highlight the two eponymous positions of the WW domain. ::
 
     # load ww information matrix
     ww_df = logomaker.get_example_matrix('ww_information_matrix',
@@ -106,26 +106,21 @@ The following code creates an information logo derived from a multiple sequence 
 ARS enrichment logo
 -------------------
 
-**[CONTINUE HERE]**
-
-We demonstrate an enrichment logo representing the effects mutations have on replication efficiency within the ARS1
-replication origin of S. cerevisiae. These data (unpublished) were collected by Justin B. Kinney from a mutARS-seq
-experiment analogous to the one reported by [#Liachko2013]_. We use the function *highlight_position_range* to
-highlight a range of positions indicating the A (lightcyan), the B1 (honeydew), B2 (lavenderblush) elements for the ARS.::
+The following code creates an enrichment logo that illustrates the results of a mutARS-seq experiment (unpublished; performed by JBK) analogous to the one reported by Liachko et al. (2013) [#Liachko2013]_. In this logo, the height of each character indicates the log-fold enrichment observed in a plasmid selection experiment performed on a large library of mutated ARS1 origins of replication. First, the enrichment matrix is loaded into ``ars_df`` by calling ``logomaker.get_example`` with the argument ``'ars_enrichment_matrix'``. Next, we call ``logomaker.open_example_datafile`` with argument ``'ars_wt_sequence.txt'``; this returns a file handle from which the wild-type ARS1 DNA sequence is parsed. Both the enrichment matrix and the ARS1 sequence are then trimmed. Next, a Logo object named ``ars_logo`` is created with all characters colored ``'dimgray'``. The wild-type ARS1 sequence is then colored in orange by calling ``ars_logo.style_glyphs_in_sequence`` with the argument ``color`` set to ``'darkorange'``. Three functional elements  within ARS1 (termed A, B1, and B2, from left to right) are then highlighted using ``ars_logo.highlight_position_range``. Some additional Axes styling is then performed. ::
 
 
-    # load ars matrix
+    # load ARS enrichment matrix
     ars_df = logomaker.get_example_matrix('ars_enrichment_matrix',
                                           print_description=False)
 
-    # load ars wt sequence
+    # load wild-type ARS1 sequence
     with logomaker.open_example_datafile('ars_wt_sequence.txt',
-                                  print_description=False) as f:
+                                         print_description=False) as f:
         lines = f.readlines()
         lines = [l.strip() for l in lines if '#' not in l]
         ars_seq = ''.join(lines)
 
-    # trim ars matrix and sequence
+    # trim matrix and sequence
     start = 10
     stop = 100
     ars_df = ars_df.iloc[start:stop, :]
@@ -137,12 +132,16 @@ highlight a range of positions indicating the A (lightcyan), the B1 (honeydew), 
                               color_scheme='dimgray',
                               font_name='Luxi Mono')
 
-    # style using Logo methods
+    # color wild-type ARS1 sequence within logo
     ars_logo.style_glyphs_in_sequence(sequence=ars_seq, color='darkorange')
-    ars_logo.style_spines(visible=False)
+
+    # highlight functional regions of ARS1
     ars_logo.highlight_position_range(pmin=7, pmax=22, color='lightcyan')
     ars_logo.highlight_position_range(pmin=33, pmax=40, color='honeydew')
     ars_logo.highlight_position_range(pmin=64, pmax=81, color='lavenderblush')
+
+    # additional styling using Logo methods
+    ars_logo.style_spines(visible=False)
 
     # style using Axes methods
     ars_logo.ax.set_ylim([-4, 4])
@@ -156,56 +155,110 @@ highlight a range of positions indicating the A (lightcyan), the B1 (honeydew), 
 Neural network saliency logo
 ----------------------------
 
-Saliency maps of deep neural networks accentuate important nucleotides. We adapt a saliency logo from [#Jaganathan]_
-representing the importance of nucleotides in the vicinity of U2SUR exon 9, as predicted by a deep neural network
-model of splice site selection. This example demonstrates how Logomaker is able to leverage functionality
-from `matplotlib <https://matplotlib.org/>`_, thus allowing the user to customize their logos however much they want
-(reproduced with author permission)::
+Saliency logos provide a useful way to visualize the features (within a specific biological sequence) that a deep neural network model deems to be important. Saliency logos differ from more standard logos in that only one character is drawn at each position. Below we reproduce (with permission) the saliency logo from Figure 1D of Jaganathan et al. (2019) [#Jaganathan]_, which illustrates sequence features important for proper splicing of *U2SUR* exon 9. First, the saliency matrix is loaded into ``nn_df`` by calling ``logomaker.get_example`` with the argument ``nn_saliency_matrix``. Next, a Logo object named ``nn_logo`` is created and its methods are used to style the Axes spines. More axes styling is then carried out using native Axes methods. Finally, a gene body diagram with annotations is drawn below the logo. ::
 
     # load saliency matrix
-    saliency_df = logomaker.get_example_matrix('nn_saliency_matrix',
-                                        print_description=False)
+    nn_df = logomaker.get_example_matrix('nn_saliency_matrix',
+                                         print_description=False)
 
-    # create and style saliency logo
-    logo = logomaker.Logo(saliency_df)
-    ax = logo.ax
-    logo.style_spines(visible=False)
-    logo.style_spines(spines=['left'], visible=True, bounds=[0, .75])
-    ax.set_xlim([20, 115])
-    ax.set_yticks([0, .75])
-    ax.set_yticklabels(['0', '0.75'])
-    ax.set_xticks([])
-    ax.set_ylabel('        saliency', labelpad=-1)
+    # create Logo object
+    nn_logo = logomaker.Logo(nn_df)
 
-    # draw gene
+    # style using Logo methods
+    nn_logo.style_spines(visible=False)
+    nn_logo.style_spines(spines=['left'], visible=True, bounds=[0, .75])
+
+    # style using Axes methods
+    nn_logo.ax.set_xlim([20, 115])
+    nn_logo.ax.set_xticks([])
+    nn_logo.ax.set_ylim([-.6, .75])
+    nn_logo.ax.set_yticks([0, .75])
+    nn_logo.ax.set_yticklabels(['0', '0.75'])
+    nn_logo.ax.set_ylabel('                 saliency', labelpad=-1)
+
+    # set parameters for drawing gene
     exon_start = 55-.5
     exon_stop = 90+.5
     y = -.2
-    ax.set_ylim([-.3, .75])
-    ax.axhline(y, color='k', linewidth=1)
-    xs = np.arange(-3, len(saliency_df),10)
+    xs = np.arange(-3, len(nn_df),10)
     ys = y*np.ones(len(xs))
-    ax.plot(xs, ys, marker='4', linewidth=0, markersize=5, color='k')
-    ax.plot([exon_start, exon_stop],
-            [y, y], color='k', linewidth=10, solid_capstyle='butt')
+
+    # draw gene
+    nn_logo.ax.axhline(y, color='k', linewidth=1)
+    nn_logo.ax.plot(xs, ys, marker='4', linewidth=0, markersize=7, color='k')
+    nn_logo.ax.plot([exon_start, exon_stop],
+                    [y, y], color='k', linewidth=10, solid_capstyle='butt')
+
+    # annotate gene
+    nn_logo.ax.plot(exon_start, 1.8*y, '^k', markersize=15)
+    nn_logo.ax.text(20,2*y,'$U2SURP$',fontsize=12)
+    nn_logo.ax.text(exon_start, 2.5*y,'chr3:142,740,192', verticalalignment='top', horizontalalignment='center')
 
 .. image:: _static/examples_images/nn_saliency_logo.png
 
+Logomaker logo
+--------------
+
+Below is the code used to make the Logomaker logo. First, Figure and Axes objects of the desired size are created. The data matrix for the logo is then loaded into ``logo_df``. Next, a custom color scheme is defined in the form of a ``dict`` object. A Logo object is then created using a variety of optional arguments that, among other things, specify the Axes and color scheme to use. Subsequently, the second 'O' in 'LOGO' is recolored, after which the characters in 'marker' are flipped right-side up, rendered in font ``'ORC A Std'``, and widened slightly. Finally, tick marks are removed and the Axes is rescaled to fill the Figure. ::
+
+    # make Figure and Axes objects
+    fig, ax = plt.subplots(1,1,figsize=[4,2])
+
+    # load logo matrix
+    logo_df = logomaker.get_example_matrix('logomaker_logo_matrix',
+                                           print_description=False)
+
+    # create color scheme
+    color_scheme = {
+        'L' : [0, .5, 0],
+        'O' : [1, 0, 0],
+        'G' : [1, .65, 0],
+        'maker': 'gray'
+    }
+
+    # create Logo object
+    logo_logo = logomaker.Logo(logo_df,
+                               ax=ax,
+                               color_scheme=color_scheme,
+                               baseline_width=0,
+                               font_name='Arial',
+                               show_spines=False,
+                               vsep=.005,
+                               width=.95)
+
+    # color the 'O' at the end of the logo a different coolor
+    logo_logo.style_single_glyph(c='O', p=3, color=[0, 0, 1])
+
+    # change the font of 'maker' and flip upright.
+    logo_logo.style_glyphs_below(font_name='OCR A Std', flip=False, width=1.0)
+
+    # remove tick marks
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    # tighten layout
+    plt.tight_layout()
+
+    # show plot
+    plt.show()
+
+.. image:: _static/examples_images/logomaker_logo.png
+
 References
-~~~~~~~~~~
+----------
 
-.. [#Tareen2019] Tareen A, Kinney JB (2019) `Logomaker: beautiful sequence logos in Python <https://biorxiv.org>`_. bioRxiv doi:XXXX/XXXX.
+.. [#Tareen2019] Tareen A, Kinney JB (2019). Logomaker: beautiful sequence logos in Python. `bioRxiv doi:XXXX/XXXX. <https://biorxiv.org>`_
 
-.. [#sortseq2010] Kinney JB, Murugan A, Callan CG, Cox EC (2010) `Using deep sequencing to characterize the biophysical mechanism of a transcriptional regulatory sequence`. Proc Natl Acad Sci USA 107:9158-9163 :download:`PDF <sortseq2010.pdf>`.
+.. [#sortseq2010] Kinney JB, Murugan A, Callan CG, Cox EC (2010). Using deep sequencing to characterize the biophysical mechanism of a transcriptional regulatory sequence. Proc Natl Acad Sci USA 107:9158-9163. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/20439748>`_ :download:`PDF <sortseq2010.pdf>`.
 
-.. [#frankish2019] Frankish A et al. (2019) `GENCODE reference annotation for the human and mouse genomes.` Nucl Acids Res, 47(D1):D766–D773.
+.. [#frankish2019] Frankish A et al. (2019). GENCODE reference annotation for the human and mouse genomes. Nucl Acids Res, 47(D1):D766–D773. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/30357393>`_
 
-.. [#Finn2014] Finn RD, et al. (2014) `Pfam: the protein families database.` Nucl Acids Res. 42(Database issue):D222–30.
+.. [#Finn2014] Finn RD, et al. (2014). Pfam: the protein families database. Nucl Acids Res 42(Database issue):D222–30. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/24288371>`_
 
-.. [#Schneider1990] Schneider TD, Stephens RM (1990) `Sequence logos: a new way to display consensus sequences.` Nucl Acids Res.18(20):6097–100.
+.. [#Schneider1990] Schneider TD, Stephens RM (1990). Sequence logos: a new way to display consensus sequences. Nucl Acids Res.18(20):6097–100. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/2172928>`_
 
-.. [#Najafabadi2017] Najafabadi HS, et al. (2017) `Non-base-contacting residues enable kaleidoscopic evolution of metazoan C2H2 zinc finger DNA binding.` Genome Biol. 18(1):1–15.
+.. [#Najafabadi2017] Najafabadi HS, et al. (2017). Non-base-contacting residues enable kaleidoscopic evolution of metazoan C2H2 zinc finger DNA binding. Genome Biol. 18(1):1–15. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/28877740>`_
 
-.. [#Liachko2013] Liachko, I. et al. (2013). `High-resolution mapping, characterization, and optimization of autonomously replicating sequences in yeast.` Genome Res, 23(4):698-704.
+.. [#Liachko2013] Liachko I et al. (2013). High-resolution mapping, characterization, and optimization of autonomously replicating sequences in yeast. Genome Res, 23(4):698-704. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/23241746>`_
 
-.. [#Jaganathan] Jaganathan, K. et al. (2019). `Predicting Splicing from Primary Sequence with Deep Learning.` Cell, 176(3):535-548.e24.
+.. [#Jaganathan] Jaganathan K. et al. (2019). Predicting Splicing from Primary Sequence with Deep Learning. Cell, 176(3):535-548.e24. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/30661751>`_
