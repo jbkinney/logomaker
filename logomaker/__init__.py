@@ -20,7 +20,7 @@ import glob
 from logomaker.src.error_handling import check, handle_errors
 
 @handle_errors
-def demo(name='crp'):
+def demo(name='fig1b'):
 
     """
     Performs a demonstration of the Logomaker software.
