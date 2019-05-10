@@ -29,7 +29,7 @@ def demo(name='crp'):
     -----------
 
     name: (str)
-        Must be one of {'crp', 'fig1b', 'fig1c', 'fig1d', 'fig1e', 'fig1f'}.
+        Must be one of {'fig1b', 'fig1c', 'fig1d', 'fig1e', 'fig1f', 'logo'}.
 
     returns
     -------
