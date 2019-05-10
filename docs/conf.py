@@ -23,20 +23,20 @@ sys.path.append('../')
 import logomaker
 
 project = 'logomaker'
-copyright = '2019, Ammar Tareen'
-author = 'Ammar Tareen'
+copyright = '2019, Ammar Tareen and Justin B. Kinney'
+author = 'Ammar Tareen and Justin B. Kinney'
 
 # The short X.Y version
-version = ''
+version = '0.7'
 # The full version, including alpha/beta/rc tags
-release = '0.6'
+release = '0.7'
 
 
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-# needs_sphinx = '1.0'
+needs_sphinx = '1.7.3'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom

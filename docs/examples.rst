@@ -3,8 +3,6 @@
 Examples
 ========
 
-**[UNDER CONSTRUCTION]**
-
 As described in :ref:`quickstart`, the five logos shown in Figure 1 of Tareen and Kinney (2019) [#Tareen2019]_ can be generated using the function ``logomaker.demo``. Here we describe each of these logos, as well as the snippets of code used to generate them. All snippets shown below are designed for use within an iPython Jupyter Notebook, and assume that the following header cell has already been run. ::
 
     # standard imports

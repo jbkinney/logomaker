@@ -2,8 +2,6 @@
 Logomaker: beautiful sequence logos in Python
 =============================================
 
-****[SITE UNDER CONSTRUCTION]****
-
 *Written by Ammar Tareen and Justin B. Kinney.*
 
 Logomaker is a Python package for generating publication-quality sequence logos.
