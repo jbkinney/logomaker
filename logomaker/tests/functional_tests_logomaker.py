@@ -4,6 +4,7 @@ import sys
 sys.path.append('../../')
 
 import logomaker
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -557,6 +558,107 @@ def test_saliency_to_matrix():
                           seq=saliency_data_df['character'], values=saliency_data_df['value'])
 
 
+def test_Glyph():
+
+    fig, ax = plt.subplots(figsize=[7, 3])
+
+    # set bounding box
+    ax.set_xlim([0, 2])
+    ax.set_ylim([0, 1])
+
+    # test parameter p
+    # TODO: need to fix fail_list bugs for parameter p
+    test_parameter_values(func=logomaker.Glyph,var_name='p',
+                          fail_list=['x',None],success_list=[0,1,10, 0.5],
+                          c='A', ax=ax, floor=0, ceiling=1)
+
+    # test parameter c
+    test_parameter_values(func=logomaker.Glyph, var_name='c',
+                          fail_list=[0,0.1,None], success_list=['A','C','x'],
+                          p=1, ax=ax, floor=0, ceiling=1)
+
+    # test parameter floor
+    test_parameter_values(func=logomaker.Glyph, var_name='floor',
+                          fail_list=['x',2, None], success_list=[0,0.1,0.5],
+                          p=1, ax=ax, ceiling=1, c='A')
+
+    # test parameter ceiling
+    test_parameter_values(func=logomaker.Glyph, var_name='ceiling',
+                          fail_list=['x', -1, None], success_list=[0, 0.1, 0.5],
+                          p=1, ax=ax, floor=0, c='A')
+
+    # test parameter ax
+    test_parameter_values(func=logomaker.Glyph, var_name='ax',
+                          fail_list=['x', -1], success_list=[None,ax],
+                          p=1, ceiling=1, floor=0, c='A')
+
+    # test parameter width
+    test_parameter_values(func=logomaker.Glyph, var_name='width',
+                          fail_list=['x', -1], success_list=[0.1,1,10],
+                          p=1, ceiling=1, floor=0, c='A', ax=ax)
+
+    # test parameter vpad
+    test_parameter_values(func=logomaker.Glyph, var_name='vpad',
+                          fail_list=['x', -1, None, 1], success_list=[0, 0.9, 0.5],
+                          p=1, ceiling=1, floor=0, c='A', ax=ax)
+
+    # test parameter font_name
+    test_parameter_values(func=logomaker.Glyph, var_name='font_name',
+                          fail_list=[-1], success_list=['DejaVu Sans'],
+                          p=1, ceiling=1, floor=0, c='A', ax=ax)
+
+    # test parameter font_weight
+    test_parameter_values(func=logomaker.Glyph, var_name='font_weight',
+                          fail_list=[-1,'xxx'], success_list=['bold',5, 'normal'],
+                          p=1, ceiling=1, floor=0, c='A', ax=ax)
+
+    # test parameter color
+    test_parameter_values(func=logomaker.Glyph, var_name='color',
+                          fail_list=[-1, 'xxx'], success_list=['red', [1,1,1], [0,0,0],[0.1,0.2,0.3]],
+                          p=1, ceiling=1, floor=0, c='A', ax=ax)
+
+    # test parameter edgecolor
+    test_parameter_values(func=logomaker.Glyph, var_name='edgecolor',
+                          fail_list=[-1, 'xxx'], success_list=['black', [1, 1, 1], [0, 0, 0], [0.1, 0.2, 0.3]],
+                          p=1, ceiling=1, floor=0, c='A', ax=ax)
+
+    # test parameter edgewidth
+    test_parameter_values(func=logomaker.Glyph, var_name='edgewidth',
+                          fail_list=['x', -1, None], success_list=[0, 0.9, 0.5],
+                          p=1, ceiling=1, floor=0, c='A', ax=ax)
+
+    # test parameter dont_stretch_more_than
+    test_parameter_values(func=logomaker.Glyph, var_name='dont_stretch_more_than',
+                          fail_list=[-1, None], success_list=['E','A'],
+                          p=1, ceiling=1, floor=0, c='A', ax=ax)
+
+    # test parameter flip
+    test_parameter_values(func=logomaker.Glyph, var_name='flip',
+                          fail_list=bool_fail_list, success_list=bool_success_list,
+                          p=1, ceiling=1, floor=0, c='A', ax=ax)
+
+    # test parameter mirror
+    test_parameter_values(func=logomaker.Glyph, var_name='mirror',
+                          fail_list=bool_fail_list, success_list=bool_success_list,
+                          p=1, ceiling=1, floor=0, c='A', ax=ax)
+
+    # test parameter zorder
+    test_parameter_values(func=logomaker.Glyph, var_name='zorder',
+                          fail_list=['x'], success_list=[0,0.5,1,5],
+                          p=1, ceiling=1, floor=0, c='A', ax=ax)
+
+    # test parameter alpha
+    test_parameter_values(func=logomaker.Glyph, var_name='alpha',
+                          fail_list=[1.1, -1, 'xxx'], success_list=[0.999, 0.5, 1.0],
+                          p=1, ceiling=1, floor=0, c='A', ax=ax)
+
+    # test parameter figsize
+    test_parameter_values(func=logomaker.Glyph, var_name='figsize',
+                          fail_list=['incorrect argument', ['x', 'y'], (1, 2, 3),[1,-1]],
+                          success_list=[(10, 2.5), [5, 5]],
+                          p=1, ceiling=1, floor=0, c='A', ax=ax)
+
+
 def test_demo():
 
     test_parameter_values(func=logomaker.demo,var_name='name',
@@ -578,10 +680,13 @@ test_Logo_draw_baseline()
 test_Logo_style_xticks()
 test_Logo_style_spines()
 
-#run tests for the methods in the matrix module
+# run tests for the methods in the matrix module
 test_transform_matrix()
 test_sequence_to_matrix()
 test_alignment_to_matrix()
 test_saliency_to_matrix()
+
+# run tests for the Glyph class
+test_Glyph()
 
 #test_demo()

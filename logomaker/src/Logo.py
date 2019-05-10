@@ -1,6 +1,14 @@
 from __future__ import division
 import numpy as np
 import pandas as pd
+
+# explicitly set a matplotlib backend if called from python to avoid the
+# 'Python is not installed as a framework... error'
+import sys
+if sys.version_info[0] == 2:
+    import matplotlib
+    matplotlib.use('TkAgg')
+
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from matplotlib.axes import Axes
