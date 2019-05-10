@@ -3,7 +3,7 @@
 Examples
 ========
 
-As described in :ref:`quickstart`, the five logos shown in Figure 1 of Tareen and Kinney (2019) [#Tareen2019]_ can be generated using the function ``logomaker.demo``. Here we describe each of these logos, as well as the snippets of code used to generate them. All snippets shown below are designed for use within an iPython Jupyter Notebook, and assume that the following header cell has already been run. ::
+As described in :ref:`quickstart`, the five logos shown in Figure 1 of Tareen and Kinney (2019) [#Tareen2019]_ can be generated using the function ``logomaker.demo``. Here we describe each of these logos, as well as the snippets of code used to generate them. All snippets shown below are designed for use within a Jupyter Notebook, and assume that the following header cell has already been run. ::
 
     # standard imports
     import numpy as np
@@ -20,7 +20,7 @@ As described in :ref:`quickstart`, the five logos shown in Figure 1 of Tareen an
 CRP energy logo
 ---------------
 
-The following code creates an energy logo for the *E. coli* transcription factor CRP. The energy matrix illustrated by this logo was reported by Kinney et. al. (2010) [#sortseq2010]_ based on the analysis of a massively parallel reporter assay. This energy matrix is included with Logomaker as example data, and is loaded here by calling ``logomaker.get_example`` with the argument ``'crp_energy_matrix'``. A Logo object named ``crp_logo`` is then created using the styling parameters ``shade_below``, ``fade_below``, and ``font_name``. Subsequent styling is then performed using the Logo object methods ``style_spines`` and ``style_xticks``. Additional styling is also performed using methods of ``crp_logo.ax``, the matplotlib Axes object on which the logo is drawn. ::
+The following code creates an energy logo for the *E. coli* transcription factor CRP. The energy matrix illustrated by this logo was reported by Kinney et. al. (2010) [#sortseq2010]_ based on the analysis of data from a massively parallel reporter assay. This energy matrix is included with Logomaker as example data, and is loaded here by calling ``logomaker.get_example_matrix`` with the argument ``'crp_energy_matrix'``. A Logo object named ``crp_logo`` is then created using the styling parameters ``shade_below``, ``fade_below``, and ``font_name``. Subsequent styling is then performed using the Logo object methods ``style_spines`` and ``style_xticks``. Additional styling is also performed using methods of ``crp_logo.ax``, the matplotlib Axes object on which the logo is drawn. ::
 
     # load crp energy matrix
     crp_df = -logomaker.get_example_matrix('crp_energy_matrix',
@@ -47,7 +47,7 @@ The following code creates an energy logo for the *E. coli* transcription factor
 Splice site probability logo
 ----------------------------
 
-The following code creates a probability logo derived from all 5' splice sites annotated in the human genome [#frankish2019]_. Here the probability of each RNA nucleotide at each position is indicated by both character height and character opacity.  The dashed line indicates the intron/exon boundary, with exonic sequence on the left and intronic sequence on the right. This probability matrix is included with Logomaker as example data, and is loaded into a pandas DataFrame named ``ss_df`` by calling ``logomaker.get_example`` with the argument ``'ss_probability_matrix'``. A Logo object named ``ss_logo`` is then created using the styling parameters ``width``, ``vpad``, ``fade_probabilities``, ``stack_order``, ``color_scheme``, and ``font_name``. Subsequent styling is performed using the Logo object method ``style_spines``, as well as multiple Axes object methods. ::
+The following code creates a probability logo derived from all 5' splice sites annotated in the human genome [#frankish2019]_. Here the probability of each RNA nucleotide at each position is indicated by both character height and character opacity.  The dashed line indicates the intron/exon boundary, with exonic sequence on the left and intronic sequence on the right. This probability matrix is included with Logomaker as example data, and is loaded into a pandas DataFrame object named ``ss_df`` by calling ``logomaker.get_example_matrix`` with the argument ``'ss_probability_matrix'``. A Logo object named ``ss_logo`` is then created using the styling parameters ``width``, ``vpad``, ``fade_probabilities``, ``stack_order``, ``color_scheme``, and ``font_name``. Subsequent styling is performed using the Logo object method ``style_spines``, as well as multiple Axes object methods. ::
 
     # load ss probability matrix
     ss_df = logomaker.get_example_matrix('ss_probability_matrix',
@@ -77,13 +77,13 @@ The following code creates a probability logo derived from all 5' splice sites a
 WW domain information logo
 --------------------------
 
-The following code creates an information logo derived from a multiple sequence alignment (obtained from PFam [#Finn2014]_) of protein WW domains. Here the height of each stack of characters indicates information content (in bits), as described by Schneider and Stevens (1990) [#Schneider1990]_. First, the information matrix is loaded into ``ww_df`` by calling ``logomaker.get_example`` with the argument ``'ww_information_matrix'``. A Logo object named ``ww_logo`` is then generated. Among other styling options, setting the ``color_scheme`` parameter to ``'NajafabadiEtAl2017'`` causes Logomaker to use a color scheme extracted from Najafabadi et. al. (2017) [#Najafabadi2017]_; the list of all available color schemes can be viewed by calling ``logomaker.list_color_schemes()``. The Logo object method ``highlight_position`` is also used to highlight the two eponymous positions of the WW domain. ::
+The following code creates an information logo derived from a multiple sequence alignment (obtained from PFam [#Finn2014]_) of protein WW domains. Here the height of each stack of characters indicates information content, as described by Schneider and Stevens (1990) [#Schneider1990]_. First, the information matrix is loaded into ``ww_df`` by calling ``logomaker.get_example_matrix`` with the argument ``'ww_information_matrix'``. A Logo object named ``ww_logo`` is then generated. Among other styling options, setting the ``color_scheme`` parameter to ``'NajafabadiEtAl2017'`` causes Logomaker to use a color scheme extracted from Najafabadi et al. (2017) [#Najafabadi2017]_; the list of all available color schemes can be viewed by calling ``logomaker.list_color_schemes()``. The Logo object method ``highlight_position`` is also used to highlight the two eponymous positions of the WW domain. ::
 
     # load ww information matrix
     ww_df = logomaker.get_example_matrix('ww_information_matrix',
                                          print_description=False)
 
-    # create logo object
+    # create Logo object
     ww_logo = logomaker.Logo(ww_df,
                              font_name='Stencil Std',
                              color_scheme='NajafabadiEtAl2017',
@@ -104,7 +104,7 @@ The following code creates an information logo derived from a multiple sequence 
 ARS enrichment logo
 -------------------
 
-The following code creates an enrichment logo that illustrates the results of a mutARS-seq experiment (unpublished; performed by JBK) analogous to the one reported by Liachko et al. (2013) [#Liachko2013]_. In this logo, the height of each character indicates the log-fold enrichment observed in a plasmid selection experiment performed on a large library of mutated ARS1 origins of replication. First, the enrichment matrix is loaded into ``ars_df`` by calling ``logomaker.get_example`` with the argument ``'ars_enrichment_matrix'``. Next, we call ``logomaker.open_example_datafile`` with argument ``'ars_wt_sequence.txt'``; this returns a file handle from which the wild-type ARS1 DNA sequence is parsed. Both the enrichment matrix and the ARS1 sequence are then trimmed. Next, a Logo object named ``ars_logo`` is created with all characters colored ``'dimgray'``. The wild-type ARS1 sequence is then colored in orange by calling ``ars_logo.style_glyphs_in_sequence`` with the argument ``color`` set to ``'darkorange'``. Three functional elements  within ARS1 (termed A, B1, and B2, from left to right) are then highlighted using ``ars_logo.highlight_position_range``. Some additional Axes styling is then performed. ::
+The following code creates an enrichment logo that illustrates the results of a mutARS-seq experiment (unpublished; performed by JBK) analogous to the one reported by Liachko et al. (2013) [#Liachko2013]_. In this logo, the height of each character indicates the log-fold enrichment observed in a plasmid selection experiment performed on a large library of mutated ARS1 origins of replication. First, the enrichment matrix is loaded into ``ars_df`` by calling ``logomaker.get_example_matrix`` with the argument ``'ars_enrichment_matrix'``. Next, we call ``logomaker.open_example_datafile`` with argument ``'ars_wt_sequence.txt'``; this returns a file handle from which the wild-type ARS1 DNA sequence is parsed. Both the enrichment matrix and the ARS1 sequence are then trimmed. Next, a Logo object named ``ars_logo`` is created with all characters colored ``'dimgray'``. The wild-type ARS1 sequence is then colored in orange by calling ``ars_logo.style_glyphs_in_sequence`` with the argument ``color`` set to ``'darkorange'``. Three functional elements  within ARS1 (termed A, B1, and B2, from left to right) are then highlighted using ``ars_logo.highlight_position_range``. Some additional Axes styling is then performed. ::
 
 
     # load ARS enrichment matrix
@@ -153,7 +153,7 @@ The following code creates an enrichment logo that illustrates the results of a 
 Neural network saliency logo
 ----------------------------
 
-Saliency logos provide a useful way to visualize the features (within a specific biological sequence) that a deep neural network model deems to be important. Saliency logos differ from more standard logos in that only one character is drawn at each position. Below we reproduce (with permission) the saliency logo from Figure 1D of Jaganathan et al. (2019) [#Jaganathan]_, which illustrates sequence features important for proper splicing of *U2SUR* exon 9. First, the saliency matrix is loaded into ``nn_df`` by calling ``logomaker.get_example`` with the argument ``nn_saliency_matrix``. Next, a Logo object named ``nn_logo`` is created and its methods are used to style the Axes spines. More axes styling is then carried out using native Axes methods. Finally, a gene body diagram with annotations is drawn below the logo. ::
+Saliency logos provide a useful way to visualize the features (within a specific biological sequence) that a deep neural network model deems to be important. Saliency logos differ from more standard logos in that only one character is drawn at each position. Below we reproduce (with permission) the saliency logo from Figure 1D of Jaganathan et al. (2019) [#Jaganathan]_, which illustrates sequence features important for the proper splicing of *U2SUR* exon 9. First, the saliency matrix is loaded into ``nn_df`` by calling ``logomaker.get_example_matrix`` with the argument ``'nn_saliency_matrix'``. Next, a Logo object named ``nn_logo`` is created and its methods are used to style the Axes spines. More axes styling is then carried out using native Axes methods. Finally, a gene body diagram with annotations is drawn below the logo. ::
 
     # load saliency matrix
     nn_df = logomaker.get_example_matrix('nn_saliency_matrix',
@@ -224,10 +224,10 @@ Below is the code used to make the Logomaker logo. First, Figure and Axes object
                                vsep=.005,
                                width=.95)
 
-    # color the 'O' at the end of the logo a different coolor
+    # color the 'O' at the end of the logo a different color
     logo_logo.style_single_glyph(c='O', p=3, color=[0, 0, 1])
 
-    # change the font of 'maker' and flip upright.
+    # change the font of 'maker' and flip characters upright.
     logo_logo.style_glyphs_below(font_name='OCR A Std', flip=False, width=1.0)
 
     # remove tick marks

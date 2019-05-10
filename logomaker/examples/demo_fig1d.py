@@ -6,7 +6,7 @@ import logomaker as logomaker
 ww_df = logomaker.get_example_matrix('ww_information_matrix',
                                      print_description=False)
 
-# create logo object
+# create Logo object
 ww_logo = logomaker.Logo(ww_df,
                          font_name='Stencil Std',
                          color_scheme='NajafabadiEtAl2017',

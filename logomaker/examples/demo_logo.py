@@ -27,10 +27,10 @@ logo_logo = logomaker.Logo(logo_df,
                            vsep=.005,
                            width=.95)
 
-# color the 'O' at the end of the logo a different coolor
+# color the 'O' at the end of the logo a different color
 logo_logo.style_single_glyph(c='O', p=3, color=[0, 0, 1])
 
-# change the font of 'maker' and flip upright.
+# change the font of 'maker' and flip characters upright.
 logo_logo.style_glyphs_below(font_name='OCR A Std', flip=False, width=1.0)
 
 # remove tick marks
