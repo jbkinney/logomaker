@@ -327,10 +327,13 @@ class Glyph:
         check input parameters in the Logo constructor for correctness
         """
 
+        from numbers import Number
         # validate p
-        check(isinstance(int(self.p), (float, int)),
-        #check(isinstance(self.p, (float, int)),
+        # check(isinstance(int(self.p, (float, int)),
+        check(isinstance(self.p, (float, int, Number)),
               'type(p) = %s must be a number' % type(self.p))
+
+        self.p = int(self.p)
 
         # check c is of type str
         check(isinstance(self.c, str),
@@ -436,5 +439,19 @@ class Glyph:
         # Check 0 <= alpha <= 1.0
         check(0 <= self.alpha <= 1.0,
               'alpha must be between 0.0 and 1.0 (inclusive)')
+
+        # validate that figsize is array=like
+        check(isinstance(self.figsize, (tuple, list, np.ndarray)),
+              'type(figsize) = %s; figsize must be array-like.' %
+              type(self.figsize))
+        self.figsize = tuple(self.figsize) # Just to pin down variable type.
+
+        # validate length of figsize
+        check(len(self.figsize) == 2, 'figsize must have length two.')
+
+        # validate that each element of figsize is a number
+        check(all([isinstance(n, (int, float)) and n > 0
+                   for n in self.figsize]),
+              'all elements of figsize array must be numbers > 0.')
 
 
