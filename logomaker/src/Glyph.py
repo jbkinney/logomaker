@@ -329,11 +329,8 @@ class Glyph:
 
         from numbers import Number
         # validate p
-        # check(isinstance(int(self.p, (float, int)),
-        check(isinstance(self.p, (float, int, Number)),
+        check(isinstance(int(self.p), (float, int)),
               'type(p) = %s must be a number' % type(self.p))
-
-        self.p = int(self.p)
 
         # check c is of type str
         check(isinstance(self.c, str),

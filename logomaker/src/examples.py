@@ -66,6 +66,11 @@ def get_example_matrix(name=None, print_description=True):
           'Matrix "%s" not recognized. Please choose from: \n%s'
           % (name, '\n'.join([repr(x) for x in valid_matrices])))
 
+    # check that print_description is boolean
+    check(isinstance(print_description, bool),
+          'type(print_description) = %s; must be of type bool ' %
+          type(print_description))
+
     # set matrix file
     file_name = '%s/%s.txt' % (matrix_dir, name)
     assert os.path.isfile(file_name), 'File %s does not exist!'%file_name
@@ -111,6 +116,11 @@ def open_example_datafile(name=None, print_description=True):
     check(name in valid_datafiles,
           'Matrix "%s" not recognized. Please choose from: \n%s'
           % (name, '\n'.join([repr(x) for x in valid_datafiles])))
+
+    # check that print_description is boolean
+    check(isinstance(print_description, bool),
+          'type(print_description) = %s; must be of type bool ' %
+          type(print_description))
 
     # set datafile file name
     file_name = '%s/%s' % (data_dir, name)

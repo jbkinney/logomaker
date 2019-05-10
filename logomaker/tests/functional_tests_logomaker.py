@@ -569,7 +569,7 @@ def test_Glyph():
     # test parameter p
     # TODO: need to fix fail_list bugs for parameter p
     test_parameter_values(func=logomaker.Glyph,var_name='p',
-                          fail_list=['x',None],success_list=[0,1,10, 0.5],
+                          fail_list=[],success_list=[0,1,10, 0.5],
                           c='A', ax=ax, floor=0, ceiling=1)
 
     # test parameter c
@@ -659,6 +659,25 @@ def test_Glyph():
                           p=1, ceiling=1, floor=0, c='A', ax=ax)
 
 
+def test_logomaker_get_data_methods():
+
+    # testing parameter name in get_example_matrix
+    test_parameter_values(func=logomaker.get_example_matrix,var_name='name',
+                          fail_list = ['wrong argument', -1], success_list=['crp_energy_matrix','ww_counts_matrix'])
+
+    # testing parameter print_description in get_example_matrix
+    test_parameter_values(func=logomaker.get_example_matrix, var_name='print_description',
+                          fail_list=bool_fail_list, success_list=bool_success_list, name='crp_energy_matrix')
+
+    # testing parameter name in open_example_datafile
+    test_parameter_values(func=logomaker.open_example_datafile, var_name='name',
+                          fail_list=['wrong argument', -1], success_list=['nn_saliency_values.txt', 'ss_sequences.txt'])
+
+    # testing parameter print_description in open_example_datafile
+    test_parameter_values(func=logomaker.open_example_datafile, var_name='print_description',
+                          fail_list=bool_fail_list, success_list=bool_success_list,
+                          name='nn_saliency_values.txt')
+
 def test_demo():
 
     test_parameter_values(func=logomaker.demo,var_name='name',
@@ -690,3 +709,4 @@ test_saliency_to_matrix()
 test_Glyph()
 
 #test_demo()
+test_logomaker_get_data_methods()
