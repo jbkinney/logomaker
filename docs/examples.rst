@@ -245,7 +245,7 @@ Below is the code used to make the Logomaker logo. First, Figure and Axes object
 References
 ----------
 
-.. [#Tareen2019] Tareen A, Kinney JB (2019). Logomaker: beautiful sequence logos in Python. `bioRxiv doi:XXXX/XXXX. <https://biorxiv.org>`_
+.. [#Tareen2019] Tareen A, Kinney JB (2019). Logomaker: beautiful sequence logos in Python. `bioRxiv doi:10.1101/635029. <https://www.biorxiv.org/content/10.1101/635029v1>`_
 
 .. [#sortseq2010] Kinney JB, Murugan A, Callan CG, Cox EC (2010). Using deep sequencing to characterize the biophysical mechanism of a transcriptional regulatory sequence. Proc Natl Acad Sci USA 107:9158-9163. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/20439748>`_
 
