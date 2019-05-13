@@ -56,7 +56,7 @@ Resources
 Reference
 ----------
 
-.. [#Tareen2019] Tareen A, Kinney JB (2019) Logomaker: beautiful sequence logos in Python. `bioRxiv doi:XXXX/XXXX. <https://biorxiv.org>`_
+.. [#Tareen2019] Tareen A, Kinney JB (2019) Logomaker: beautiful sequence logos in Python. `bioRxiv doi:10.1101/635029. <https://www.biorxiv.org/content/10.1101/635029v1>`_
 
 
 Contact
