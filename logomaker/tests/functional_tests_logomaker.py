@@ -122,8 +122,8 @@ def test_parameter_values(func,
 def test_Logo():
 
     # df inputs that successfully execute when entered into Logo.
-    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
-    good_prob_df = logomaker.get_example_matrix('ss_probability_matrix')
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix', print_description=False)
+    good_prob_df = logomaker.get_example_matrix('ss_probability_matrix', print_description=False)
     random_df = pd.DataFrame(np.random.randint(0, 3, size=(10, 4)), columns=list('ACGT'))
 
     # df inputs that fail when entered into Logo.
@@ -205,7 +205,7 @@ def test_Logo():
 
 def test_Logo_style_glyphs():
 
-    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix', print_description=False)
 
     # test parameter color_scheme
     test_parameter_values(func=logomaker.Logo(good_crp_df).style_glyphs,var_name='color_scheme',
@@ -217,7 +217,7 @@ def test_Logo_style_glyphs():
 
 def test_Logo_fade_glyphs_in_probability_logo():
 
-    good_prob_df = logomaker.get_example_matrix('ss_probability_matrix')
+    good_prob_df = logomaker.get_example_matrix('ss_probability_matrix', print_description=False)
 
     # test parameter v_alpha0
     test_parameter_values(func=logomaker.Logo(good_prob_df).fade_glyphs_in_probability_logo, var_name='v_alpha0',
@@ -231,7 +231,7 @@ def test_Logo_fade_glyphs_in_probability_logo():
 
 def test_Logo_style_glyphs_below():
 
-    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix', print_description=False)
 
     # test parameter color
     test_parameter_values(func=logomaker.Logo(good_crp_df).style_glyphs_below, var_name='color',
@@ -257,7 +257,7 @@ def test_Logo_style_glyphs_below():
 
 def test_Logo_style_single_glyph():
 
-    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix', print_description=False)
 
     # test parameter p
     test_parameter_values(func=logomaker.Logo(good_crp_df).style_single_glyph, var_name='p',
@@ -270,7 +270,7 @@ def test_Logo_style_single_glyph():
 
 def test_Logo_style_glyphs_in_sequence():
 
-    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix', print_description=False)
 
     # randomly make up a sequence of the correct length
     test_good_sequence = np.random.choice(['A', 'C', 'G', 'T'], size=26, p=[0.25, 0.25, 0.25, 0.25])
@@ -288,7 +288,7 @@ def test_Logo_style_glyphs_in_sequence():
 
 def test_Logo_highlight_position():
 
-    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix', print_description=False)
 
     # test parameter p
     test_parameter_values(func=logomaker.Logo(good_crp_df).highlight_position, var_name='p',
@@ -296,7 +296,7 @@ def test_Logo_highlight_position():
 
 def test_Logo_highlight_position_range():
 
-    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix', print_description=False)
 
     # test parameter pmin
     test_parameter_values(func=logomaker.Logo(good_crp_df).highlight_position_range, var_name='pmin',
@@ -340,7 +340,7 @@ def test_Logo_highlight_position_range():
 
 def test_Logo_draw_baseline():
 
-    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix', print_description=False)
 
     # test parameter zorder
     test_parameter_values(func=logomaker.Logo(good_crp_df).draw_baseline, var_name='zorder',
@@ -357,7 +357,7 @@ def test_Logo_draw_baseline():
 
 def test_Logo_style_xticks():
 
-    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix', print_description=False)
 
     # test parameter anchor
     test_parameter_values(func=logomaker.Logo(good_crp_df).style_xticks, var_name='anchor',
@@ -378,7 +378,7 @@ def test_Logo_style_xticks():
 
 def test_Logo_style_spines():
 
-    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix')
+    good_crp_df = logomaker.get_example_matrix('crp_energy_matrix', print_description=False)
 
     # test parameter anchor
     test_parameter_values(func=logomaker.Logo(good_crp_df).style_spines, var_name='spines',
@@ -407,8 +407,8 @@ def test_Logo_style_spines():
 
 def test_transform_matrix():
 
-    good_crp_weight_df = logomaker.get_example_matrix('crp_energy_matrix')
-    good_crp_counts_df = logomaker.get_example_matrix('crp_counts_matrix')
+    good_crp_weight_df = logomaker.get_example_matrix('crp_energy_matrix', print_description=False)
+    good_crp_counts_df = logomaker.get_example_matrix('crp_counts_matrix', print_description=False)
 
     # test parameter df
     test_parameter_values(func=logomaker.transform_matrix, var_name='df',
@@ -534,7 +534,7 @@ def test_alignment_to_matrix():
 def test_saliency_to_matrix():
 
     # load saliency data
-    with logomaker.open_example_datafile('nn_saliency_values.txt') as f:
+    with logomaker.open_example_datafile('nn_saliency_values.txt', print_description=False) as f:
         saliency_data_df = pd.read_csv(f, comment='#', sep='\t')
 
     # test parameter seq
@@ -662,8 +662,8 @@ def test_Glyph():
 def test_logomaker_get_data_methods():
 
     # testing parameter name in get_example_matrix
-    test_parameter_values(func=logomaker.get_example_matrix,var_name='name',
-                          fail_list = ['wrong argument', -1], success_list=['crp_energy_matrix','ww_counts_matrix'])
+    test_parameter_values(func=logomaker.get_example_matrix, var_name='name',
+                          fail_list = ['wrong argument', -1], success_list=['crp_energy_matrix','ww_counts_matrix'], print_description=False)
 
     # testing parameter print_description in get_example_matrix
     test_parameter_values(func=logomaker.get_example_matrix, var_name='print_description',
@@ -671,7 +671,7 @@ def test_logomaker_get_data_methods():
 
     # testing parameter name in open_example_datafile
     test_parameter_values(func=logomaker.open_example_datafile, var_name='name',
-                          fail_list=['wrong argument', -1], success_list=['nn_saliency_values.txt', 'ss_sequences.txt'])
+                          fail_list=['wrong argument', -1], success_list=['nn_saliency_values.txt', 'ss_sequences.txt'], print_description=False)
 
     # testing parameter print_description in open_example_datafile
     test_parameter_values(func=logomaker.open_example_datafile, var_name='print_description',
@@ -686,27 +686,40 @@ def test_demo():
     plt.close('all')
 
 
-# run tests for the Logo class and it's helper methods
-test_Logo()
-test_Logo_style_glyphs()
-test_Logo_fade_glyphs_in_probability_logo()
-test_Logo_style_glyphs_below()
-test_Logo_style_single_glyph()
-test_Logo_style_glyphs_in_sequence()
-test_Logo_highlight_position()
-test_Logo_highlight_position_range()
-test_Logo_draw_baseline()
-test_Logo_style_xticks()
-test_Logo_style_spines()
+def run_tests():
+    """
+    Run all Logomaker functional tests. There are 547 tests as of 14 May 2019.
 
-# run tests for the methods in the matrix module
-test_transform_matrix()
-test_sequence_to_matrix()
-test_alignment_to_matrix()
-test_saliency_to_matrix()
+    parameters
+    ----------
+    None.
 
-# run tests for the Glyph class
-test_Glyph()
+    return
+    ------
+    None.
+    """
 
-#test_demo()
-test_logomaker_get_data_methods()
+    # run tests for the Logo class and it's helper methods
+    test_Logo()
+    test_Logo_style_glyphs()
+    test_Logo_fade_glyphs_in_probability_logo()
+    test_Logo_style_glyphs_below()
+    test_Logo_style_single_glyph()
+    test_Logo_style_glyphs_in_sequence()
+    test_Logo_highlight_position()
+    test_Logo_highlight_position_range()
+    test_Logo_draw_baseline()
+    test_Logo_style_xticks()
+    test_Logo_style_spines()
+
+    # run tests for the methods in the matrix module
+    test_transform_matrix()
+    test_sequence_to_matrix()
+    test_alignment_to_matrix()
+    test_saliency_to_matrix()
+
+    # run tests for the Glyph class
+    test_Glyph()
+
+    #test_demo()
+    test_logomaker_get_data_methods()

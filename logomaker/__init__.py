@@ -12,6 +12,7 @@ from logomaker.src.examples import list_example_matrices
 from logomaker.src.examples import get_example_matrix
 from logomaker.src.examples import list_example_datafiles
 from logomaker.src.examples import open_example_datafile
+from logomaker.tests.functional_tests_logomaker import run_tests
 
 
 # demo functions for logomaker
@@ -69,3 +70,4 @@ def demo(name='fig1b'):
         # returns logo if there is any
         logo = eval(logo_names[0])
         return logo
+

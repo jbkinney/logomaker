@@ -71,3 +71,11 @@ dataset functions
 .. _open_example_datafile:
 
 .. autofunction:: logomaker.open_example_datafile
+
+functional tests
+----------------
+
+.. _tests
+
+.. autofunction:: logomaker.run_tests
+
