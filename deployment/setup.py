@@ -5,7 +5,7 @@ def readme():
         return f.read()
 
 setup(name='logomaker',
-      version='0.0.1',
+      version='0.8.0',
       description='Package for making Sequence Logos',
       long_description=readme(),
       classifiers=[
