@@ -43,6 +43,15 @@ COLOR_SCHEME_DICT = {
         'GC': [0, 0, 1]
     },
 
+    # Suggested by Ryan Z. Friedman
+    # https://twitter.com/rfriedman22/status/1085722502649786368
+    'colorblind_safe': {
+        'A': '#009980',
+        'C': '#59B3E6',
+        'G': '#E69B04',
+        'T': '#1A1A1A'
+    },
+
     # Weblogo: http://weblogo.berkeley.edu/examples.html
     # BlockLogo: http://research4.dfci.harvard.edu/cvc/blocklogo/HTML/examples.php
     'weblogo_protein': {
