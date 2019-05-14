@@ -24,9 +24,6 @@ setup(name='logomaker',
       install_requires=[
         'numpy',
 		'matplotlib>=2.2.2',
-		'pandas',
-        'gzip',
-        'glob2',
-        'glob3'
+		'pandas'
       ],
       zip_safe=False)

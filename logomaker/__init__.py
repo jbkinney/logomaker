@@ -16,7 +16,7 @@ from logomaker.src.examples import open_example_datafile
 
 # demo functions for logomaker
 import os
-import glob
+import re
 from logomaker.src.error_handling import check, handle_errors
 
 @handle_errors
@@ -37,11 +37,14 @@ def demo(name='fig1b'):
 
     """
 
-    # build list of demo names and corresponding files
-    example_dir = os.path.dirname(__file__)
-    example_files = glob.glob('%s/examples/demo_*.py' % example_dir)
+    # build list of demo names and corresponding file names
+    example_dir = '%s/examples' % os.path.dirname(__file__)
+    all_base_file_names = os.listdir(example_dir)
+    example_file_names = ['%s/%s' % (example_dir, name)
+                     for name in all_base_file_names
+                     if re.match('demo_.*\.py', name)]
     examples_dict = {}
-    for file_name in example_files:
+    for file_name in example_file_names:
         key = file_name.split('_')[-1][:-3]
         examples_dict[key] = file_name
 
