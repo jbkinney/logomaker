@@ -723,3 +723,6 @@ def run_tests():
 
     #test_demo()
     test_logomaker_get_data_methods()
+
+if __name__ == '__main__':
+    run_tests()
