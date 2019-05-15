@@ -1,4 +1,4 @@
-#from __future__ import print_function   # so that print behaves like python 3.x not a special lambda statement
+from __future__ import print_function   # so that print behaves like python 3.x not a special lambda statement
 
 import sys
 sys.path.append('../../')
