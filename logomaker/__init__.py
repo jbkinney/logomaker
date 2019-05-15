@@ -14,7 +14,6 @@ from logomaker.src.examples import list_example_datafiles
 from logomaker.src.examples import open_example_datafile
 from logomaker.tests.functional_tests_logomaker import run_tests
 
-
 # demo functions for logomaker
 import os
 import re
@@ -41,9 +40,9 @@ def demo(name='fig1b'):
     # build list of demo names and corresponding file names
     example_dir = '%s/examples' % os.path.dirname(__file__)
     all_base_file_names = os.listdir(example_dir)
-    example_file_names = ['%s/%s' % (example_dir, name)
-                     for name in all_base_file_names
-                     if re.match('demo_.*\.py', name)]
+    example_file_names = ['%s/%s' % (example_dir, temp_name)
+                     for temp_name in all_base_file_names
+                     if re.match('demo_.*\.py', temp_name)]
     examples_dict = {}
     for file_name in example_file_names:
         key = file_name.split('_')[-1][:-3]
