@@ -22,5 +22,5 @@ crp_logo.ax.set_ylabel("$-\Delta \Delta G$ (kcal/mol)", labelpad=-1)
 crp_logo.ax.xaxis.set_ticks_position('none')
 crp_logo.ax.xaxis.set_tick_params(pad=-1)
 
-# show plot
-plt.show()
+# style and show figure
+crp_logo.fig.show()

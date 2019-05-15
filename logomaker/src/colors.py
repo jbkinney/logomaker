@@ -49,7 +49,7 @@ COLOR_SCHEME_DICT = {
         'A': '#009980',
         'C': '#59B3E6',
         'G': '#E69B04',
-        'T': '#1A1A1A'
+        'TU': '#1A1A1A'
     },
 
     # Weblogo: http://weblogo.berkeley.edu/examples.html

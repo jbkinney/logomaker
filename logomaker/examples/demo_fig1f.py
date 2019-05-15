@@ -41,4 +41,4 @@ nn_logo.ax.text(20,2*y,'$U2SURP$',fontsize=12)
 nn_logo.ax.text(exon_start, 2.5*y,'chr3:142,740,192', verticalalignment='top', horizontalalignment='center')
 
 # show plot
-plt.show()
+nn_logo.fig.show()

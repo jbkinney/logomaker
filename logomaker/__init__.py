@@ -16,6 +16,7 @@ from logomaker.tests.functional_tests_logomaker import run_tests
 
 
 # demo functions for logomaker
+import matplotlib.pyplot as plt
 import os
 import re
 from logomaker.src.error_handling import check, handle_errors
@@ -63,11 +64,6 @@ def demo(name='fig1b'):
               (file_name, line, content, line))
     exec(open(file_name).read())
 
-    # Find logo in name space and, if it exists, return
-    logo_names = [name for name in dir() if name[-5:] == '_logo']
-    if len(logo_names) == 1:
-
-        # returns logo if there is any
-        logo = eval(logo_names[0])
-        return logo
+    # return the current matplotlib Figure object
+    return plt.gcf()
 

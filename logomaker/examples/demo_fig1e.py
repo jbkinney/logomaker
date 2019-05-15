@@ -43,4 +43,4 @@ ars_logo.ax.set_yticks([-4, -2, 0, 2, 4])
 ars_logo.ax.set_xticks([])
 
 # show plot
-plt.show()
+ars_logo.fig.show()

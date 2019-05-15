@@ -23,4 +23,4 @@ ww_logo.ax.set_ylabel('information (bits)')
 ww_logo.ax.set_xlim([-1, len(ww_df)])
 
 # show plot
-plt.show()
+ww_logo.fig.show()

@@ -38,7 +38,7 @@ ax.set_xticks([])
 ax.set_yticks([])
 
 # tighten layout
-plt.tight_layout()
+logo_logo.fig.tight_layout()
 
 # show plot
-plt.show()
+logo_logo.fig.show()

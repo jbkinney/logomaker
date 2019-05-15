@@ -26,4 +26,4 @@ ss_logo.ax.axvline(2.5, color='k', linewidth=1, linestyle=':')
 ss_logo.ax.set_ylabel('probability')
 
 # show plot
-plt.show()
+ss_logo.fig.show()
