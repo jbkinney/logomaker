@@ -1,6 +1,7 @@
 # logomaker 
 
 [![Downloads](https://pepy.tech/badge/logomaker)](https://pepy.tech/project/logomaker)
+[![PyPI version](https://badge.fury.io/py/logomaker.svg)](https://badge.fury.io/py/logomaker)
 
 Software for creating highly customized sequence logos
 
