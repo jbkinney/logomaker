@@ -27,9 +27,9 @@ copyright = '2019, Ammar Tareen and Justin B. Kinney'
 author = 'Ammar Tareen and Justin B. Kinney'
 
 # The short X.Y version
-version = '0.7'
+version = '0.8'
 # The full version, including alpha/beta/rc tags
-release = '0.7'
+release = '0.8'
 
 
 # -- General configuration ---------------------------------------------------
