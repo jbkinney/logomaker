@@ -20,7 +20,7 @@ Installation
 
 Logomaker has minimal dependencies and is compatible with both Python 2.7 and Python 3.6.
 The code for Logomaker is available on `GitHub <https://github.com/jbkinney/logomaker>`_ under an MIT open source license.
-Logomaker can be installed using the ``pip`` package manager by executing the following at the commandline: ::
+Logomaker can be installed from `PyPI <https://pypi.org/project/logomaker/>`_ using the ``pip`` package manager by executing the following at the commandline: ::
 
     pip install logomaker
 
@@ -62,14 +62,13 @@ Reference
 Contact
 -------
 
-For technical assistance or to report bugs, please
-contact `Ammar Tareen <tareen@cshl.edu>`_.
+For technical assistance or to report bugs, please contact Ammar Tareen (`Email: tareen@cshl.edu <tareen@cshl.edu>`_, `Twitter: @AmmarTareen1 <https://twitter.com/AmmarTareen1>`_) . For more general correspondence, please contact Justin Kinney (`Email: jkinney@cshl.edu <jkinney@cshl.edu>`_, `Twitter: @jbkinney <https://twitter.com/jbkinney>`_).
 
-For more general correspondence, please
-contact `Justin Kinney <jkinney@cshl.edu>`_.
+Links
+-----
 
-Other links:
-
+- `Logomaker preprint on bioRxiv <https://www.biorxiv.org/content/10.1101/635029v1>`_
+- `Logomaker on GitHub <https://github.com/jbkinney/logomaker>`_
+- `Logomaker on PyPI <https://pypi.org/project/logomaker/>`_
 - `Kinney Lab <http://kinneylab.labsites.cshl.edu/>`_
-- `Simons Center for Quantitative Biology <https://www.cshl.edu/research/quantitative-biology/>`_
 - `Cold Spring Harbor Laboratory <https://www.cshl.edu/>`_
