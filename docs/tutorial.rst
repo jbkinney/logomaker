@@ -15,6 +15,9 @@ Lesson 1: Basic logo creation and styling
 Shows how to load data into Logomaker, draw a logo, and perform some basic logo styling.
 `Access notebook on GitHub <https://github.com/jbkinney/logomaker/blob/master/logomaker/tutorials/1_simple_example_basic_styling.ipynb>`_.
 
+.. image:: https://mybinder.org/badge_logo.svg
+ :target: https://mybinder.org/v2/gh/jbkinney/logomaker/master?filepath=logomaker%2Ftutorials%2F1_simple_example_basic_styling.ipynb
+
 Lesson 2: Logos from alignments
 -------------------------------
 
