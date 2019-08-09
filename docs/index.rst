@@ -47,7 +47,8 @@ Tutorial
 
 A tutorial for Logomaker is provided via a series of `Jupyter notebooks <https://jupyter.org/>`_.
 Each notebook focuses on a different aspect of the Logomaker functionality. To run each tutorial
-interactively, click the binder badge below.
+interactively, click the binder badge below. View the notebooks statically on github: 
+`tutorial notebooks <https://github.com/jbkinney/logomaker/tree/master/logomaker/tutorials>`_.
 
 .. image:: https://mybinder.org/badge_logo.svg
  :target: https://mybinder.org/v2/gh/jbkinney/logomaker/master?filepath=logomaker%2Ftutorials
