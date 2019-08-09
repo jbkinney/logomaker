@@ -45,13 +45,14 @@ We note that the logo shown here is from Figure 1B of Tareen and Kinney (2019) [
 Tutorial
 --------
 
-A tutorial for Logomaker is provided via a series of `Jupyter notebooks <https://jupyter.org/>`_.
-Each notebook focuses on a different aspect of the Logomaker functionality. To run each tutorial
-interactively, click the binder badge below. View the notebooks statically on github: 
-`tutorial notebooks <https://github.com/jbkinney/logomaker/tree/master/logomaker/tutorials>`_.
+A tutorial is available via a series of Jupyter notebooks, each of which focuses on a different aspect of Logomaker's functionality. To run each notebook
+interactively, click the Binder badge below. To instead view the notebooks statically on GitHub,
+`click here <https://github.com/jbkinney/logomaker/tree/master/logomaker/tutorials>`_.
+
 
 .. image:: https://mybinder.org/badge_logo.svg
  :target: https://mybinder.org/v2/gh/jbkinney/logomaker/master?filepath=logomaker%2Ftutorials
+
 
 Resources
 ---------
