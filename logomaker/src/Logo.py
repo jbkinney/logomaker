@@ -583,8 +583,8 @@ class Logo:
         """
 
         # validate p is an integer
-        check(isinstance(p, int),
-              'type(p) = %s must be of type int' % type(p))
+        check(isinstance(p, (int, np.int64)),
+              'type(p) = %s must be of type int or numpy.int64' % type(p))
 
         # check p is a valid position
         check(p in self.glyph_df.index,
