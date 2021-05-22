@@ -2,7 +2,7 @@ from __future__ import division
 import numpy as np
 import pandas as pd
 from matplotlib.colors import to_rgb
-
+import warnings
 from logomaker.src.error_handling import check
 from logomaker.src.matrix import ALPHABET_DICT
 
@@ -346,7 +346,7 @@ def get_color_dict(color_scheme, chars):
     if not set(chars) <= set(color_dict.keys()):
         for c in chars:
             if not c in color_dict:
-                print(" Warning: Character '%s' is not in color_dict. " % c +
+                warnings.warn(" Warning: Character '%s' is not in color_dict. " % c +
                       "Using black.")
                 color_dict[c] = to_rgb('black')
 
