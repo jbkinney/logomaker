@@ -1,7 +1,7 @@
 from __future__ import division
 from functools import wraps
-
-
+import warnings, sys
+from typing import Union
 class LogomakerError(Exception):
     """
     Class used by Logomaker to handle errors.
@@ -21,7 +21,6 @@ class LogomakerError(Exception):
     def __str__(self):
         return self.message
 
-
 class DebugResult:
     """
     Container class for debugging results.
@@ -31,7 +30,7 @@ class DebugResult:
         self.mistake = mistake
 
 
-def check(condition, message):
+def check(condition: bool, message: str, warn: bool = None):
 
     """
     Checks a condition; raises a LogomakerError with message if condition
@@ -46,14 +45,20 @@ def check(condition, message):
 
     message: (str)
         The string to show user if condition is False.
-
+        
+    warn: (bool)
+        warn instead or raise error
+        
     returns
     -------
     None
     """
-
     if not condition:
-        raise LogomakerError(message)
+        Error = LogomakerError(message)
+        if warn:
+            warnings.warn(Error)
+        else:
+            raise Error
 
 
 def handle_errors(func):
@@ -119,14 +124,12 @@ def handle_errors(func):
 
             # If running functional test and expect to fail
             if should_fail is True:
-                print('Expected error:',
-                      e.__str__())
+                print("Expected error: {}".format(e.__str__()))
                 mistake = False
 
             # If running functional test and expect to pass
             elif should_fail is False:
-                print('UNEXPECTED ERROR:',
-                      e.__str__())
+                print("UNEXPECTED ERROR: {}".format(e.__str__()))
                 mistake = True
 
             # Otherwise, raise error

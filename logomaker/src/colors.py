@@ -346,10 +346,11 @@ def get_color_dict(color_scheme, chars):
     if not set(chars) <= set(color_dict.keys()):
         for c in chars:
             if not c in color_dict:
-                print(" Warning: Character '%s' is not in color_dict. " % c +
-                      "Using black.")
+                check(False,
+                      " Warning: Character '%s' is not in color_dict. " % c +
+                      "Using black.",
+                      warn=True)
                 color_dict[c] = to_rgb('black')
-
     return color_dict
 
 

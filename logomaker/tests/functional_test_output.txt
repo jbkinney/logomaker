@@ -1,27 +1,3 @@
-Description of example matrix "crp_energy_matrix":
-# 
-# CRP energy matrix from Kinney et al. (2010).
-# Matrix values are in units of kcal/mol.
-# 
-# References
-# 
-# Kinney JB et al. (2010) Using deep sequencing to characterize the
-# biophysical mechanism of a transcriptional regulatory sequence.
-# Proc Natl Acad Sci USA. 107(20):9158–63.
-# 
-
-Description of example matrix "ss_probability_matrix":
-# 
-# Probability matrix for all 5'ss sequences in the human genome.
-# Sequences were parsed from hg38 using GENCODE annotation.
-# Only sequences of the form NNNGYNNNN were considered.
-# 
-# References
-# 
-# Frankish A et al. (2019) GENCODE reference annotation
-# for the human and mouse genomes. Nucl Acids Res. 47(D1):D766–73.
-# 
-
 Testing Logo() parameter df ...
 Test # 0: Expected error: out_df needs to be a valid pandas out_df, out_df entered: <class 'list'>
 Test # 1: Expected error: out_df needs to be a valid pandas out_df, out_df entered: <class 'str'>
@@ -160,18 +136,6 @@ Test # 91: Expected success.
 Test # 92: Expected success.
 Tests passed: 93. Tests failed: 0.
 
-Description of example matrix "crp_energy_matrix":
-# 
-# CRP energy matrix from Kinney et al. (2010).
-# Matrix values are in units of kcal/mol.
-# 
-# References
-# 
-# Kinney JB et al. (2010) Using deep sequencing to characterize the
-# biophysical mechanism of a transcriptional regulatory sequence.
-# Proc Natl Acad Sci USA. 107(20):9158–63.
-# 
-
 Testing style_glyphs() parameter color_scheme ...
 Test # 93: Expected error: invalid choice: color_scheme=bad_color_scheme
 Test # 94: Expected error: Error: color_scheme has invalid type <class 'int'>
@@ -180,18 +144,6 @@ Test # 96: Expected success.
 Test # 97: Expected success.
 Test # 98: Expected success.
 Tests passed: 99. Tests failed: 0.
-
-Description of example matrix "ss_probability_matrix":
-# 
-# Probability matrix for all 5'ss sequences in the human genome.
-# Sequences were parsed from hg38 using GENCODE annotation.
-# Only sequences of the form NNNGYNNNN were considered.
-# 
-# References
-# 
-# Frankish A et al. (2019) GENCODE reference annotation
-# for the human and mouse genomes. Nucl Acids Res. 47(D1):D766–73.
-# 
 
 Testing fade_glyphs_in_probability_logo() parameter v_alpha0 ...
 Test # 99: Expected error: v_alpha0 must be between 0 and 1; value is -1.000000.
@@ -214,18 +166,6 @@ Test # 112: Expected success.
 Test # 113: Expected success.
 Test # 114: Expected success.
 Tests passed: 115. Tests failed: 0.
-
-Description of example matrix "crp_energy_matrix":
-# 
-# CRP energy matrix from Kinney et al. (2010).
-# Matrix values are in units of kcal/mol.
-# 
-# References
-# 
-# Kinney JB et al. (2010) Using deep sequencing to characterize the
-# biophysical mechanism of a transcriptional regulatory sequence.
-# Proc Natl Acad Sci USA. 107(20):9158–63.
-# 
 
 Testing style_glyphs_below() parameter color ...
 Test # 115: Expected error: type(color_spec) = <class 'int'> is invalid.
@@ -276,22 +216,10 @@ Test # 147: Expected success.
 Test # 148: Expected success.
 Tests passed: 149. Tests failed: 0.
 
-Description of example matrix "crp_energy_matrix":
-# 
-# CRP energy matrix from Kinney et al. (2010).
-# Matrix values are in units of kcal/mol.
-# 
-# References
-# 
-# Kinney JB et al. (2010) Using deep sequencing to characterize the
-# biophysical mechanism of a transcriptional regulatory sequence.
-# Proc Natl Acad Sci USA. 107(20):9158–63.
-# 
-
 Testing style_single_glyph() parameter p ...
 Test # 149: Expected error: p=-1 is not a valid position
-Test # 150: Expected error: type(p) = <class 'str'> must be of type int
-Test # 151: Expected error: type(p) = <class 'float'> must be of type int
+Test # 150: Expected error: type(p) = <class 'str'> must be of type int or numpy.int64
+Test # 151: Expected error: type(p) = <class 'float'> must be of type int or numpy.int64
 Test # 152: Expected error: p=10000 is not a valid position
 Test # 153: Expected success.
 Test # 154: Expected success.
@@ -308,18 +236,6 @@ Test # 161: Expected success.
 Test # 162: Expected success.
 Tests passed: 163. Tests failed: 0.
 
-Description of example matrix "crp_energy_matrix":
-# 
-# CRP energy matrix from Kinney et al. (2010).
-# Matrix values are in units of kcal/mol.
-# 
-# References
-# 
-# Kinney JB et al. (2010) Using deep sequencing to characterize the
-# biophysical mechanism of a transcriptional regulatory sequence.
-# Proc Natl Acad Sci USA. 107(20):9158–63.
-# 
-
 Testing style_glyphs_in_sequence() parameter sequence ...
 Test # 163: Expected error: type(sequence) = <class 'int'> must be of type str
 Test # 164: Expected error: sequence to restyle (length 1) must have same length as logo (length 26).
@@ -328,18 +244,6 @@ Test # 166: Expected error: sequence to restyle (length 10) must have same lengt
 Test # 167: Expected success.
 Tests passed: 168. Tests failed: 0.
 
-Description of example matrix "crp_energy_matrix":
-# 
-# CRP energy matrix from Kinney et al. (2010).
-# Matrix values are in units of kcal/mol.
-# 
-# References
-# 
-# Kinney JB et al. (2010) Using deep sequencing to characterize the
-# biophysical mechanism of a transcriptional regulatory sequence.
-# Proc Natl Acad Sci USA. 107(20):9158–63.
-# 
-
 Testing highlight_position() parameter p ...
 Test # 168: Expected error: type(p) = <class 'str'> must be of type int
 Test # 169: Expected error: type(p) = <class 'float'> must be of type int
@@ -347,18 +251,6 @@ Test # 170: Expected success.
 Test # 171: Expected success.
 Test # 172: Expected success.
 Tests passed: 173. Tests failed: 0.
-
-Description of example matrix "crp_energy_matrix":
-# 
-# CRP energy matrix from Kinney et al. (2010).
-# Matrix values are in units of kcal/mol.
-# 
-# References
-# 
-# Kinney JB et al. (2010) Using deep sequencing to characterize the
-# biophysical mechanism of a transcriptional regulatory sequence.
-# Proc Natl Acad Sci USA. 107(20):9158–63.
-# 
 
 Testing highlight_position_range() parameter pmin ...
 Test # 173: Expected error: type(pmin) = <class 'str'> must be a number
@@ -429,18 +321,6 @@ Test # 216: Expected success.
 Test # 217: Expected success.
 Tests passed: 218. Tests failed: 0.
 
-Description of example matrix "crp_energy_matrix":
-# 
-# CRP energy matrix from Kinney et al. (2010).
-# Matrix values are in units of kcal/mol.
-# 
-# References
-# 
-# Kinney JB et al. (2010) Using deep sequencing to characterize the
-# biophysical mechanism of a transcriptional regulatory sequence.
-# Proc Natl Acad Sci USA. 107(20):9158–63.
-# 
-
 Testing draw_baseline() parameter zorder ...
 Test # 218: Expected error: type(zorder) = <class 'str'>; must a float or int.
 Test # 219: Expected error: type(zorder) = <class 'NoneType'>; must a float or int.
@@ -469,18 +349,6 @@ Test # 235: Expected success.
 Test # 236: Expected success.
 Test # 237: Expected success.
 Tests passed: 238. Tests failed: 0.
-
-Description of example matrix "crp_energy_matrix":
-# 
-# CRP energy matrix from Kinney et al. (2010).
-# Matrix values are in units of kcal/mol.
-# 
-# References
-# 
-# Kinney JB et al. (2010) Using deep sequencing to characterize the
-# biophysical mechanism of a transcriptional regulatory sequence.
-# Proc Natl Acad Sci USA. 107(20):9158–63.
-# 
 
 Testing style_xticks() parameter anchor ...
 Test # 238: Expected error: type(anchor) = <class 'str'> must be of type int
@@ -515,18 +383,6 @@ Test # 257: Expected success.
 Test # 258: Expected success.
 Test # 259: Expected success.
 Tests passed: 260. Tests failed: 0.
-
-Description of example matrix "crp_energy_matrix":
-# 
-# CRP energy matrix from Kinney et al. (2010).
-# Matrix values are in units of kcal/mol.
-# 
-# References
-# 
-# Kinney JB et al. (2010) Using deep sequencing to characterize the
-# biophysical mechanism of a transcriptional regulatory sequence.
-# Proc Natl Acad Sci USA. 107(20):9158–63.
-# 
 
 Testing style_spines() parameter spines ...
 Test # 260: Expected error: type(spines) = <class 'str'>; must be of type (tuple, list, set) 
@@ -575,30 +431,6 @@ Test # 290: Expected success.
 Test # 291: Expected success.
 Tests passed: 292. Tests failed: 0.
 
-Description of example matrix "crp_energy_matrix":
-# 
-# CRP energy matrix from Kinney et al. (2010).
-# Matrix values are in units of kcal/mol.
-# 
-# References
-# 
-# Kinney JB et al. (2010) Using deep sequencing to characterize the
-# biophysical mechanism of a transcriptional regulatory sequence.
-# Proc Natl Acad Sci USA. 107(20):9158–63.
-# 
-
-Description of example matrix "crp_counts_matrix":
-# 
-# CRP counts matrix. Created from the CRP binding sites from listed in RegulonDB.
-# 
-# References
-# 
-# Salgado H, et al. (2013) RegulonDB v8.0: omics data sets, evolutionary
-# conservation, regulatory phrases, cross-validated gold standards
-# and more. Nucl Acids Res. 41(Database issue):D203–13.
-# 
-# 
-
 Testing transform_matrix() parameter df ...
 Test # 292: Expected error: out_df needs to be a valid pandas out_df, out_df entered: <class 'str'>
 Test # 293: Expected error: Some data frame entries are negative.
@@ -635,15 +467,15 @@ Test # 311: Expected success.
 Tests passed: 312. Tests failed: 0.
 
 Testing transform_matrix() parameter from_type ...
-Test # 312: Expected error: from_type = 1 must be None or in {'counts', 'probability', 'information', 'weight'}
-Test # 313: Expected error: from_type = x must be None or in {'counts', 'probability', 'information', 'weight'}
+Test # 312: Expected error: from_type = 1 must be None or in {'probability', 'weight', 'counts', 'information'}
+Test # 313: Expected error: from_type = x must be None or in {'probability', 'weight', 'counts', 'information'}
 Test # 314: Expected error: Unless center_values is True or normalize_values is True,Neither from_type (=None) nor to_type (=probability) can be None.
 Test # 315: Expected success.
 Tests passed: 316. Tests failed: 0.
 
 Testing transform_matrix() parameter to_type ...
-Test # 316: Expected error: to_type = 1 must be None or in {'counts', 'probability', 'information', 'weight'}
-Test # 317: Expected error: to_type = x must be None or in {'counts', 'probability', 'information', 'weight'}
+Test # 316: Expected error: to_type = 1 must be None or in {'probability', 'weight', 'counts', 'information'}
+Test # 317: Expected error: to_type = x must be None or in {'probability', 'weight', 'counts', 'information'}
 Test # 318: Expected error: Unless center_values is True or normalize_values is True,Neither from_type (=counts) nor to_type (=None) can be None.
 Test # 319: Expected success.
 Test # 320: Expected success.
@@ -710,9 +542,9 @@ Test # 356: Expected success.
 Tests passed: 357. Tests failed: 0.
 
 Testing sequence_to_matrix() parameter to_type ...
-Test # 357: Expected error: invalid to_type=0; to_type must be in {'probability', 'information', 'weight'}
-Test # 358: Expected error: invalid to_type=True; to_type must be in {'probability', 'information', 'weight'}
-Test # 359: Expected error: invalid to_type=xxx; to_type must be in {'probability', 'information', 'weight'}
+Test # 357: Expected error: invalid to_type=0; to_type must be in {'probability', 'weight', 'information'}
+Test # 358: Expected error: invalid to_type=True; to_type must be in {'probability', 'weight', 'information'}
+Test # 359: Expected error: invalid to_type=xxx; to_type must be in {'probability', 'weight', 'information'}
 Test # 360: Expected success.
 Test # 361: Expected success.
 Test # 362: Expected success.
@@ -744,9 +576,9 @@ Test # 378: Expected success.
 Tests passed: 379. Tests failed: 0.
 
 Testing alignment_to_matrix() parameter to_type ...
-Test # 379: Expected error: to_type=0; must be in {'counts', 'probability', 'information', 'weight'}
-Test # 380: Expected error: to_type=True; must be in {'counts', 'probability', 'information', 'weight'}
-Test # 381: Expected error: to_type=xxx; must be in {'counts', 'probability', 'information', 'weight'}
+Test # 379: Expected error: to_type=0; must be in {'probability', 'weight', 'counts', 'information'}
+Test # 380: Expected error: to_type=True; must be in {'probability', 'weight', 'counts', 'information'}
+Test # 381: Expected error: to_type=xxx; must be in {'probability', 'weight', 'counts', 'information'}
 Test # 382: Expected success.
 Test # 383: Expected success.
 Test # 384: Expected success.
@@ -789,18 +621,6 @@ Test # 408: Expected success.
 Test # 409: Expected success.
 Tests passed: 410. Tests failed: 0.
 
-Description of example matrix "nn_saliency_values.txt":
-# 
-# Saliency values illustrated in Figure 1F.
-# Data are from Figure 1D of Janganathan et al. (2019),
-# and were kindly provided by Kyle Farh and Kishore Jaganathan.
-# 
-# References:
-# 
-# Jaganathan K et al. (2019) Predicting Splicing from Primary Sequence with
-# Deep Learning. Cell. 176(3):535–548.e24.
-# 
-
 Testing saliency_to_matrix() parameter seq ...
 Test # 410: Expected error: length of seq and values list must be equal.
 Test # 411: Expected error: length of seq and values list must be equal.
@@ -831,156 +651,240 @@ Test # 426: Expected success.
 Tests passed: 427. Tests failed: 0.
 
 Testing Glyph() parameter p ...
-Test # 427: Expected error: type(p) = <class 'str'> must be a number
-Test # 428: Expected error: type(p) = <class 'NoneType'> must be a number
+Test # 427: Expected success.
+Test # 428: Expected success.
 Test # 429: Expected success.
 Test # 430: Expected success.
-Test # 431: Expected success.
-Test # 432: Expected success.
-Tests passed: 433. Tests failed: 0.
+Tests passed: 431. Tests failed: 0.
 
 Testing Glyph() parameter c ...
-Test # 433: Expected error: type(c) = <class 'int'>; must be of type str 
-Test # 434: Expected error: type(c) = <class 'float'>; must be of type str 
-Test # 435: Expected error: type(c) = <class 'NoneType'>; must be of type str 
+Test # 431: Expected error: type(c) = <class 'int'>; must be of type str 
+Test # 432: Expected error: type(c) = <class 'float'>; must be of type str 
+Test # 433: Expected error: type(c) = <class 'NoneType'>; must be of type str 
+Test # 434: Expected success.
+Test # 435: Expected success.
 Test # 436: Expected success.
-Test # 437: Expected success.
-Test # 438: Expected success.
-Tests passed: 439. Tests failed: 0.
+Tests passed: 437. Tests failed: 0.
 
 Testing Glyph() parameter floor ...
-Test # 439: Expected error: type(floor) = <class 'str'> must be a number
-Test # 440: Expected error: must have floor <= ceiling. Currently, floor=2.000000, ceiling=1.000000
-Test # 441: Expected error: type(floor) = <class 'NoneType'> must be a number
+Test # 437: Expected error: type(floor) = <class 'str'> must be a number
+Test # 438: Expected error: must have floor <= ceiling. Currently, floor=2.000000, ceiling=1.000000
+Test # 439: Expected error: type(floor) = <class 'NoneType'> must be a number
+Test # 440: Expected success.
+Test # 441: Expected success.
 Test # 442: Expected success.
-Test # 443: Expected success.
-Test # 444: Expected success.
-Tests passed: 445. Tests failed: 0.
+Tests passed: 443. Tests failed: 0.
 
 Testing Glyph() parameter ceiling ...
-Test # 445: Expected error: type(ceiling) = <class 'str'> must be a number
-Test # 446: Expected error: must have floor <= ceiling. Currently, floor=0.000000, ceiling=-1.000000
-Test # 447: Expected error: type(ceiling) = <class 'NoneType'> must be a number
+Test # 443: Expected error: type(ceiling) = <class 'str'> must be a number
+Test # 444: Expected error: must have floor <= ceiling. Currently, floor=0.000000, ceiling=-1.000000
+Test # 445: Expected error: type(ceiling) = <class 'NoneType'> must be a number
+Test # 446: Expected success.
+Test # 447: Expected success.
 Test # 448: Expected success.
-Test # 449: Expected success.
-Test # 450: Expected success.
-Tests passed: 451. Tests failed: 0.
+Tests passed: 449. Tests failed: 0.
 
 Testing Glyph() parameter ax ...
-Test # 451: Expected error: ax must be either a matplotlib Axes object or None.
-Test # 452: Expected error: ax must be either a matplotlib Axes object or None.
-Test # 453: Expected success.
-Test # 454: Expected success.
-Tests passed: 455. Tests failed: 0.
+Test # 449: Expected error: ax must be either a matplotlib Axes object or None.
+Test # 450: Expected error: ax must be either a matplotlib Axes object or None.
+Test # 451: Expected success.
+Test # 452: Expected success.
+Tests passed: 453. Tests failed: 0.
 
 Testing Glyph() parameter width ...
-Test # 455: Expected error: type(width) = <class 'str'>; must be of type float or int 
-Test # 456: Expected error: width = -1 must be > 0 
+Test # 453: Expected error: type(width) = <class 'str'>; must be of type float or int 
+Test # 454: Expected error: width = -1 must be > 0 
+Test # 455: Expected success.
+Test # 456: Expected success.
 Test # 457: Expected success.
-Test # 458: Expected success.
-Test # 459: Expected success.
-Tests passed: 460. Tests failed: 0.
+Tests passed: 458. Tests failed: 0.
 
 Testing Glyph() parameter vpad ...
-Test # 460: Expected error: type(vpad) = <class 'str'>; must be of type float or int 
-Test # 461: Expected error: vpad = -1 must be >= 0 and < 1 
-Test # 462: Expected error: type(vpad) = <class 'NoneType'>; must be of type float or int 
-Test # 463: Expected error: vpad = 1 must be >= 0 and < 1 
+Test # 458: Expected error: type(vpad) = <class 'str'>; must be of type float or int 
+Test # 459: Expected error: vpad = -1 must be >= 0 and < 1 
+Test # 460: Expected error: type(vpad) = <class 'NoneType'>; must be of type float or int 
+Test # 461: Expected error: vpad = 1 must be >= 0 and < 1 
+Test # 462: Expected success.
+Test # 463: Expected success.
 Test # 464: Expected success.
-Test # 465: Expected success.
+Tests passed: 465. Tests failed: 0.
+
+Testing Glyph() parameter font_name ...
+Test # 465: Expected error: type(font_name) = <class 'int'> must be of type str
 Test # 466: Expected success.
 Tests passed: 467. Tests failed: 0.
 
-Testing Glyph() parameter font_name ...
-Test # 467: Expected error: type(font_name) = <class 'int'> must be of type str
-Test # 468: Expected success.
-Tests passed: 469. Tests failed: 0.
-
 Testing Glyph() parameter font_weight ...
-Test # 469: Expected error: font_weight must be in range [0,1000]
-Test # 470: Expected error: font_weight must be one of ['ultralight', 'light', 'normal', 'regular', 'book', 'medium', 'roman', 'semibold', 'demibold', 'demi', 'bold', 'heavy', 'extra bold', 'black']
+Test # 467: Expected error: font_weight must be in range [0,1000]
+Test # 468: Expected error: font_weight must be one of ['ultralight', 'light', 'normal', 'regular', 'book', 'medium', 'roman', 'semibold', 'demibold', 'demi', 'bold', 'heavy', 'extra bold', 'black']
+Test # 469: Expected success.
+Test # 470: Expected success.
 Test # 471: Expected success.
-Test # 472: Expected success.
-Test # 473: Expected success.
-Tests passed: 474. Tests failed: 0.
+Tests passed: 472. Tests failed: 0.
 
 Testing Glyph() parameter color ...
-Test # 474: Expected error: type(color_spec) = <class 'int'> is invalid.
-Test # 475: Expected error: invalid choice: color_spec=xxx
+Test # 472: Expected error: type(color_spec) = <class 'int'> is invalid.
+Test # 473: Expected error: invalid choice: color_spec=xxx
+Test # 474: Expected success.
+Test # 475: Expected success.
 Test # 476: Expected success.
 Test # 477: Expected success.
-Test # 478: Expected success.
-Test # 479: Expected success.
-Tests passed: 480. Tests failed: 0.
+Tests passed: 478. Tests failed: 0.
 
 Testing Glyph() parameter edgecolor ...
-Test # 480: Expected error: type(color_spec) = <class 'int'> is invalid.
-Test # 481: Expected error: invalid choice: color_spec=xxx
+Test # 478: Expected error: type(color_spec) = <class 'int'> is invalid.
+Test # 479: Expected error: invalid choice: color_spec=xxx
+Test # 480: Expected success.
+Test # 481: Expected success.
 Test # 482: Expected success.
 Test # 483: Expected success.
-Test # 484: Expected success.
-Test # 485: Expected success.
-Tests passed: 486. Tests failed: 0.
+Tests passed: 484. Tests failed: 0.
 
 Testing Glyph() parameter edgewidth ...
-Test # 486: Expected error: type(edgewidth) = <class 'str'> must be a number
-Test # 487: Expected error:  edgewidth must be >= 0; is -1.000000
-Test # 488: Expected error: type(edgewidth) = <class 'NoneType'> must be a number
+Test # 484: Expected error: type(edgewidth) = <class 'str'> must be a number
+Test # 485: Expected error:  edgewidth must be >= 0; is -1.000000
+Test # 486: Expected error: type(edgewidth) = <class 'NoneType'> must be a number
+Test # 487: Expected success.
+Test # 488: Expected success.
 Test # 489: Expected success.
-Test # 490: Expected success.
-Test # 491: Expected success.
-Tests passed: 492. Tests failed: 0.
+Tests passed: 490. Tests failed: 0.
 
 Testing Glyph() parameter dont_stretch_more_than ...
-Test # 492: Expected error: type(dont_stretch_more_than) = <class 'int'>; must be of type str 
-Test # 493: Expected error: type(dont_stretch_more_than) = <class 'NoneType'>; must be of type str 
-Test # 494: Expected success.
-Test # 495: Expected success.
-Tests passed: 496. Tests failed: 0.
+Test # 490: Expected error: type(dont_stretch_more_than) = <class 'int'>; must be of type str 
+Test # 491: Expected error: type(dont_stretch_more_than) = <class 'NoneType'>; must be of type str 
+Test # 492: Expected success.
+Test # 493: Expected success.
+Tests passed: 494. Tests failed: 0.
 
 Testing Glyph() parameter flip ...
-Test # 496: Expected error: type(flip) = <class 'int'>; must be of type bool 
-Test # 497: Expected error: type(flip) = <class 'int'>; must be of type bool 
-Test # 498: Expected error: type(flip) = <class 'str'>; must be of type bool 
-Test # 499: Expected error: type(flip) = <class 'str'>; must be of type bool 
-Test # 500: Expected error: type(flip) = <class 'int'>; must be of type bool 
-Test # 501: Expected success.
-Test # 502: Expected success.
-Tests passed: 503. Tests failed: 0.
+Test # 494: Expected error: type(flip) = <class 'int'>; must be of type bool 
+Test # 495: Expected error: type(flip) = <class 'int'>; must be of type bool 
+Test # 496: Expected error: type(flip) = <class 'str'>; must be of type bool 
+Test # 497: Expected error: type(flip) = <class 'str'>; must be of type bool 
+Test # 498: Expected error: type(flip) = <class 'int'>; must be of type bool 
+Test # 499: Expected success.
+Test # 500: Expected success.
+Tests passed: 501. Tests failed: 0.
 
 Testing Glyph() parameter mirror ...
-Test # 503: Expected error: type(mirror) = <class 'int'>; must be of type bool 
-Test # 504: Expected error: type(mirror) = <class 'int'>; must be of type bool 
-Test # 505: Expected error: type(mirror) = <class 'str'>; must be of type bool 
-Test # 506: Expected error: type(mirror) = <class 'str'>; must be of type bool 
-Test # 507: Expected error: type(mirror) = <class 'int'>; must be of type bool 
-Test # 508: Expected success.
-Test # 509: Expected success.
-Tests passed: 510. Tests failed: 0.
+Test # 501: Expected error: type(mirror) = <class 'int'>; must be of type bool 
+Test # 502: Expected error: type(mirror) = <class 'int'>; must be of type bool 
+Test # 503: Expected error: type(mirror) = <class 'str'>; must be of type bool 
+Test # 504: Expected error: type(mirror) = <class 'str'>; must be of type bool 
+Test # 505: Expected error: type(mirror) = <class 'int'>; must be of type bool 
+Test # 506: Expected success.
+Test # 507: Expected success.
+Tests passed: 508. Tests failed: 0.
 
 Testing Glyph() parameter zorder ...
-Test # 510: Expected error: type(zorder) = <class 'str'>; must be of type float or int 
+Test # 508: Expected error: type(zorder) = <class 'str'>; must be of type float or int 
+Test # 509: Expected success.
+Test # 510: Expected success.
 Test # 511: Expected success.
 Test # 512: Expected success.
-Test # 513: Expected success.
-Test # 514: Expected success.
-Tests passed: 515. Tests failed: 0.
+Tests passed: 513. Tests failed: 0.
 
 Testing Glyph() parameter alpha ...
-Test # 515: Expected error: alpha must be between 0.0 and 1.0 (inclusive)
-Test # 516: Expected error: alpha must be between 0.0 and 1.0 (inclusive)
-Test # 517: Expected error: type(alpha) = <class 'str'> must be a float or int
+Test # 513: Expected error: alpha must be between 0.0 and 1.0 (inclusive)
+Test # 514: Expected error: alpha must be between 0.0 and 1.0 (inclusive)
+Test # 515: Expected error: type(alpha) = <class 'str'> must be a float or int
+Test # 516: Expected success.
+Test # 517: Expected success.
 Test # 518: Expected success.
-Test # 519: Expected success.
-Test # 520: Expected success.
-Tests passed: 521. Tests failed: 0.
+Tests passed: 519. Tests failed: 0.
 
 Testing Glyph() parameter figsize ...
-Test # 521: Expected error: type(figsize) = <class 'str'>; figsize must be array-like.
+Test # 519: Expected error: type(figsize) = <class 'str'>; figsize must be array-like.
+Test # 520: Expected error: all elements of figsize array must be numbers > 0.
+Test # 521: Expected error: figsize must have length two.
 Test # 522: Expected error: all elements of figsize array must be numbers > 0.
-Test # 523: Expected error: figsize must have length two.
-Test # 524: Expected error: all elements of figsize array must be numbers > 0.
-Test # 525: Expected success.
-Test # 526: Expected success.
-Tests passed: 527. Tests failed: 0.
+Test # 523: Expected success.
+Test # 524: Expected success.
+Tests passed: 525. Tests failed: 0.
+
+Testing get_example_matrix() parameter name ...
+Test # 525: Expected error: Matrix "wrong argument" not recognized. Please choose from: 
+'crp_counts_matrix'
+'ww_counts_matrix'
+'ars_enrichment_matrix'
+'nn_saliency_matrix'
+'ww_information_matrix'
+'ss_probability_matrix'
+'crp_energy_matrix'
+'logomaker_logo_matrix'
+Test # 526: Expected error: Matrix "-1" not recognized. Please choose from: 
+'crp_counts_matrix'
+'ww_counts_matrix'
+'ars_enrichment_matrix'
+'nn_saliency_matrix'
+'ww_information_matrix'
+'ss_probability_matrix'
+'crp_energy_matrix'
+'logomaker_logo_matrix'
+Test # 527: Expected success.
+Test # 528: Expected success.
+Tests passed: 529. Tests failed: 0.
+
+Testing get_example_matrix() parameter print_description ...
+Test # 529: Expected error: type(print_description) = <class 'int'>; must be of type bool 
+Test # 530: Expected error: type(print_description) = <class 'int'>; must be of type bool 
+Test # 531: Expected error: type(print_description) = <class 'str'>; must be of type bool 
+Test # 532: Expected error: type(print_description) = <class 'str'>; must be of type bool 
+Test # 533: Expected error: type(print_description) = <class 'int'>; must be of type bool 
+Test # 534: Expected success.
+Test # 535: Description of example matrix "crp_energy_matrix":
+# 
+# CRP energy matrix from Kinney et al. (2010).
+# Matrix values are in units of kcal/mol.
+# 
+# References
+# 
+# Kinney JB et al. (2010) Using deep sequencing to characterize the
+# biophysical mechanism of a transcriptional regulatory sequence.
+# Proc Natl Acad Sci USA. 107(20):9158–63.
+# 
+
+Expected success.
+Tests passed: 536. Tests failed: 0.
+
+Testing open_example_datafile() parameter name ...
+Test # 536: Expected error: Matrix "wrong argument" not recognized. Please choose from: 
+'ars_sequences.txt.gz'
+'ss_sequences.txt'
+'crp_sites.fa'
+'ars_wt_sequence.txt'
+'nn_saliency_values.txt'
+'ww_sequences.fa'
+Test # 537: Expected error: Matrix "-1" not recognized. Please choose from: 
+'ars_sequences.txt.gz'
+'ss_sequences.txt'
+'crp_sites.fa'
+'ars_wt_sequence.txt'
+'nn_saliency_values.txt'
+'ww_sequences.fa'
+Test # 538: Expected success.
+Test # 539: Expected success.
+Tests passed: 540. Tests failed: 0.
+
+Testing open_example_datafile() parameter print_description ...
+Test # 540: Expected error: type(print_description) = <class 'int'>; must be of type bool 
+Test # 541: Expected error: type(print_description) = <class 'int'>; must be of type bool 
+Test # 542: Expected error: type(print_description) = <class 'str'>; must be of type bool 
+Test # 543: Expected error: type(print_description) = <class 'str'>; must be of type bool 
+Test # 544: Expected error: type(print_description) = <class 'int'>; must be of type bool 
+Test # 545: Expected success.
+Test # 546: Description of example matrix "nn_saliency_values.txt":
+# 
+# Saliency values illustrated in Figure 1F.
+# Data are from Figure 1D of Janganathan et al. (2019),
+# and were kindly provided by Kyle Farh and Kishore Jaganathan.
+# 
+# References:
+# 
+# Jaganathan K et al. (2019) Predicting Splicing from Primary Sequence with
+# Deep Learning. Cell. 176(3):535–548.e24.
+# 
+
+Expected success.
+Tests passed: 547. Tests failed: 0.
 
