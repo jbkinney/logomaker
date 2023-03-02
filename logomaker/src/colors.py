@@ -2,7 +2,6 @@ from __future__ import division
 import numpy as np
 import pandas as pd
 from matplotlib.colors import to_rgb
-import warnings
 from logomaker.src.error_handling import check
 from logomaker.src.matrix import ALPHABET_DICT
 
