@@ -16,9 +16,6 @@ from logomaker.src.error_handling import check, handle_errors
 from logomaker.src.colors import get_rgb
 import numpy as np
 
-# Create global font manager instance. This takes a second or two
-font_manager = FontManager()
-
 # Create global list of valid font weights
 VALID_FONT_WEIGHT_STRINGS = [
     'ultralight', 'light', 'normal', 'regular', 'book',
@@ -41,7 +38,7 @@ def list_font_names():
         List of valid font_name names. This will vary from system to system.
 
     """
-    fontnames_dict = dict([(f.name, f.fname) for f in font_manager.ttflist])
+    fontnames_dict = dict([(f.name, f.fname) for f in matplotlib.font_manager.fontManager.ttflist])
     fontnames = list(fontnames_dict.keys())
     fontnames.append('sans')  # This always exists
     fontnames.sort()
