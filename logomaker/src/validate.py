@@ -69,10 +69,12 @@ def validate_matrix(df, matrix_type=None, allow_nan=False):
               'column %d is %s and has length %d; ' % (i, repr(col), len(col))
               + 'must have length 1.')
 
-    # sort columns alphabetically
-    char_cols = list(out_df.columns)
-    char_cols.sort()
-    out_df = out_df[char_cols]
+    # 2025.01.19 Fix for Issue #36 - Columns should *not* be sorted alphabetically
+    # as this nullifies the 'fixed_order' option in Logo()
+    # # sort columns alphabetically
+    # char_cols = list(out_df.columns)
+    # char_cols.sort()
+    # out_df = out_df[char_cols]
 
     # name out_df.index as 'pos'
     out_df.index.name = 'pos'
