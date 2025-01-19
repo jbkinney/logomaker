@@ -1054,11 +1054,28 @@ class Logo:
         # set xlims
         xmin = min([g.p - .5*g.width for g in self.glyph_list])
         xmax = max([g.p + .5*g.width for g in self.glyph_list])
+
+        # Check for shared x axes and adjust limits accordingly
+        for sibling in self.ax.get_shared_x_axes().get_siblings(self.ax):
+            if sibling != self.ax:
+                sibling_xmin, sibling_xmax = sibling.get_xlim()
+                xmin = min(xmin, sibling_xmin)
+                xmax = max(xmax, sibling_xmax)
+
+        # set xlims 
         self.ax.set_xlim([xmin, xmax])
 
         # set ylims
         ymin = min([g.floor for g in self.glyph_list])
         ymax = max([g.ceiling for g in self.glyph_list])
+        
+        # Check for shared y axes and adjust limits accordingly
+        for sibling in self.ax.get_shared_y_axes().get_siblings(self.ax):
+            if sibling != self.ax:
+                sibling_ymin, sibling_ymax = sibling.get_ylim()
+                ymin = min(ymin, sibling_ymin) 
+                ymax = max(ymax, sibling_ymax)
+        
         self.ax.set_ylim([ymin, ymax])
 
         # style spines if requested
