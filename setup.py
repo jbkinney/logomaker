@@ -1,13 +1,14 @@
 from setuptools import setup
 
 def readme():
-    with open('README.rst') as f:
+    with open('README.md') as f:
         return f.read()
 
 setup(name='logomaker',
       version='0.8.2',
       description='Package for making Sequence Logos',
       long_description=readme(),
+      long_description_content_type='text/markdown',
       classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
