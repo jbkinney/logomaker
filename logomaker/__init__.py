@@ -1,3 +1,6 @@
+# Define the version of the package
+__version__ = '0.9.0'
+
 # Classes / functions imported with logomaker
 from logomaker.src.Logo import Logo
 from logomaker.src.Glyph import Glyph

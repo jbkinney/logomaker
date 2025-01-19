@@ -8,7 +8,7 @@ if sys.version_info[0] == 2:
 from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch
 from matplotlib.transforms import Affine2D, Bbox
-from matplotlib.font_manager import FontManager, FontProperties
+import matplotlib.font_manager as fm
 from matplotlib.colors import to_rgb
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
@@ -16,15 +16,11 @@ from logomaker.src.error_handling import check, handle_errors
 from logomaker.src.colors import get_rgb
 import numpy as np
 
-# Create global font manager instance. This takes a second or two
-font_manager = FontManager()
-
 # Create global list of valid font weights
 VALID_FONT_WEIGHT_STRINGS = [
     'ultralight', 'light', 'normal', 'regular', 'book',
     'medium', 'roman', 'semibold', 'demibold', 'demi',
     'bold', 'heavy', 'extra bold', 'black']
-
 
 def list_font_names():
     """
@@ -41,7 +37,8 @@ def list_font_names():
         List of valid font_name names. This will vary from system to system.
 
     """
-    fontnames_dict = dict([(f.name, f.fname) for f in font_manager.ttflist])
+    
+    fontnames_dict = dict([(f.name, f.fname) for f in fm.fontManager.ttflist])
     fontnames = list(fontnames_dict.keys())
     fontnames.append('sans')  # This always exists
     fontnames.sort()
@@ -251,8 +248,8 @@ class Glyph:
                                 char_height)
 
         # Set font properties of Glyph
-        font_properties = FontProperties(family=self.font_name,
-                                         weight=self.font_weight)
+        font_properties = fm.FontProperties(family=self.font_name,
+                                            weight=self.font_weight)
 
         # Create a path for Glyph that does not yet have the correct
         # position or scaling

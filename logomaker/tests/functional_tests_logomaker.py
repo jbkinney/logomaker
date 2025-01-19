@@ -1,7 +1,8 @@
-from __future__ import print_function   # so that print behaves like python 3.x not a special lambda statement
+
 
 import sys
-sys.path.append('../../')
+#sys.path.append('../../')
+sys.path = ['../'] + sys.path
 
 import logomaker
 
