@@ -110,4 +110,8 @@ venv.bak/
 # idea file
 .idea/
 
+# sandbox
+sandbox/
+
+# ipynb_checkpoints
 .ipynb_checkpoints/
