@@ -8,7 +8,7 @@ if sys.version_info[0] == 2:
 from matplotlib.textpath import TextPath
 from matplotlib.patches import PathPatch
 from matplotlib.transforms import Affine2D, Bbox
-from matplotlib.font_manager import FontManager, FontProperties
+import matplotlib.font_manager as fm
 from matplotlib.colors import to_rgb
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
@@ -38,7 +38,7 @@ def list_font_names():
         List of valid font_name names. This will vary from system to system.
 
     """
-    fontnames_dict = dict([(f.name, f.fname) for f in matplotlib.font_manager.fontManager.ttflist])
+    fontnames_dict = dict([(f.name, f.fname) for f in fm.fontManager.ttflist])
     fontnames = list(fontnames_dict.keys())
     fontnames.append('sans')  # This always exists
     fontnames.sort()
@@ -248,8 +248,8 @@ class Glyph:
                                 char_height)
 
         # Set font properties of Glyph
-        font_properties = FontProperties(family=self.font_name,
-                                         weight=self.font_weight)
+        font_properties = fm.FontProperties(family=self.font_name,
+                                            weight=self.font_weight)
 
         # Create a path for Glyph that does not yet have the correct
         # position or scaling

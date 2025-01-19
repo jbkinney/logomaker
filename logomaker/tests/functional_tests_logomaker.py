@@ -1,7 +1,12 @@
-from __future__ import print_function   # so that print behaves like python 3.x not a special lambda statement
 
+import os
 import sys
-sys.path.append('../../')
+
+# Get the directory of the current file
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Add the parent directory to the system path
+sys.path = [os.path.dirname(current_dir)+'/..'] + sys.path
 
 import logomaker
 
