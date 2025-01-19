@@ -18,7 +18,7 @@ crp_logo.style_spines(spines=['left', 'bottom'], visible=True)
 crp_logo.style_xticks(rotation=90, fmt='%d', anchor=0)
 
 # style using Axes methods
-crp_logo.ax.set_ylabel("$-\Delta \Delta G$ (kcal/mol)", labelpad=-1)
+crp_logo.ax.set_ylabel(r"$-\Delta \Delta G$ (kcal/mol)", labelpad=-1)
 crp_logo.ax.xaxis.set_ticks_position('none')
 crp_logo.ax.xaxis.set_tick_params(pad=-1)
 
