@@ -1,0 +1,8 @@
+include README.rst
+include LICENSE
+recursive-include logomaker/src *
+recursive-include logomaker/data *
+recursive-include logomaker/jupyter_notebooks *
+recursive-include logomaker/tests *
+recursive-include logomaker/examples *
+
