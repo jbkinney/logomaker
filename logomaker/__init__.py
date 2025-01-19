@@ -1,5 +1,5 @@
 # Specify version
-__version__ = '0.8.1'
+__version__ = '0.8.2' #bumped to 0.8.2 on 2025.01.19
 
 # Classes / functions imported with logomaker
 from logomaker.src.Logo import Logo
