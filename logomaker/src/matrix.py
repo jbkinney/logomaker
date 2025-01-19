@@ -265,7 +265,7 @@ def _counts_mat_to_probability_mat(counts_df, pseudocount=1.0):
     check(pseudocount >= 0, "pseudocount must be >= 0.")
 
     # Compute prob_df
-    prob_df = counts_df.copy()
+    prob_df = counts_df.copy().astype(float)  # 25.01.19 Issue #41 - Need to specify float to avoid FutureWarning. 
     vals = counts_df.values + pseudocount
     prob_df.loc[:, :] = vals / vals.sum(axis=1)[:, np.newaxis]
     prob_df = _normalize_matrix(prob_df)
