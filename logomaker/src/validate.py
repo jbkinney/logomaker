@@ -95,13 +95,13 @@ def validate_matrix(df, matrix_type=None, allow_nan=False):
           'not all values of df.index are unique. Make sure all are unique.')
 
     # if type is 'information', make sure elements are nonnegative
-    if matrix_type is 'information':
+    if matrix_type == 'information':
 
         # make sure all elements are nonnegative
         check(all(df.values.ravel() >= 0), 'not all values in df are >=0.')
 
     # if type is 'probability', make sure elements are valid probabilities
-    elif matrix_type is 'probability':
+    elif matrix_type == 'probability':
 
         # make sure all values are non-negative
         check(all(df.values.ravel() >= 0),
