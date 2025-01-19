@@ -1,3 +1,6 @@
+# Specify version
+__version__ = '0.8.1'
+
 # Classes / functions imported with logomaker
 from logomaker.src.Logo import Logo
 from logomaker.src.Glyph import Glyph
@@ -43,7 +46,7 @@ def demo(name='fig1b'):
     all_base_file_names = os.listdir(example_dir)
     example_file_names = ['%s/%s' % (example_dir, temp_name)
                      for temp_name in all_base_file_names
-                     if re.match('demo_.*\.py', temp_name)]
+                     if re.match(r'demo_.*\.py', temp_name)]
     examples_dict = {}
     for file_name in example_file_names:
         key = file_name.split('_')[-1][:-3]
