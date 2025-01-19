@@ -552,6 +552,9 @@ def alignment_to_matrix(sequences,
               'counts must be the same length as sequences;'
               'len(counts) = %d; len(sequences) = %d' %
               (len(counts), len(sequences)))
+        
+    # 2025.01.19 Fix for Issue #25 - Cast counts to numpy array
+    counts = np.array(counts, dtype=int)
 
     # validate background
     check(isinstance(background, (type([]), np.ndarray, pd.DataFrame)) or

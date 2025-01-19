@@ -502,13 +502,12 @@ def test_alignment_to_matrix():
     seqs = [seq.strip() for seq in raw_seqs if ('#' not in seq) and ('>') not in seq]
 
     # test parameter sequences
-    test_parameter_values(func=logomaker.alignment_to_matrix,var_name='sequences',
+    test_parameter_values(func=logomaker.alignment_to_matrix, var_name='sequences',
                           fail_list = [0,'x',['AACCT','AACGATA']], success_list = [seqs,['ACA','GGA']])
 
     # test parameter counts
-    # TODO: need to find a working example for counts other than None
     test_parameter_values(func=logomaker.alignment_to_matrix, var_name='counts',
-                          fail_list=[0, 'x', -1], success_list=[None],sequences=['ACA', 'GGA'])
+                          fail_list=[0, 'x', -1], success_list=[None, [3, 1], np.array([3, 1])], sequences=['ACA', 'GGA'])
 
     # test parameter to_type
     test_parameter_values(func=logomaker.alignment_to_matrix, var_name='to_type',
