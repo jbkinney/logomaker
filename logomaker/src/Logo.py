@@ -1070,7 +1070,8 @@ class Logo:
         Specifies the placement and styling of all glyphs within the logo.
         """
         # Create a dataframe of glyphs
-        glyph_df = pd.DataFrame()
+        # 2025.01.20 Fix for Issue #36 - Define dtype of glyph_df to be object
+        glyph_df = pd.DataFrame(index=self.ps, columns=self.cs, dtype=object)
 
         # For each position
         for p in self.ps:
