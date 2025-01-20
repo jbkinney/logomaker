@@ -21,16 +21,18 @@ sys.path.append('../')
 # -- Project information -----------------------------------------------------
 
 import logomaker
+from datetime import datetime
 
 project = 'logomaker'
 copyright = '2019, Ammar Tareen and Justin B. Kinney'
 author = 'Ammar Tareen and Justin B. Kinney'
 
-# The short X.Y version
-version = '0.8'
-# The full version, including alpha/beta/rc tags
-release = '0.8'
+# Version info
+version = logomaker.__version__  # The short X.Y version
+release = logomaker.__version__  # The full version, including alpha/beta/rc tags
 
+# Build date
+html_last_updated_fmt = '%B %d, %Y'  # Format for the build date
 
 # -- General configuration ---------------------------------------------------
 
@@ -180,3 +182,9 @@ texinfo_documents = [
      author, 'logomaker', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+html_context = {
+    'display_version': True,  # Display version number
+    'current_version': version,
+    'build_date': datetime.now().strftime('%B %d, %Y'),
+}
