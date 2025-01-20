@@ -21,7 +21,6 @@ class Logo:
 
     attributes
     ----------
-
     df: (pd.DataFrame)
         A matrix specifying character heights and positions. Rows correspond
         to positions while columns correspond to characters. Column names
@@ -30,10 +29,10 @@ class Logo:
     color_scheme: (str, dict, or array with length 3)
         Specification of logo colors. Default is 'gray'. Can take a variety of
         forms.
-         - (str) A built-in Logomaker color scheme in which the color of each character is determined by that character's identity. Options for DNA/RNA: 'classic', 'grays', or 'base_paring'. Options for protein: 'hydrophobicity', 'chemistry', or 'charge'.
-         - (str) A built-in matplotlib color name such as 'k' or 'tomato'
-         - (list) An RGB array, i.e., 3 floats with values in the interval [0,1]
-         - (dict) A dictionary that maps characters to colors, E.g., {'A': 'blue', 'C': 'yellow', 'G': 'green', 'T': 'red'}
+        - (str) A built-in Logomaker color scheme in which the color of each character is determined by that character's identity. Options for DNA/RNA: 'classic', 'grays', or 'base_paring'. Options for protein: 'hydrophobicity', 'chemistry', or 'charge'.
+        - (str) A built-in matplotlib color name such as 'k' or 'tomato'
+        - (list) An RGB array, i.e., 3 floats with values in the interval [0,1]
+        - (dict) A dictionary that maps characters to colors, E.g., {'A': 'blue', 'C': 'yellow', 'G': 'green', 'T': 'red'}
 
     font_name: (str)
         The character font to use when rendering the logo. For a list of
@@ -316,29 +315,24 @@ class Logo:
               'all elements of figsize array must be numbers > 0.')
 
     @handle_errors
-    def style_glyphs(self,
-                     color_scheme=None,
-                     **kwargs):
+    def style_glyphs(self, color_scheme=None, **kwargs):
         """
         Modifies the properties of all characters in a Logo.
 
         parameters
         ----------
-
         color_scheme: (str, dict, or array with length 3)
             Specification of logo colors. Default is 'gray'. Can take a variety of
-            forms.
-             - (str) A built-in Logomaker color scheme in which the color of each
-             character is determined that character's identity. Options are,
-                 + For DNA/RNA: 'classic', 'grays', or 'base_paring'.
-                 + For protein: 'hydrophobicity', 'chemistry', or 'charge'.
-             - (str) A built-in matplotlib color name such as 'k' or 'tomato'
-             - (list) An RGB array, i.e., 3 floats with values in the interval [0,1]
-             - (dict) A dictionary that maps characters to colors, E.g.,
-                {'A': 'blue',
-                 'C': 'yellow',
-                 'G': 'green',
-                 'T': 'red'}
+            forms:
+
+            - A built-in Logomaker color scheme in which the color of each
+              character is determined that character's identity. Options are:
+              'classic', 'grays', 'base_paring' for DNA/RNA; 'hydrophobicity',
+              'chemistry', 'charge' for protein.
+            - A built-in matplotlib color name such as 'k' or 'tomato'
+            - An RGB array, i.e., 3 floats with values in the interval [0,1]
+            - A dictionary that maps characters to colors, E.g.,
+              {'A': 'blue', 'C': 'yellow', 'G': 'green', 'T': 'red'}
 
         **kwargs:
             Keyword arguments to pass to Glyph.set_attributes()

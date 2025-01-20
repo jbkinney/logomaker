@@ -18,7 +18,7 @@ from logomaker.src.examples import open_example_datafile
 from logomaker.tests.functional_tests_logomaker import run_tests
 
 # demo functions for logomaker
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as pltx
 import os
 import re
 from logomaker.src.error_handling import check, handle_errors
