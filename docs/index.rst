@@ -13,12 +13,6 @@ Logos are rendered as vector graphics embedded within native matplotlib Axes obj
 The :ref:`installation`, :ref:`quickstart`, :ref:`examples`, and :ref:`tutorial` sections below are provided to help users quickly get Logomaker working for their own research needs.
 For more information about Logomaker, please see Tareen and Kinney (2019) [#Tareen2019]_.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-   reference/index
-
 .. _installation:
 
 Installation

@@ -10,6 +10,7 @@ Logo class
 .. autoclass:: logomaker.Logo
     :members:
 
+
 .. _Glyph_class:
 
 Glyph class
@@ -17,7 +18,6 @@ Glyph class
 
 .. autoclass:: logomaker.Glyph
     :members:
-
 
 
 .. _matrix_functions:
@@ -55,7 +55,6 @@ dataset functions
 .. _demo:
 
 .. autofunction:: logomaker.demo
-   :no-index:
 
 .. _list_example_matrices:
 
