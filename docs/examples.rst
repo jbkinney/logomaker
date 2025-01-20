@@ -303,18 +303,18 @@ The following code creates a figure that illustrates all of Logomaker's built-in
 References
 ----------
 
-.. [#Tareen2019] Tareen A, Kinney JB (2019). Logomaker: beautiful sequence logos in Python. `bioRxiv doi:10.1101/635029. <https://www.biorxiv.org/content/10.1101/635029v1>`_
+.. [#Tareen2019] `Tareen A, Kinney JB (2019). Logomaker: beautiful sequence logos in Python. bioRxiv doi:10.1101/635029. <https://www.biorxiv.org/content/10.1101/635029v1>`_
 
-.. [#sortseq2010] Kinney JB, Murugan A, Callan CG, Cox EC (2010). Using deep sequencing to characterize the biophysical mechanism of a transcriptional regulatory sequence. Proc Natl Acad Sci USA 107:9158-9163. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/20439748>`_
+.. [#sortseq2010] `Kinney JB, Murugan A, Callan CG, Cox EC (2010). Using deep sequencing to characterize the biophysical mechanism of a transcriptional regulatory sequence. Proc Natl Acad Sci USA 107:9158-9163. <https://www.ncbi.nlm.nih.gov/pubmed/20439748>`_
 
-.. [#frankish2019] Frankish A et al. (2019). GENCODE reference annotation for the human and mouse genomes. Nucl Acids Res, 47(D1):D766–D773. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/30357393>`_
+.. [#frankish2019] `Frankish A et al. (2019). GENCODE reference annotation for the human and mouse genomes. Nucl Acids Res, 47(D1):D766–D773. <https://www.ncbi.nlm.nih.gov/pubmed/30357393>`_
 
-.. [#Finn2014] Finn RD, et al. (2014). Pfam: the protein families database. Nucl Acids Res 42(Database issue):D222–30. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/24288371>`_
+.. [#Finn2014] `Finn RD, et al. (2014). Pfam: the protein families database. Nucl Acids Res 42(Database issue):D222–30. <https://www.ncbi.nlm.nih.gov/pubmed/24288371>`_
 
-.. [#Schneider1990] Schneider TD, Stephens RM (1990). Sequence logos: a new way to display consensus sequences. Nucl Acids Res.18(20):6097–100. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/2172928>`_
+.. [#Schneider1990] `Schneider TD, Stephens RM (1990). Sequence logos: a new way to display consensus sequences. Nucl Acids Res.18(20):6097–100. <https://www.ncbi.nlm.nih.gov/pubmed/2172928>`_
 
-.. [#Najafabadi2017] Najafabadi HS, et al. (2017). Non-base-contacting residues enable kaleidoscopic evolution of metazoan C2H2 zinc finger DNA binding. Genome Biol. 18(1):1–15. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/28877740>`_
+.. [#Najafabadi2017] `Najafabadi HS, et al. (2017). Non-base-contacting residues enable kaleidoscopic evolution of metazoan C2H2 zinc finger DNA binding. Genome Biol. 18(1):1–15. <https://www.ncbi.nlm.nih.gov/pubmed/28877740>`_
 
-.. [#Liachko2013] Liachko I et al. (2013). High-resolution mapping, characterization, and optimization of autonomously replicating sequences in yeast. Genome Res, 23(4):698-704. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/23241746>`_
+.. [#Liachko2013] `Liachko I et al. (2013). High-resolution mapping, characterization, and optimization of autonomously replicating sequences in yeast. Genome Res, 23(4):698-704. <https://www.ncbi.nlm.nih.gov/pubmed/23241746>`_
 
-.. [#Jaganathan] Jaganathan K. et al. (2019). Predicting Splicing from Primary Sequence with Deep Learning. Cell, 176(3):535-548.e24. `PubMed. <https://www.ncbi.nlm.nih.gov/pubmed/30661751>`_
+.. [#Jaganathan] `Jaganathan K. et al. (2019). Predicting Splicing from Primary Sequence with Deep Learning. Cell, 176(3):535-548.e24. <https://www.ncbi.nlm.nih.gov/pubmed/30661751>`_

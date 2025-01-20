@@ -3,7 +3,7 @@ Logomaker: beautiful sequence logos in Python
 =============================================
 
 Welcome to Logomaker's documentation!
-===================================
+=====================================
 
 Version: |version| (Built on |today|)
 
@@ -17,6 +17,7 @@ For more information about Logomaker, please see Tareen and Kinney (2019) [#Tare
    :maxdepth: 2
    :caption: Contents:
 
+   reference/index
 
 .. _installation:
 
@@ -46,6 +47,8 @@ DNA binding specificity of CRP, a major transcription factor in *Escherichia col
 
 This command will also print out the code used to generate the logo.
 We note that the logo shown here is from Figure 1B of Tareen and Kinney (2019) [#Tareen2019]_, and that the other logos in Figure 1 can be generated in a similar manner.
+
+.. _tutorial:
 
 Tutorial
 --------

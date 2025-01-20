@@ -55,6 +55,7 @@ dataset functions
 .. _demo:
 
 .. autofunction:: logomaker.demo
+   :no-index:
 
 .. _list_example_matrices:
 
@@ -75,7 +76,7 @@ dataset functions
 functional tests
 ----------------
 
-.. _tests
+.. _tests:
 
 .. autofunction:: logomaker.run_tests
 
