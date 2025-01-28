@@ -1,4 +1,3 @@
-
 import os
 import sys
 
@@ -27,16 +26,14 @@ def test_for_mistake(func, *args, **kw):
     Run a function with the specified parameters and register whether
     success or failure was a mistake
 
-    parameters
+    Parameters
     ----------
-
     func: (function or class constructor)
         An executable function to which *args and **kwargs are passed.
 
-    return
-    ------
-
-    None.
+    Returns
+    -------
+    None
     """
 
     global global_fail_counter
@@ -65,7 +62,7 @@ def test_parameter_values(func,
     Tests predictable success & failure of different values for a
     specified parameter when passed to a specified function
 
-    parameters
+    Parameters
     ----------
 
     func: (function)
@@ -84,8 +81,8 @@ def test_parameter_values(func,
     **kwargs:
         Other keyword variables to pass onto func.
 
-    return
-    ------
+    Returns
+    -------
 
     None.
 
@@ -694,12 +691,12 @@ def run_tests():
     """
     Run all Logomaker functional tests. There are 547 tests as of 14 May 2019.
 
-    parameters
+    Parameters
     ----------
     None.
 
-    return
-    ------
+    Returns
+    -------
     None.
     """
 

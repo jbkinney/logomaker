@@ -8,7 +8,7 @@ from matplotlib.axes import Axes
 
 # Import stuff from logomaker
 from logomaker.src.Glyph import Glyph
-from logomaker.src.validate import validate_matrix
+from logomaker.src.validate import validate_matrix, validate_numeric
 from logomaker.src.error_handling import check, handle_errors
 from logomaker.src.colors import get_color_dict, get_rgb
 from logomaker.src.matrix import transform_matrix
@@ -27,12 +27,12 @@ class Logo:
         must be single characters and row indices must be integers.
 
     color_scheme: (str, dict, or array with length 3)
-        Specification of logo colors. Default is 'gray'. Can take a variety of
-        forms.
-        - (str) A built-in Logomaker color scheme in which the color of each character is determined by that character's identity. Options for DNA/RNA: 'classic', 'grays', or 'base_paring'. Options for protein: 'hydrophobicity', 'chemistry', or 'charge'.
-        - (str) A built-in matplotlib color name such as 'k' or 'tomato'
-        - (list) An RGB array, i.e., 3 floats with values in the interval [0,1]
-        - (dict) A dictionary that maps characters to colors, E.g., {'A': 'blue', 'C': 'yellow', 'G': 'green', 'T': 'red'}
+        Specification of logo colors. Default is 'gray'. Can take several forms:
+        For DNA/RNA, built-in schemes include 'classic', 'grays', or 'base_paring'.
+        For protein, built-in schemes include 'hydrophobicity', 'chemistry', or 'charge'.
+        Can also be a matplotlib color name like 'k' or 'tomato', an RGB array with
+        3 floats in [0,1], or a dictionary mapping characters to colors like
+        {'A': 'blue', 'C': 'yellow', 'G': 'green', 'T': 'red'}.
 
     font_name: (str)
         The character font to use when rendering the logo. For a list of
@@ -88,7 +88,7 @@ class Logo:
         existing opacity values.
 
     show_spines: (None or bool)
-        Whether a box should be drawn around the logo.  For additional
+        Whether a box should be drawn around the logo. For additional
         customization of spines, use Logo.style_spines().
 
     ax: (matplotlib Axes object)
@@ -133,14 +133,14 @@ class Logo:
         self.font_name = font_name
         self.stack_order = stack_order
         self.center_values = center_values
-        self.baseline_width = baseline_width
+        self.baseline_width = validate_numeric(baseline_width, 'baseline_width', min_val=0.0)
         self.flip_below = flip_below
-        self.shade_below = shade_below
-        self.fade_below = fade_below
+        self.shade_below = validate_numeric(shade_below, 'shade_below', min_val=0.0, max_val=1.0)
+        self.fade_below = validate_numeric(fade_below, 'fade_below', min_val=0.0, max_val=1.0)
         self.fade_probabilities = fade_probabilities
-        self.vpad = vpad
-        self.vsep = vsep
-        self.alpha = alpha
+        self.vpad = validate_numeric(vpad, 'vpad', min_val=0.0, max_val=1.0)
+        self.vsep = validate_numeric(vsep, 'vsep', min_val=0.0)
+        self.alpha = validate_numeric(alpha, 'alpha', min_val=0.0, max_val=1.0)
         self.show_spines = show_spines
         self.zorder = zorder
         self.figsize = figsize
@@ -208,8 +208,6 @@ class Logo:
         # validate dataframe
         self.df = validate_matrix(self.df)
 
-        # CANNOT validate color_scheme here; this is done in Logo constructor.
-
         # validate that font_name is a str
         check(isinstance(self.font_name, str),
               'type(font_name) = %s must be of type str' % type(self.font_name))
@@ -225,65 +223,15 @@ class Logo:
               'type(center_values) = %s; must be of type bool.' %
               type(self.center_values))
 
-        # check baseline_width is a number
-        check(isinstance(self.baseline_width, (int, float)),
-              'type(baseline_width) = %s must be of type number' %
-              (type(self.baseline_width)))
-
-        # check baseline_width >= 0.0
-        check(self.baseline_width >= 0.0,
-              'baseline_width = %s must be >= 0.0' % self.baseline_width)
-
         # check that flip_below is boolean
         check(isinstance(self.flip_below, bool),
               'type(flip_below) = %s; must be of type bool ' %
               type(self.flip_below))
 
-        # validate that shade_below is a number
-        check(isinstance(self.shade_below, (float, int)),
-              'type(shade_below) = %s must be of type float' %
-              type(self.shade_below))
-
-        # validate that shade_below is between 0 and 1
-        check(0.0 <= self.shade_below <= 1.0,
-              'shade_below must be between 0 and 1')
-
-        # validate that fade_below is a number
-        check(isinstance(self.fade_below, (float, int)),
-              'type(fade_below) = %s must be of type float' %
-              type(self.fade_below))
-
-        # validate that fade_below is between 0 and 1
-        check(0.0 <= self.fade_below <= 1.0,
-              'fade_below must be between 0 and 1')
-
         # validate that fade_probabilities is boolean
         check(isinstance(self.fade_probabilities, bool),
               'type(fade_probabilities) = %s; must be of type bool '
               % type(self.fade_probabilities))
-
-        # validate that vpad is a number
-        check(isinstance(self.vpad, (float, int)),
-              'type(vpad) = %s must be of type float' % type(self.vpad))
-
-        # validate that vpad is between 0 and 1
-        check(0.0 <= self.vpad <= 1.0, 'vpad must be between 0 and 1')
-
-        # validate that vsep is a number
-        check(isinstance(self.vsep, (float, int)),
-              'type(vsep) = %s; must be of type float or int ' %
-              type(self.vsep))
-
-        # validate that vsep is >= 0
-        check(self.vsep >= 0,
-              "vsep = %d must be greater than 0 " % self.vsep)
-
-        # validate that alpha is a number
-        check(isinstance(self.alpha, (float, int)),
-              'type(alpha) = %s must be of type float' % type(self.alpha))
-
-        # validate that alpha is between 0 and 1
-        check(0.0 <= self.alpha <= 1.0, 'alpha must be between 0 and 1')
 
         # validate show_spines is None or boolean
         check(isinstance(self.show_spines, bool) or (self.show_spines is None),
@@ -296,9 +244,7 @@ class Logo:
               repr(self.ax))
 
         # validate zorder
-        check(isinstance(self.zorder, (float, int)),
-              'type(zorder) = %s; zorder must be a number.' %
-              type(self.zorder))
+        self.zorder = validate_numeric(self.zorder, 'zorder')
 
         # validate that figsize is array=like
         check(isinstance(self.figsize, (tuple, list, np.ndarray)),
@@ -322,17 +268,13 @@ class Logo:
         parameters
         ----------
         color_scheme: (str, dict, or array with length 3)
-            Specification of logo colors. Default is 'gray'. Can take a variety of
-            forms:
-
-            - A built-in Logomaker color scheme in which the color of each
-              character is determined that character's identity. Options are:
-              'classic', 'grays', 'base_paring' for DNA/RNA; 'hydrophobicity',
-              'chemistry', 'charge' for protein.
-            - A built-in matplotlib color name such as 'k' or 'tomato'
-            - An RGB array, i.e., 3 floats with values in the interval [0,1]
-            - A dictionary that maps characters to colors, E.g.,
-              {'A': 'blue', 'C': 'yellow', 'G': 'green', 'T': 'red'}
+            Specification of logo colors. Default is 'gray'. Can take several forms:
+            For DNA/RNA, built-in schemes include 'classic', 'grays', or 
+            'base_paring'. For protein, built-in schemes include 'hydrophobicity',
+            'chemistry', or 'charge'. Can also be a matplotlib color name like 'k'
+            or 'tomato', an RGB array with 3 floats in [0,1], or a dictionary
+            mapping characters to colors like {'A': 'blue', 'C': 'yellow',
+            'G': 'green', 'T': 'red'}.
 
         **kwargs:
             Keyword arguments to pass to Glyph.set_attributes()

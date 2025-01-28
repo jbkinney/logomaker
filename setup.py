@@ -5,7 +5,7 @@ def readme():
         return f.read()
 
 setup(name='logomaker',
-      version='0.8.2',
+      version='0.8.3',
       description='Package for making Sequence Logos',
       long_description=readme(),
       long_description_content_type='text/markdown',

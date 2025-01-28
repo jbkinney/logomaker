@@ -15,6 +15,7 @@ from matplotlib.axes import Axes
 from logomaker.src.error_handling import check, handle_errors
 from logomaker.src.colors import get_rgb
 import numpy as np
+from logomaker.src.validate import validate_numeric
 
 # Create global list of valid font weights
 VALID_FONT_WEIGHT_STRINGS = [
@@ -73,7 +74,7 @@ class Glyph:
     width: (number > 0)
         x-coordinate span of the Glyph.
 
-    vpad: (number in [0,1])
+    vpad: (number in [0,1))
         Amount of whitespace to leave within the Glyph bounding box above
         and below the actual Glyph. Specifically, in a glyph with
         height h = ceiling-floor, a margin of size h*vpad/2 will be left blank
@@ -319,30 +320,20 @@ class Glyph:
         self.ax.add_patch(self.patch)
 
     def _input_checks(self):
-
         """
         check input parameters in the Logo constructor for correctness
         """
-
-        from numbers import Number
         # validate p
-        check(isinstance(int(self.p), (float, int)),
-              'type(p) = %s must be a number' % type(self.p))
+        self.p = validate_numeric(self.p, 'p')
 
         # check c is of type str
         check(isinstance(self.c, str),
               'type(c) = %s; must be of type str ' %
               type(self.c))
 
-        # validate floor
-        check(isinstance(self.floor, (float, int)),
-              'type(floor) = %s must be a number' % type(self.floor))
-        self.floor = float(self.floor)
-
-        # validate ceiling
-        check(isinstance(self.ceiling, (float, int)),
-              'type(ceiling) = %s must be a number' % type(self.ceiling))
-        self.ceiling = float(self.ceiling)
+        # validate floor and ceiling
+        self.floor = validate_numeric(self.floor, 'floor')
+        self.ceiling = validate_numeric(self.ceiling, 'ceiling')
 
         # check floor <= ceiling
         check(self.floor <= self.ceiling,
@@ -354,18 +345,10 @@ class Glyph:
               'ax must be either a matplotlib Axes object or None.')
 
         # validate width
-        check(isinstance(self.width, (float, int)),
-              'type(width) = %s; must be of type float or int ' %
-              type(self.width))
-        check(self.width > 0, "width = %d must be > 0 " %
-              self.width)
+        self.width = validate_numeric(self.width, 'width', min_val=0.0)
 
         # validate vpad
-        check(isinstance(self.vpad, (float, int)),
-              'type(vpad) = %s; must be of type float or int ' %
-              type(self.vpad))
-        check(0 <=self.vpad <1, "vpad = %d must be >= 0 and < 1 " %
-              self.vpad)
+        self.vpad = validate_numeric(self.vpad, 'vpad', min_val=0.0, max_val=1.0, min_inclusive=True, max_inclusive=False)
 
         # validate font_name
         check(isinstance(self.font_name, str),
@@ -389,13 +372,7 @@ class Glyph:
         self.edgecolor = get_rgb(self.edgecolor)
 
         # Check that edgewidth is a number
-        check(isinstance(self.edgewidth, (float, int)),
-              'type(edgewidth) = %s must be a number' % type(self.edgewidth))
-        self.edgewidth = float(self.edgewidth)
-
-        # Check that edgewidth is nonnegative
-        check(self.edgewidth >= 0,
-              ' edgewidth must be >= 0; is %f' % self.edgewidth)
+        self.edgewidth = validate_numeric(self.edgewidth, 'edgewidth', min_val=0.0)
 
         # check dont_stretch_more_than is of type str
         check(isinstance(self.dont_stretch_more_than, str),
@@ -419,20 +396,11 @@ class Glyph:
         self.mirror = bool(self.mirror)
 
         # validate zorder
-        if self.zorder is not None :
-            check(isinstance(self.zorder, (float, int)),
-                  'type(zorder) = %s; must be of type float or int ' %
-                  type(self.zorder))
+        if self.zorder is not None:
+            self.zorder = validate_numeric(self.zorder, 'zorder')
 
         # Check alpha is a number
-        check(isinstance(self.alpha, (float, int)),
-              'type(alpha) = %s must be a float or int' %
-              type(self.alpha))
-        self.alpha = float(self.alpha)
-
-        # Check 0 <= alpha <= 1.0
-        check(0 <= self.alpha <= 1.0,
-              'alpha must be between 0.0 and 1.0 (inclusive)')
+        self.alpha = validate_numeric(self.alpha, 'alpha', min_val=0.0, max_val=1.0)
 
         # validate that figsize is array=like
         check(isinstance(self.figsize, (tuple, list, np.ndarray)),

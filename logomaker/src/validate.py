@@ -174,3 +174,58 @@ def validate_probability_mat(df):
 
     # Return validated probability matrix to user
     return prob_df
+
+
+@handle_errors
+def validate_numeric(value, name, min_val=None, max_val=None, allow_none=False,
+                     min_inclusive=True, max_inclusive=True):
+    """Validate numeric parameters with optional range checking
+    
+    Parameters
+    ----------
+    value : object
+        Value to validate
+    name : str
+        Parameter name for error messages
+    min_val : float, optional
+        Minimum allowed value
+    max_val : float, optional 
+        Maximum allowed value
+    allow_none : bool, optional
+        Whether to allow None as a valid value
+    min_inclusive : bool, optional
+        Whether minimum bound is inclusive (default True)
+    max_inclusive : bool, optional
+        Whether maximum bound is inclusive (default True)
+        
+    Returns
+    -------
+    float
+        Validated numeric value
+    """
+    if allow_none and value is None:
+        return None
+        
+    check(isinstance(value, (int, float, np.number)),
+          f'type({name}) = {type(value)}; must be numeric')
+    
+    value_float = float(value)
+    
+    if min_val is not None:
+        if min_inclusive:
+            check(value_float >= min_val,
+                  f'{name} = {value} must be >= {min_val}')
+        else:
+            check(value_float > min_val,
+                  f'{name} = {value} must be > {min_val}')
+              
+    if max_val is not None:
+        if max_inclusive:
+            check(value_float <= max_val,
+                  f'{name} = {value} must be <= {max_val}')
+        else:
+            check(value_float < max_val,
+                  f'{name} = {value} must be < {max_val}')
+              
+    return value_float
+

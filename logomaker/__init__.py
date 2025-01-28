@@ -1,5 +1,5 @@
 # Specify version
-__version__ = '0.8.2' #bumped to 0.8.2 on 2025.01.19
+__version__ = '0.8.3' #bumped to 0.8.3 on 2025.01.28
 
 # Classes / functions imported with logomaker
 from logomaker.src.Logo import Logo
@@ -18,27 +18,25 @@ from logomaker.src.examples import open_example_datafile
 from logomaker.tests.functional_tests_logomaker import run_tests
 
 # demo functions for logomaker
-import matplotlib.pyplot as pltx
+import matplotlib.pyplot as plt
 import os
 import re
 from logomaker.src.error_handling import check, handle_errors
 
 @handle_errors
 def demo(name='fig1b'):
-
     """
     Performs a demonstration of the Logomaker software.
 
-    parameters
-    -----------
-
+    Parameters
+    ----------
     name: (str)
         Must be one of {'fig1b', 'fig1c', 'fig1d', 'fig1e', 'fig1f', 'logo'}.
 
-    returns
+    Returns
     -------
-    None.
-
+    matplotlib.figure.Figure
+        The current matplotlib Figure object.
     """
 
     # build list of demo names and corresponding file names
