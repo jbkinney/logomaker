@@ -51,17 +51,11 @@ jobs:
         echo "github.event_name = ${{ github.event_name }}"
         echo "github.sha = ${{ github.sha }}"
         echo "github.base_ref = ${{ github.base_ref }}"
+        echo "github.ref = ${{ github.ref }}"
     
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Get all history for branch checking
-        
-    - name: Check if on master
-      run: |
-        if [[ "$(git branch --contains ${{ github.sha }}) " != *" master "* ]]; then
-          echo "Not on master branch"
-          exit 1
-        fi
     
     - name: Set up Python
       uses: actions/setup-python@v4
