@@ -729,9 +729,9 @@ def run_tests():
     #test_demo()
     test_logomaker_get_data_methods()
     
-    # Trigger artificial failture for Python 3.8, just for testing purposes.
-    if sys.version_info.major == 3 and sys.version_info.minor < 9:
-        global_fail_counter += 1
+    # # Trigger artificial failture for Python 3.8, just for testing purposes.
+    # if sys.version_info.major == 3 and sys.version_info.minor < 9:
+    #     global_fail_counter += 1
     
     if global_fail_counter > 0:
         raise LogomakerError(f'{global_fail_counter} tests failed. See above for details.')
