@@ -1,8 +1,10 @@
 name: Build, Test and Publish
 
 on:
-  push:  # Run on all pushes
-  pull_request:  # Run on all PRs
+  push:
+    tags:
+      - 'v*'  # version tags for PyPI
+      - 'test*'  # test tags for TestPyPI
 
 jobs:
   test:
@@ -51,7 +53,8 @@ jobs:
         echo "github.event_name = ${{ github.event_name }}"
         echo "github.sha = ${{ github.sha }}"
         echo "github.base_ref = ${{ github.base_ref }}"
-        echo "github.ref = ${{ github.ref }}"
+        echo "github.ref_type = ${{ github.ref_type }}"
+        echo "github.ref_name = ${{ github.ref_name }}"
     
     - uses: actions/checkout@v4
       with:
@@ -71,14 +74,16 @@ jobs:
       run: python -m build
     
     - name: Publish to PyPI
-      if: github.ref == 'refs/heads/master' && startsWith(github.ref, 'refs/tags/v')
+      # Only publish to PyPI when a v* tag is pushed on the master branch
+      if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
       run: twine upload dist/*
       
     - name: Publish to TestPyPI
-      if: startsWith(github.ref, 'refs/tags/test')
+      # Only publish to TestPyPI when a test* tag is pushed
+      if: github.ref_type == 'tag' && startsWith(github.ref_name, 'test')
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
