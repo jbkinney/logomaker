@@ -90,4 +90,24 @@ jobs:
         TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
       run: twine upload dist/*
 
+  set-rtd-default:
+    name: Set ReadTheDocs Default Version
+    needs: [publish]
+    runs-on: ubuntu-latest
+    # Only run for PyPI releases (v* tags)
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    
+    steps:
+    - name: Wait for ReadTheDocs build
+      # Give RTD some time to detect the new tag and start building
+      run: sleep 60
+      
+    - name: Set RTD Default Version
+      run: |
+        curl -X PATCH \
+          -H "Authorization: Token ${{ secrets.RTD_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{"default_version": "latest"}' \
+          https://readthedocs.org/api/v3/projects/logomaker/
+
       

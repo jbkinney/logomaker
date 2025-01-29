@@ -123,8 +123,8 @@ html_theme = 'sphinx_rtd_theme'
 # html_theme_options = {}
 
 html_theme_options = {
-    'canonical_url': 'https://logomaker.readthedocs.io',
-    #'analytics_id': 'UA-XXXXXXX-1',  #  Provided by Google in your dashboard
+    'display_version': True,
+    'canonical_url': 'https://logomaker.readthedocs.io/en/latest/',
     'logo_only': True,
     'prev_next_buttons_location': 'none', #'bottom',
     'style_external_links': False,
@@ -217,7 +217,7 @@ texinfo_documents = [
 ]
 
 html_context = {
-    'display_version': True,  # Display version number
+    'display_version': True,
     'current_version': version,
     'build_date': datetime.now().strftime('%B %d, %Y'),
 }
