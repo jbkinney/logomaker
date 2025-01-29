@@ -23,7 +23,7 @@ from logomaker.src.examples import (
     list_example_datafiles,
     open_example_datafile
 )
-from logomaker.src.error_handling import check, handle_errors
+from logomaker.src.error_handling import check, handle_errors, LogomakerError
 from logomaker.tests.functional_tests_logomaker import run_tests
 
 @handle_errors

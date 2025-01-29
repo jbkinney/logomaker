@@ -8,6 +8,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path = [os.path.dirname(current_dir)+'/..'] + sys.path
 
 import logomaker
+from logomaker import LogomakerError
 
 import numpy as np
 import pandas as pd
@@ -700,6 +701,9 @@ def run_tests():
     None.
     """
 
+    global global_fail_counter
+    global global_success_counter
+    
     # run tests for the Logo class and it's helper methods
     test_Logo()
     test_Logo_style_glyphs()
@@ -724,6 +728,15 @@ def run_tests():
 
     #test_demo()
     test_logomaker_get_data_methods()
+    
+    # Trigger artificial failture for Python 3.8, just for testing purposes.
+    if sys.version_info.major == 3 and sys.version_info.minor < 9:
+        global_fail_counter += 1
+    
+    if global_fail_counter > 0:
+        raise LogomakerError(f'{global_fail_counter} tests failed. See above for details.')
+    else:
+        print('All tests passed')
 
 if __name__ == '__main__':
     run_tests()
