@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    # This will run the tests for each Python version
     name: Run Python Tests
     runs-on: ubuntu-latest
     strategy:
@@ -37,11 +38,28 @@ jobs:
       run: |
         python -c "import logomaker; logomaker.run_tests()"
 
-  publish:
-    name: Build and Publish
+  create-release:
+    # This will create a release on GitHub, automatically triggering a build on ReadTheDocs via a webhook
+    name: Create GitHub Release
     needs: [test]
     runs-on: ubuntu-latest
-    # Run publish job it's a tag push starting with v or test
+    steps:
+    - uses: actions/checkout@v4
+    - name: Create GitHub Release
+      if: github.ref_type == 'tag'
+      uses: softprops/action-gh-release@v1
+      with:
+        generate_release_notes: true
+        name: Release ${{ github.ref_name }}
+        prerelease: ${{ startsWith(github.ref_name, 'test') }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    name: Build and Publish
+    needs: [test, create-release]
+    runs-on: ubuntu-latest
+    # Run publish job if it's a tag push starting with v or test
     # Use v* tags (e.g., v1.0.0) for PyPI releases (must be on master branch)
     # Use test* tags (e.g., test1.0.0) for TestPyPI releases
     # if: (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/test'))
@@ -90,24 +108,5 @@ jobs:
         TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
       run: twine upload dist/*
 
-  set-rtd-default:
-    name: Set ReadTheDocs Default Version
-    needs: [publish]
-    runs-on: ubuntu-latest
-    # Only run for PyPI releases (v* tags)
-    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
-    
-    steps:
-    - name: Wait for ReadTheDocs build
-      # Give RTD some time to detect the new tag and start building
-      run: sleep 60
-      
-    - name: Set RTD Default Version
-      run: |
-        curl -X PATCH \
-          -H "Authorization: Token ${{ secrets.RTD_API_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          -d '{"default_version": "latest"}' \
-          https://readthedocs.org/api/v3/projects/logomaker/
 
       
