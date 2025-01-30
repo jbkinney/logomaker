@@ -36,3 +36,14 @@ include = [
     "logomaker/tests/*",
     "logomaker/examples/*"
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["logomaker"]
+
+[tool.hatch.build.targets.sdist]
+packages = ["logomaker"]
+include = [
+    "/logomaker",
+    "LICENSE",
+    "README.md"
+]

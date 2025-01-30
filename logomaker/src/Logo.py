@@ -7,11 +7,11 @@ from matplotlib.patches import Rectangle
 from matplotlib.axes import Axes
 
 # Import stuff from logomaker
-from logomaker.src.Glyph import Glyph
-from logomaker.src.validate import validate_matrix, validate_numeric
-from logomaker.src.error_handling import check, handle_errors
-from logomaker.src.colors import get_color_dict, get_rgb
-from logomaker.src.matrix import transform_matrix
+from ..src.Glyph import Glyph
+from ..src.validate import validate_matrix, validate_numeric
+from ..src.error_handling import check, handle_errors
+from ..src.colors import get_color_dict, get_rgb
+from ..src.matrix import transform_matrix
 
 
 class Logo:

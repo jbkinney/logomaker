@@ -1,18 +1,8 @@
-import os
-import sys
-
-# Get the directory of the current file
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Add the parent directory to the system path
-sys.path = [os.path.dirname(current_dir)+'/..'] + sys.path
-
-import logomaker
-from logomaker import LogomakerError
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import logomaker
+from logomaker.src.error_handling import LogomakerError
 
 global_success_counter = 0
 global_fail_counter = 0

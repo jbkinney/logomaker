@@ -1,6 +1,6 @@
 # do imports
 import matplotlib.pyplot as plt
-import logomaker as logomaker
+import logomaker  # Use the installed package instead of relative import
 
 # make Figure and Axes objects
 fig, ax = plt.subplots(1,1,figsize=[4,2])

@@ -7,24 +7,24 @@ import re
 import matplotlib.pyplot as plt
 
 # Local imports
-from logomaker.src.Logo import Logo
-from logomaker.src.Glyph import Glyph, list_font_names
-from logomaker.src.matrix import (
+from .src.Logo import Logo
+from .src.Glyph import Glyph, list_font_names
+from .src.matrix import (
     transform_matrix,
     sequence_to_matrix,
     alignment_to_matrix,
     saliency_to_matrix,
     validate_matrix
 )
-from logomaker.src.colors import list_color_schemes
-from logomaker.src.examples import (
+from .src.colors import list_color_schemes
+from .src.examples import (
     list_example_matrices,
     get_example_matrix,
     list_example_datafiles,
     open_example_datafile
 )
-from logomaker.src.error_handling import check, handle_errors, LogomakerError
-from logomaker.tests.functional_tests_logomaker import run_tests
+from .src.error_handling import check, handle_errors, LogomakerError
+from .tests.functional_tests_logomaker import run_tests
 
 @handle_errors
 def demo(name: str = 'fig1b') -> plt.Figure:
