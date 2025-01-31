@@ -18,7 +18,7 @@ For more information about Logomaker, please see Tareen and Kinney (2019) [#Tare
 Installation
 --------------
 
-Logomaker has minimal dependencies and is compatible with both Python 2.7 and Python 3.6.
+Logomaker has minimal dependencies and is compatible with Python 3.8 and later.
 The code for Logomaker is available on `GitHub <https://github.com/jbkinney/logomaker>`_ under an MIT open source license.
 Logomaker can be installed from `PyPI <https://pypi.org/project/logomaker/>`_ using the ``pip`` package manager by executing the following at the commandline: ::
 
