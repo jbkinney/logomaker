@@ -1,0 +1,66 @@
+name: Daily Tests
+
+on:
+  schedule:
+    - cron: '0 6 * * *' #Runs workflow at 06:00 UTC every day
+  workflow_dispatch:  # Also allow manual triggering
+
+jobs:
+  test:
+  # This will run the tests for each Python version
+    name: Run Python Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+        os: [ubuntu-latest, windows-latest, macos-latest]
+      fail-fast: false  # Continue testing other versions if one fails
+
+    steps:
+      - name: Checkout specific version
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pytest hatch
+
+      - name: Configure matplotlib backend
+        run: |
+          mkdir -p $HOME/.config/matplotlib
+          echo "backend: Agg" > $HOME/.config/matplotlib/matplotlibrc
+
+      - name: Test build
+        run: |
+          pip install build
+          python -m build
+          ls -l dist/
+
+      - name: Run tests
+        run: |
+          pip install -i https://test.pypi.org/simple/ logomaker-acordero
+          python -c "import logomaker; logomaker.run_tests()"
+  notify:
+    name: Send email notification
+    needs: test
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}
+
+    steps:
+      - name: Send email
+        uses: dawidd6/action-send-mail@v4
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: Logomaker - Daily Tests
+          body: At least one of the in the "Daily Tests" workflow has failed. Please check the logs for more details at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          to: ${{ secrets.MAIL_RECIPIENT }}
+          from: GitHub Actions
