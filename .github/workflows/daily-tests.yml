@@ -44,7 +44,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pip install -i https://test.pypi.org/simple/ logomaker-acordero
+          pip install logomaker
           python -c "import logomaker; logomaker.run_tests()"
   notify:
     name: Send email notification
