@@ -1,19 +1,22 @@
-name: Build, Test and Publish
+
+name: Publish logomaker to PyPI and TestPyPI
 
 on:
   push:
     tags:
       - 'v*'  # version tags for PyPI
       - 'test*'  # test tags for TestPyPI
-
+            
+      
 jobs:
   test:
     # This will run the tests for each Python version
     name: Run Python Tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
     - uses: actions/checkout@v4
@@ -36,34 +39,19 @@ jobs:
 
     - name: Run tests
       run: |
+        pip install -i https://test.pypi.org/simple/ logomaker-acordero
         python -c "import logomaker; logomaker.run_tests()"
 
-  create-release:
-    # This will create a release on GitHub, automatically triggering a build on ReadTheDocs via a webhook
-    name: Create GitHub Release
+  
+        
+  build:
+    name: Build
     needs: [test]
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Create GitHub Release
-      if: github.ref_type == 'tag'
-      uses: softprops/action-gh-release@v1
-      with:
-        generate_release_notes: true
-        name: Release ${{ github.ref_name }}
-        prerelease: ${{ startsWith(github.ref_name, 'test') }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
 
-  publish:
-    name: Build and Publish
-    needs: [test, create-release]
-    runs-on: ubuntu-latest
-    # Run publish job if it's a tag push starting with v or test
-    # Use v* tags (e.g., v1.0.0) for PyPI releases (must be on master branch)
-    # Use test* tags (e.g., test1.0.0) for TestPyPI releases
-    # if: (startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/test'))
-    
     steps:
     - name: Debug
       run: |
@@ -73,11 +61,12 @@ jobs:
         echo "github.base_ref = ${{ github.base_ref }}"
         echo "github.ref_type = ${{ github.ref_type }}"
         echo "github.ref_name = ${{ github.ref_name }}"
-    
+        
     - uses: actions/checkout@v4
       with:
+        persist-credentials: false
         fetch-depth: 0  # Get all history for branch checking
-    
+        
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -87,26 +76,121 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install build twine hatch
-    
+        
     - name: Build package
       run: python -m build
-    
-    - name: Publish to PyPI
-      # Only publish to PyPI when a v* tag is pushed on the master branch
-      if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-      run: twine upload dist/*
       
-    - name: Publish to TestPyPI
-      # Only publish to TestPyPI when a test* tag is pushed
+    - name: Store the distribution packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-package-distributions-${{ matrix.python-version }}
+        path: dist/
+
+  publish-to-pypi:
+    name: >-
+      Publish to PyPI
+
+    needs:
+      - build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/logomaker
+
+    permissions:
+      id-token: write # needed for trusted publishing
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          pattern: python-package-distributions-*
+          merge-multiple: true
+          path: dist/
+      - name: Publish dist to PyPI
+        if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+
+
+  publish-to-testpypi:
+    name: Publish to TestPyPI
+    needs:
+    - build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/logomaker
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
+      with:
+        pattern: python-package-distributions-*
+        merge-multiple: true
+        path: dist/
+    - name: Publish dist to TestPyPI
       if: github.ref_type == 'tag' && startsWith(github.ref_name, 'test')
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
-      run: twine upload dist/*
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
 
 
-      
+  github-release:
+    name: >-
+      Sign the distribution with Sigstore
+      and upload them to GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - publish-to-pypi
+      - publish-to-testpypi
+    if: >-
+      always() && 
+      (needs.publish-to-pypi.result == 'success' || needs.publish-to-testpypi.result == 'success')
+
+    permissions:
+      contents: write  # mandatory for making GitHub Releases
+      id-token: write  # mandatory for sigstore
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          pattern: python-package-distributions-*
+          merge-multiple: true
+          path: dist/
+      - name: Sign the dists with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v3.0.0
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create
+          "$GITHUB_REF_NAME"
+          --repo "$GITHUB_REPOSITORY"
+          --notes ""
+      - name: Upload artifact signatures to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        # Upload to GitHub Release using the `gh` CLI.
+        # `dist/` contains the built packages, and the
+        # sigstore-produced signatures and certificates.
+        run: >-
+          gh release upload
+          "$GITHUB_REF_NAME" dist/**
+          --repo "$GITHUB_REPOSITORY"
+          
+
+
+
+
+  
