@@ -55,7 +55,7 @@ def check(condition: bool, message: str, warn: bool = None):
     if not condition:
         Error = LogomakerError(message)
         if warn:
-            warnings.warn(Error)
+            warnings.warn(str(Error))
         else:
             raise Error
 
