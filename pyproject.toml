@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "logomaker"
-version = "0.8.6"
+version = "0.8.7"
 description = "Package for making Sequence Logos"
 readme = "README.md"
 requires-python = ">=3.8"
