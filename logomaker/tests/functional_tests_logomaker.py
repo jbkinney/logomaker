@@ -117,19 +117,25 @@ def test_Logo():
     # df inputs that successfully execute when entered into Logo.
     good_crp_df = logomaker.get_example_matrix('crp_energy_matrix', print_description=False)
     good_prob_df = logomaker.get_example_matrix('ss_probability_matrix', print_description=False)
+    color_dict_warning_df = pd.DataFrame({'*': [1, 2]})
     random_df = pd.DataFrame(np.random.randint(0, 3, size=(10, 4)), columns=list('ACGT'))
+
 
     # df inputs that fail when entered into Logo.
     bad_df1 = 'x'
 
     # test parameter df
     test_parameter_values(func=logomaker.Logo, var_name='df',fail_list=[bool_fail_list,bad_df1],
-                          success_list=[good_crp_df,random_df])
+                          success_list=[good_crp_df,random_df, color_dict_warning_df])
 
     # test parameter colors
     test_parameter_values(func=logomaker.Logo, var_name='color_scheme', fail_list=['x','bad_color_name',3],
                           success_list=['classic', 'grays', 'charge','salmon'],
                           df=good_crp_df)
+
+    test_parameter_values(func=logomaker.Logo, var_name='color_scheme', fail_list=['x', 'bad_color_name', 3],
+                          success_list = ['classic', 'grays', 'charge', 'salmon'],
+                          df = color_dict_warning_df)
 
     # test parameter font names
     test_parameter_values(func=logomaker.Logo, var_name='font_name', fail_list=[True, None, good_crp_df],
