@@ -39,7 +39,8 @@ jobs:
 
     - name: Run tests
       run: |
-        python -c "import logomaker; logomaker.run_tests()"
+        python -c "import logomaker"
+        pytest -v logomaker/tests/functional_tests_logomaker.py
 
   
         

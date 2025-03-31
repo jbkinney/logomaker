@@ -24,7 +24,6 @@ from .src.examples import (
     open_example_datafile
 )
 from .src.error_handling import check, handle_errors, LogomakerError
-from .tests.functional_tests_logomaker import run_tests
 
 @handle_errors
 def demo(name: str = 'fig1b') -> plt.Figure:
