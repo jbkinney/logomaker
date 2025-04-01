@@ -29,7 +29,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e .
-          pip install pytest hatch
+          pip install pytest pytest-cov hatch
 
       - name: Configure matplotlib backend
         run: |
@@ -46,7 +46,7 @@ jobs:
         run: |
           pip install logomaker
           python -c "import logomaker"
-          pytest -v logomaker/tests/functional_tests_logomaker.py
+          pytest -v --cov-report term-missing --cov=logomaker
   notify:
     name: Send email notification
     needs: test

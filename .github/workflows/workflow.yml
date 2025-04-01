@@ -30,7 +30,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install .
-        pip install pytest hatch
+        pip install pytest pytest-cov hatch
 
     - name: Configure matplotlib backend
       run: |
@@ -40,7 +40,7 @@ jobs:
     - name: Run tests
       run: |
         python -c "import logomaker"
-        pytest -v logomaker/tests/functional_tests_logomaker.py
+        pytest -v --cov-report term-missing --cov=logomaker
 
   
         
