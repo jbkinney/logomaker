@@ -30,7 +30,7 @@ def get_Logo_tests():
     """
     return [ 
         # test parameter df
-        (logomaker.Logo, 'df', 0, True, {}),
+        (logomaker.Logo, 'df', 0, False, {}), #Changed 26.01.06 to test github actions notifications
         (logomaker.Logo, 'df', -1, True, {}),
         (logomaker.Logo, 'df', 'True', True, {}),
         (logomaker.Logo, 'df', 'x', True, {}),
