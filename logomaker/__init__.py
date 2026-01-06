@@ -1,5 +1,5 @@
 # Specify version
-__version__ = '0.8.7'  # Updated 2025.01.30
+__version__ = '0.10.2'  # Updated 2025.04.01
 
 # Standard library imports
 import os
