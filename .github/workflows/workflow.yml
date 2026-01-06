@@ -34,14 +34,16 @@ jobs:
 
     - name: Configure matplotlib backend
       run: |
-        mkdir -p $HOME/.config/matplotlib
-        echo "backend: Agg" > $HOME/.config/matplotlib/matplotlibrc
+        python -c "import matplotlib; matplotlib.use('Agg')"
+      env:
+        MPLBACKEND: Agg
 
     - name: Run tests
       run: |
-        python -c "import logomaker"
+        python -c "import matplotlib; matplotlib.use('Agg'); import logomaker"
         pytest -v --cov-report term-missing --cov=logomaker
-
+      env:
+        MPLBACKEND: Agg
   
         
   build:
